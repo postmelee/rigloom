@@ -1,6 +1,6 @@
 # Dependency, research and asset ledger
 
-Rigloom source: MIT, copyright 2026 postmelee. Pin direct dependency versions in manifests and all resolved code in Cargo.lock/package-lock.json. dependencies.json records the resolved Cargo and installed npm package license declarations; package license text remains authoritative. Optional platform packages are additionally pinned by package-lock.json.
+Rigloom source: MIT, copyright 2026 Taegyu Lee (see LICENSE). Pin direct dependency versions in manifests and all resolved code in Cargo.lock/package-lock.json. dependencies.json records the resolved Cargo and installed npm package license declarations; package license text remains authoritative. Optional platform packages are additionally pinned by package-lock.json.
 
 | Direct code/tool | Version | Declared license | Use |
 |---|---|---|---|

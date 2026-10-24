@@ -16,6 +16,6 @@ Execution: #1 and initial #2 audit → #3 inspection → #4 semantic mapping and
 
 First implementation boundary: read-only GLB inspection, one Worker, Three.js static preview and JSON inspection report. No editable-project or VRM export claim. Future engine types should use stable node indices/semantic joints and source revisions, never Three.js object names. Major reorderings require an ADR or issue evidence.
 
-First session implementation: #3 is implemented and locally verified in a review branch; see validation.md and handoff.md. #4–#12 remain implementation/research work, and neither M1 nor M2 is complete.
+First implementation: #3 was verified and merged through PR #14 (`4e1e11cda89518281c16facf5ecc2a098de6c8d5`); see validation.md and handoff.md. #4–#12 remain implementation/research work, and neither M1 nor M2 is complete.
 
-Owner checkpoint (2026-10-24): review and merge #13 then #14 only. Do not begin #4 or later implementation until the owner gives a new explicit approval. This takes precedence over the execution sequence above.
+Owner checkpoint (2026-10-25): restore the documentation and working rules before #17/#18, tracked in #19. Do not begin #4 or later product implementation until the owner gives a new explicit approval. Release/deployment remain unapproved. This takes precedence over the execution sequence above.
