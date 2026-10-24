@@ -1,40 +1,25 @@
 # Rigloom
 
-[한국어](README.ko.md) · [User guide](docs/guide/en.md) · [Roadmap](docs/plan.md)
+브라우저에서 휴머노이드 모델을 검사하고 리깅을 준비하는 도구입니다. Rust, WebAssembly, Three.js로 만들며, 장기적으로 관절 배치·스키닝·보정을 거쳐 VRM 1.0으로 내보내는 작업을 목표로 합니다.
 
-An independent browser tool for preparing humanoid characters with Rust, WebAssembly and Three.js. Planned workflow: **GLB → inspect or place joints → skin → preview and correct → VRM 1.0**.
+현재는 **읽기 전용 GLB 검사, 3D 정적 미리보기, 검사 보고서 저장**을 사용할 수 있습니다. 휴머노이드 매핑, 관절 편집, 가중치 생성, 프로젝트 저장·복원, VRM 출력은 아직 구현하지 않았습니다. 공개 서비스와 릴리스는 없으며 로컬에서 실행합니다.
 
-**Status: early development, not released or deployed.** The first implementation PR provides read-only GLB inspection and a 3D preview. Humanoid mapping, joint dragging, automatic weights, project save/restore and VRM export are not implemented. M2 semi-automatic rigging is the core MVP; M1 is only a prerequisite.
+## 시작하기
 
-Initial product scope is a self-contained glTF 2.0 GLB containing one character, possibly multiple meshes, with an existing rig or an unrigged T/A-pose surface. The current inspector is narrower: one scene, dense triangle geometry, embedded BIN/resources, core glTF materials, no extensions or URI resources (including data URIs). It inventories skins but does not certify weight/bind correctness. See the [supported formats and troubleshooting guide](docs/guide/en.md).
+[로컬 실행 환경을 준비](docs/how-to/local-development.md)한 뒤 [처음 GLB 검사하기](docs/tutorials/first-inspection.md)를 따라 해 보세요. 직접 생성한 작은 예제로 검사 결과와 화면 조작을 익힐 수 있습니다.
 
-## Local development
+| 하고 싶은 일 | 읽을 문서 |
+|---|---|
+| 문서 전체에서 필요한 내용 찾기 | [문서 안내](docs/README.md) |
+| 내 파일을 사용할 수 있는지 확인하기 | [지원 입력과 제한](docs/reference/supported-inputs.md) |
+| 파일을 열지 못하는 문제 해결하기 | [검사 문제 해결](docs/how-to/troubleshoot-inspection.md) |
+| 내려받은 JSON 이해하기 | [검사 보고서 참조](docs/reference/inspection-report.md) |
+| 파일 처리 방식 이해하기 | [검사와 미리보기의 역할](docs/explanation/processing-model.md) |
 
-Requires Rust 1.94.1, Node 24.15.0, npm 11.12.1 and wasm-pack 0.15.0. Dependencies and lockfiles are pinned. Install Rust's wasm32-unknown-unknown target first.
+## 기여하기
 
-```sh
-rustup target add wasm32-unknown-unknown
-cargo install wasm-pack --version 0.15.0 --locked
-npm ci
-npm run build
-npm run dev
-```
+제품의 목표와 설계 기준은 [specs](specs/README.md), 개발·검증 방법은 [로컬 개발](docs/how-to/local-development.md)과 [검증 방법](docs/how-to/verification.md)에 있습니다. 실행할 작업은 [GitHub 이슈](https://github.com/postmelee/rigloom/issues)에서 확인하고, 저장소 작업 절차는 [AGENTS.md](AGENTS.md)와 [작업 기록 안내](mydocs/README.md)를 따릅니다.
 
-Open the localhost URL printed by Vite. `npm run fixtures` creates original tiny test GLBs in ignored `.local/fixtures/`. They test structure, not humanoid quality.
+## 라이선스
 
-```sh
-cargo test --workspace --locked
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo fmt --all -- --check
-npm run check
-npx playwright install chromium
-npm run test:e2e
-```
-
-Files are inspected in a browser Worker and rendered locally. No model upload service, telemetry or external runtime CDN is configured. External resource URIs are rejected before rendering; the browser tests check network behavior for synthetic fixtures. This is not a universal privacy/performance guarantee for every future integration. Development setup downloads dependencies.
-
-Rigloom prepares standard avatars; [drum-vrm](https://github.com/postmelee/drum-vrm) performs music-driven animation. Neither character-specific conversion rules nor a drum-vrm-only VRM dialect belong here.
-
-[Milestones](https://github.com/postmelee/rigloom/milestones) · [Issues](https://github.com/postmelee/rigloom/issues) · [Architecture](docs/architecture.md) · [Handoff](docs/handoff.md) · [License ledger](docs/research/licenses.md) · [Release policy](docs/release-policy.md)
-
-MIT for Rigloom code. Model conversion does not change source rights. No external model assets are included. Releases, deployments and model inclusion in public release artifacts require explicit owner approval for that batch; no automatic PR merge is authorized.
+Rigloom 코드는 [MIT](LICENSE)입니다. 의존성 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 확인하세요. 외부 모델 에셋은 포함하지 않습니다. 모델 변환은 원본의 이용·재배포 권리를 바꾸지 않습니다.
