@@ -12,15 +12,15 @@
 
 실행일: 2026-10-24. 환경: macOS arm64, Rust 1.94.1, Node 24.15.0, npm 11.12.1, wasm-pack 0.15.0, Playwright Chromium 156.0.8078.4, 소프트웨어 WebGL. 검증 구현 커밋: `03aa5e895f2885f919d9c33e45a5a990c055ed47`.
 
-| 검사 | 당시 결과 |
-|---|---|
-| `cargo test --workspace --locked` | 네이티브 통합 검사 16개 통과. 빈 unit/doc suite는 개수에 포함하지 않음 |
-| `cargo clippy --workspace --all-targets --locked -- -D warnings` | 통과 |
-| `cargo fmt --all -- --check`, `npm run check`, `npm run format:check` | 통과 |
-| `npm ci`, `npm run build` | 최종 로컬 경로에서 의존성 재설치 및 release WASM·정적 빌드 통과 |
-| `npm run test:e2e` | 개발 서버에서 5개 통과, 5.1초 |
-| `RIGLOOM_PREVIEW=1 npm run test:e2e` | 정적 서버에서 5개 통과, 4.3초 |
-| `git diff --cached --check` | 구현 커밋 전 통과 |
+| 검사                                                                  | 당시 결과                                                              |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `cargo test --workspace --locked`                                     | 네이티브 통합 검사 16개 통과. 빈 unit/doc suite는 개수에 포함하지 않음 |
+| `cargo clippy --workspace --all-targets --locked -- -D warnings`      | 통과                                                                   |
+| `cargo fmt --all -- --check`, `npm run check`, `npm run format:check` | 통과                                                                   |
+| `npm ci`, `npm run build`                                             | 최종 로컬 경로에서 의존성 재설치 및 release WASM·정적 빌드 통과        |
+| `npm run test:e2e`                                                    | 개발 서버에서 5개 통과, 5.1초                                          |
+| `RIGLOOM_PREVIEW=1 npm run test:e2e`                                  | 정적 서버에서 5개 통과, 4.3초                                          |
+| `git diff --cached --check`                                           | 구현 커밋 전 통과                                                      |
 
 브라우저 검사는 여러 메시·보고서 다운로드, 기존 skin 표시, URI 네트워크 차단, 확장·절단 진단, 지연 Worker 취소·교체, 시점과 테마를 다뤘습니다. 관찰한 합성 입력 세션에서는 교차 출처 HTTP 및 POST/PUT/PATCH 업로드가 없었습니다. 향후 모든 연동의 무업로드 보장은 아닙니다. 생성 형상의 스크린샷으로 레이아웃·뷰포트를 확인했습니다.
 
@@ -32,15 +32,15 @@
 
 초기 PR에서 accessor count 0, POSITION shape 불일치, 부동소수 인덱스, 범위를 벗어난 POSITION accessor 참조의 네 가지 네이티브 panic을 재현했습니다. 마지막 문제는 gltf-json 1.4.1 검증 hook의 직접 인덱싱에서 발생하고 나머지는 binary reader 전제 위반이었습니다. parser 이전 참조 범위 검사, binary reader 이전 count·POSITION·index 타입/shape/정규화 검사를 추가하여 안정적인 진단으로 반환하게 했습니다.
 
-| 수정 후 검사 | 당시 결과 |
-|---|---|
-| `cargo test --workspace --locked` | 통합 검사 20개 통과 |
-| 엄격 Clippy | 통과 |
-| `cargo fmt --all` | 실행 완료. CI가 별도로 형식 검사 |
-| `npm run build` | release WASM·TypeScript·정적 빌드 통과 |
-| `npm run format:check`, `git diff --check` | 통과 |
-| `npm run test:e2e` | 6개 통과, 5.8초 |
-| `RIGLOOM_PREVIEW=1 npm run test:e2e` | 6개 통과, 5.2초 |
+| 수정 후 검사                               | 당시 결과                              |
+| ------------------------------------------ | -------------------------------------- |
+| `cargo test --workspace --locked`          | 통합 검사 20개 통과                    |
+| 엄격 Clippy                                | 통과                                   |
+| `cargo fmt --all`                          | 실행 완료. CI가 별도로 형식 검사       |
+| `npm run build`                            | release WASM·TypeScript·정적 빌드 통과 |
+| `npm run format:check`, `git diff --check` | 통과                                   |
+| `npm run test:e2e`                         | 6개 통과, 5.8초                        |
+| `RIGLOOM_PREVIEW=1 npm run test:e2e`       | 6개 통과, 5.2초                        |
 
 추가 브라우저 검사는 네 오류가 보고서로 반환되고 이후 정상 rigged 입력이 다시 표시됨을 확인했습니다. 새로운 의존성·모델 자산·출력·매핑·bind 구현은 추가하지 않았고 기본 fixture 출력도 유지했습니다.
 
@@ -48,13 +48,13 @@
 
 당시 `scripts/fixtures.mjs`에서 직접 생성했으며 바이너리는 무시되는 `.local/fixtures/`에 보관했습니다. 실제 캐릭터를 다운로드하지 않았습니다. surface와 rigged는 정점 3개, rigged는 관절 1개, multi는 메시 2개·원본 정점 6개이며 모두 텍스처가 없습니다. 오류 fixture는 미지원 기능·자원을 의도적으로 선언합니다.
 
-| 파일 | 바이트 | SHA-256 |
-|---|---:|---|
-| extension.glb | 504 | `2c91f95531d98a2922d6e828258f0fe4220bc961c0e98d8922480b806ca35686` |
-| external.glb | 504 | `c20d00393002e9d199d77ed75390ee9d637ccf47e8c5b3deca916f0a1b683c69` |
-| multi.glb | 536 | `a727203968cd0ac104063cbc0d51377e1e1074b863b6bfd5920c89baff12330e` |
-| rigged.glb | 840 | `5370ec4d85fb76765a7ef389bab5a18646ca4b71a6631c35dcc147fe07d6743a` |
-| surface.glb | 456 | `8b42fd4833a8422b5f41ba2b89fa14446f31a86e441adbcd175e45b07940c78b` |
+| 파일          | 바이트 | SHA-256                                                            |
+| ------------- | -----: | ------------------------------------------------------------------ |
+| extension.glb |    504 | `2c91f95531d98a2922d6e828258f0fe4220bc961c0e98d8922480b806ca35686` |
+| external.glb  |    504 | `c20d00393002e9d199d77ed75390ee9d637ccf47e8c5b3deca916f0a1b683c69` |
+| multi.glb     |    536 | `a727203968cd0ac104063cbc0d51377e1e1074b863b6bfd5920c89baff12330e` |
+| rigged.glb    |    840 | `5370ec4d85fb76765a7ef389bab5a18646ca4b71a6631c35dcc147fe07d6743a` |
+| surface.glb   |    456 | `8b42fd4833a8422b5f41ba2b89fa14446f31a86e441adbcd175e45b07940c78b` |
 
 ## 측정과 미검증 범위
 

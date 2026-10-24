@@ -10,20 +10,20 @@ Rigloom의 [루트 LICENSE](../../LICENSE)는 MIT이며 저작권 표기는 **Co
 
 ## 당시 사용한 코드와 도구
 
-| 코드·도구 | 버전 | 선언된 라이선스 | 용도 |
-|---|---|---|---|
-| gltf / 간접 의존성 gltf-json | 1.4.1 | MIT OR Apache-2.0 | 네이티브·Worker 파싱과 스키마 타입 |
-| serde | 1.0.229 | MIT OR Apache-2.0 | 보고서 직렬화 |
-| serde_json | 1.0.154 | MIT OR Apache-2.0 | JSON 정책 검사와 보고서 |
-| wasm-bindgen | 0.2.129 | MIT OR Apache-2.0 | WASM 연결 |
-| Three.js | 0.186.1 | MIT | 뷰어 |
-| lucide | 1.61.0 | ISC | SVG 아이콘 |
-| @types/three | 0.186.0 | MIT | 타입 정의 |
-| TypeScript | 7.0.2 | Apache-2.0 | 개발 타입 검사 |
-| Vite | 8.3.5 | MIT | 개발 서버·빌드 |
-| @playwright/test | 1.64.1 | Apache-2.0 | 브라우저 검증 |
-| Prettier | 3.9.10 | MIT | 개발 포맷 검사 |
-| wasm-pack | 0.15.0 | MIT OR Apache-2.0 | 빌드 도구 |
+| 코드·도구                    | 버전    | 선언된 라이선스   | 용도                               |
+| ---------------------------- | ------- | ----------------- | ---------------------------------- |
+| gltf / 간접 의존성 gltf-json | 1.4.1   | MIT OR Apache-2.0 | 네이티브·Worker 파싱과 스키마 타입 |
+| serde                        | 1.0.229 | MIT OR Apache-2.0 | 보고서 직렬화                      |
+| serde_json                   | 1.0.154 | MIT OR Apache-2.0 | JSON 정책 검사와 보고서            |
+| wasm-bindgen                 | 0.2.129 | MIT OR Apache-2.0 | WASM 연결                          |
+| Three.js                     | 0.186.1 | MIT               | 뷰어                               |
+| lucide                       | 1.61.0  | ISC               | SVG 아이콘                         |
+| @types/three                 | 0.186.0 | MIT               | 타입 정의                          |
+| TypeScript                   | 7.0.2   | Apache-2.0        | 개발 타입 검사                     |
+| Vite                         | 8.3.5   | MIT               | 개발 서버·빌드                     |
+| @playwright/test             | 1.64.1  | Apache-2.0        | 브라우저 검증                      |
+| Prettier                     | 3.9.10  | MIT               | 개발 포맷 검사                     |
+| wasm-pack                    | 0.15.0  | MIT OR Apache-2.0 | 빌드 도구                          |
 
 [의존성 스냅샷](task_m0_2_dependencies.json)은 당시 해결된 Cargo 패키지와 설치된 npm 패키지의 라이선스 **선언**을 기록한다. 실제 패키지 라이선스 본문이 우선하며, 플랫폼별 선택 패키지는 `package-lock.json`에 추가로 고정된다. 이 목록 전체가 브라우저 배포물에 들어간다는 뜻은 아니다.
 

@@ -13,24 +13,24 @@
 
 ## 폴더 안내
 
-| 폴더 | 담는 내용 |
-|---|---|
-| [orders](orders/README.md) | 날짜별 간결한 작업 보드 |
-| [plans](plans/README.md) | 이슈별 수행·구현계획; 완료 후 archives |
-| [working](working/README.md) | 실제 단계 결과 |
-| [report](report/README.md) | 최종 결과·장기 보관 검증 증거 |
-| [feedback](feedback/README.md) | 소유자의 승인·판단과 리뷰 근거 |
-| [tech](tech/README.md) | 조사·대안·미확정 채택 조건 |
-| [troubleshootings](troubleshootings/README.md) | 재현·원인·해결·재발 방지 |
-| [pr](pr/README.md) | 외부 기여자 PR 검토 기록 |
-| [manual](manual/README.md) | Hyper Waterfall의 반복 운영 절차 |
-| [_templates](_templates/README.md) | 산출물 작성 형식 |
-| [skills](skills/README.md) | 에이전트 절차 원본; 두 도구 링크가 공유 |
+| 폴더                                           | 담는 내용                               |
+| ---------------------------------------------- | --------------------------------------- |
+| [orders](orders/README.md)                     | 날짜별 간결한 작업 보드                 |
+| [plans](plans/README.md)                       | 이슈별 수행·구현계획; 완료 후 archives  |
+| [working](working/README.md)                   | 실제 단계 결과                          |
+| [report](report/README.md)                     | 최종 결과·장기 보관 검증 증거           |
+| [feedback](feedback/README.md)                 | 소유자의 승인·판단과 리뷰 근거          |
+| [tech](tech/README.md)                         | 조사·대안·미확정 채택 조건              |
+| [troubleshootings](troubleshootings/README.md) | 재현·원인·해결·재발 방지                |
+| [pr](pr/README.md)                             | 외부 기여자 PR 검토 기록                |
+| [manual](manual/README.md)                     | Hyper Waterfall의 반복 운영 절차        |
+| [_templates](_templates/README.md)             | 산출물 작성 형식                        |
+| [skills](skills/README.md)                     | 에이전트 절차 원본; 두 도구 링크가 공유 |
 
 ## 기록 찾기
 
 - [2026-10-25 작업 보드](orders/20261025.md), [문서 재편 승인 범위](feedback/20261025_documentation-approval.md)
-- [#16 문서 재편 계획](plans/task_m0_16.md)
+- [#16 문서 재편 계획](plans/task_m0_16.md), [최종 결과와 이동표](report/task_m0_16_report.md)
 - [#3 검사 구현의 과거 검증](report/task_m1_3_report.md)
 - [#2 표준·알고리즘 조사](tech/task_m0_2_standards-and-algorithms.md), [라이선스 대장](tech/task_m0_2_licenses.md)
 - [의존성 선언 스냅샷](tech/task_m0_2_dependencies.json), [upstream 조사 스냅샷](tech/task_m0_2_source-snapshot.json)

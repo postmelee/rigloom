@@ -8,13 +8,13 @@
 
 [로컬 실행 환경을 준비](docs/how-to/local-development.md)한 뒤 [처음 GLB 검사하기](docs/tutorials/first-inspection.md)를 따라 해 보세요. 직접 생성한 작은 예제로 검사 결과와 화면 조작을 익힐 수 있습니다.
 
-| 하고 싶은 일 | 읽을 문서 |
-|---|---|
-| 문서 전체에서 필요한 내용 찾기 | [문서 안내](docs/README.md) |
-| 내 파일을 사용할 수 있는지 확인하기 | [지원 입력과 제한](docs/reference/supported-inputs.md) |
-| 파일을 열지 못하는 문제 해결하기 | [검사 문제 해결](docs/how-to/troubleshoot-inspection.md) |
-| 내려받은 JSON 이해하기 | [검사 보고서 참조](docs/reference/inspection-report.md) |
-| 파일 처리 방식 이해하기 | [검사와 미리보기의 역할](docs/explanation/processing-model.md) |
+| 하고 싶은 일                        | 읽을 문서                                                      |
+| ----------------------------------- | -------------------------------------------------------------- |
+| 문서 전체에서 필요한 내용 찾기      | [문서 안내](docs/README.md)                                    |
+| 내 파일을 사용할 수 있는지 확인하기 | [지원 입력과 제한](docs/reference/supported-inputs.md)         |
+| 파일을 열지 못하는 문제 해결하기    | [검사 문제 해결](docs/how-to/troubleshoot-inspection.md)       |
+| 내려받은 JSON 이해하기              | [검사 보고서 참조](docs/reference/inspection-report.md)        |
+| 파일 처리 방식 이해하기             | [검사와 미리보기의 역할](docs/explanation/processing-model.md) |
 
 ## 기여하기
 

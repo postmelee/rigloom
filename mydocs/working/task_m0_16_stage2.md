@@ -8,14 +8,14 @@
 
 ## 산출물
 
-| 경로 | 변경 |
-|---|---|
-| mydocs/README.md | 보드→실제 이슈→승인 계획→마지막 단계 재개 경로와 자료 인덱스 |
-| mydocs/tech/task_m0_2_* | 조사·라이선스의 한국어 이관과 JSON 원문 보존 |
-| mydocs/report/task_m1_3_report.md | 초기16→검토20개 테스트, 날짜·SHA·fixture·제한 이관 |
-| specs/policies/documentation.md | 문서 책임·갱신 기준·framework 원문 보호 |
-| AGENTS.md, THIRD_PARTY_NOTICES.md | 프로젝트 구역 축소·새 위치 연결·MIT 전문 이동 |
-| 기존 README.ko와 docs 13개 경로 | 새 책임별 문서로 통합 후 제거 |
+| 경로                              | 변경                                                         |
+| --------------------------------- | ------------------------------------------------------------ |
+| mydocs/README.md                  | 보드→실제 이슈→승인 계획→마지막 단계 재개 경로와 자료 인덱스 |
+| mydocs/tech/task_m0_2_*           | 조사·라이선스의 한국어 이관과 JSON 원문 보존                 |
+| mydocs/report/task_m1_3_report.md | 초기16→검토20개 테스트, 날짜·SHA·fixture·제한 이관           |
+| specs/policies/documentation.md   | 문서 책임·갱신 기준·framework 원문 보호                      |
+| AGENTS.md, THIRD_PARTY_NOTICES.md | 프로젝트 구역 축소·새 위치 연결·MIT 전문 이동                |
+| 기존 README.ko와 docs 13개 경로   | 새 책임별 문서로 통합 후 제거                                |
 
 ## 본문 변경 정도 / 본문 무손실 여부
 

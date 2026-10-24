@@ -32,17 +32,17 @@ docs는 실제 사용 가능한 기능의 학습/문제 해결/참조/설명만 
 
 ## 문서 위치 판단
 
-| 기존 파일/내용 | 분류·독자 | 선택 위치 | 대안 위치 | 선택 이유 |
-|---|---|---|---|---|
-| README.md / README.ko.md | 공식 입구·사용자 | README.md | docs/README.md만 사용 | 저장소 첫 화면에서 시작점 제공 |
-| guide/en.md, ko.md | 공식 사용법·사용자/기여자 | docs/{tutorials,how-to,reference,explanation}/ | 단일 guide | Diátaxis의 사용자 목적 분리 |
-| product-requirements.md, plan의 목표·종료 조건 | 규범 설계·구현자 | specs/product/ | docs/explanation/ | 계획과 현재 사용법 혼동 방지 |
-| architecture.md, decisions/ | 채택된 설계·구현자 | specs/architecture/, specs/decisions/ | mydocs/tech/ | 채택된 기준과 조사 가설 분리 |
-| release-policy, 자산 원칙 | 상시 정책·기여자 | specs/policies/ | mydocs/manual/ | 프레임워크 절차와 프로젝트 정책 분리 |
-| validation의 재현 명령 | 공식 기여 안내 | docs/how-to/verification.md | report/ | 반복 가능한 목표 중심 절차 |
-| validation/handoff의 실행 증거 | 과거 작업 보고 | mydocs/report/task_m1_3_report.md | 전역 handoff | commit별 근거 보존, 최신 상태 중복 제거 |
-| research/* | 조사 근거·내부 작업자 | mydocs/tech/task_m0_2_* | specs/reference/ | 미확정 채택·라이선스 판단 보존 |
-| 승인 범위·이번 계획/결과 | 작업 기억·내부 작업자 | mydocs/feedback, plans, working, report, orders | 루트 README | 일시적 기록의 수명 분리 |
+| 기존 파일/내용                                 | 분류·독자                 | 선택 위치                                       | 대안 위치             | 선택 이유                               |
+| ---------------------------------------------- | ------------------------- | ----------------------------------------------- | --------------------- | --------------------------------------- |
+| README.md / README.ko.md                       | 공식 입구·사용자          | README.md                                       | docs/README.md만 사용 | 저장소 첫 화면에서 시작점 제공          |
+| guide/en.md, ko.md                             | 공식 사용법·사용자/기여자 | docs/{tutorials,how-to,reference,explanation}/  | 단일 guide            | Diátaxis의 사용자 목적 분리             |
+| product-requirements.md, plan의 목표·종료 조건 | 규범 설계·구현자          | specs/product/                                  | docs/explanation/     | 계획과 현재 사용법 혼동 방지            |
+| architecture.md, decisions/                    | 채택된 설계·구현자        | specs/architecture/, specs/decisions/           | mydocs/tech/          | 채택된 기준과 조사 가설 분리            |
+| release-policy, 자산 원칙                      | 상시 정책·기여자          | specs/policies/                                 | mydocs/manual/        | 프레임워크 절차와 프로젝트 정책 분리    |
+| validation의 재현 명령                         | 공식 기여 안내            | docs/how-to/verification.md                     | report/               | 반복 가능한 목표 중심 절차              |
+| validation/handoff의 실행 증거                 | 과거 작업 보고            | mydocs/report/task_m1_3_report.md               | 전역 handoff          | commit별 근거 보존, 최신 상태 중복 제거 |
+| research/*                                     | 조사 근거·내부 작업자     | mydocs/tech/task_m0_2_*                         | specs/reference/      | 미확정 채택·라이선스 판단 보존          |
+| 승인 범위·이번 계획/결과                       | 작업 기억·내부 작업자     | mydocs/feedback, plans, working, report, orders | 루트 README           | 일시적 기록의 수명 분리                 |
 
 ## 예상 변경 파일
 
