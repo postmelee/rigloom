@@ -15,3 +15,5 @@ Issues are under https://github.com/postmelee/rigloom/issues. Keep implementatio
 Execution: #1 and initial #2 audit → #3 inspection → #4 semantic mapping and bind/weight validation → #5 serialization → #6 independent compatibility → #7 and #10 editor/project state → #8 algorithm experiments → #9 quality loop → #11 → #12. #2's algorithm and licensing uncertainty must be resolved before adopting research implementations, not assumed solved by inspection work.
 
 First implementation boundary: read-only GLB inspection, one Worker, Three.js static preview and JSON inspection report. No editable-project or VRM export claim. Future engine types should use stable node indices/semantic joints and source revisions, never Three.js object names. Major reorderings require an ADR or issue evidence.
+
+First session implementation: #3 is implemented and locally verified in a review branch; see validation.md and handoff.md. #4–#12 remain implementation/research work, and neither M1 nor M2 is complete.
