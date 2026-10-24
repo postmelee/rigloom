@@ -1,0 +1,44 @@
+[
+  {
+    "repository": "vrm-c/vrm-specification",
+    "commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "license_metadata": null,
+    "pushed_at": "2026-10-02T07:29:08Z"
+  },
+  {
+    "repository": "KhronosGroup/glTF",
+    "commit": "7cee0fcddd5730e90d488bfb5aa2e52171483dde",
+    "license_metadata": "NOASSERTION",
+    "pushed_at": "2026-10-20T06:57:52Z"
+  },
+  {
+    "repository": "saturday06/VRM-Addon-for-Blender",
+    "commit": "2efbdfc2b91bd041dda68782d8a36422527c8d36",
+    "license_metadata": "MIT",
+    "pushed_at": "2026-10-24T02:46:20Z"
+  },
+  {
+    "repository": "vrm-c/UniVRM",
+    "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+    "license_metadata": "MIT",
+    "pushed_at": "2026-10-19T07:26:22Z"
+  },
+  {
+    "repository": "pixiv/three-vrm",
+    "commit": "3caf7a21ee68f0d5dfa363ab3d577450bbf60136",
+    "license_metadata": "MIT",
+    "pushed_at": "2026-10-22T05:14:04Z"
+  },
+  {
+    "repository": "MMD-Blender/blender_mmd_tools",
+    "commit": "e321bd02dd0288a3dc9f1974c06597803c060e11",
+    "license_metadata": "GPL-3.0",
+    "pushed_at": "2026-10-04T07:12:43Z"
+  },
+  {
+    "repository": "libigl/libigl",
+    "commit": "7100764c2a2833284a8bdfa9b948d2b3bf124624",
+    "license_metadata": "GPL-3.0",
+    "pushed_at": "2026-09-21T14:26:10Z"
+  }
+]
