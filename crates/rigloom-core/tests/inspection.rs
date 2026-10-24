@@ -154,3 +154,47 @@ fn malformed_header_and_chunk_lengths_are_diagnosed() {
         assert!(!inspect_glb(&bad).preview_allowed);
     }
 }
+
+#[test]
+fn rejects_zero_count_before_binary_reader() {
+    let mut m = model();
+    m["accessors"][0]["count"] = json!(0);
+    has(m, "accessor_count");
+}
+
+#[test]
+fn rejects_mismatched_position_layout_before_binary_reader() {
+    for (shape, component, normalized) in [
+        ("VEC2", 5126, false),
+        ("VEC3", 5123, false),
+        ("VEC3", 5126, true),
+    ] {
+        let mut m = model();
+        m["accessors"][0]["type"] = json!(shape);
+        m["accessors"][0]["componentType"] = json!(component);
+        m["accessors"][0]["normalized"] = json!(normalized);
+        has(m, "position_layout");
+    }
+}
+
+#[test]
+fn rejects_invalid_index_layout_before_binary_reader() {
+    for (shape, component, normalized) in [
+        ("SCALAR", 5126, false),
+        ("VEC3", 5121, false),
+        ("SCALAR", 5122, false),
+        ("SCALAR", 5123, true),
+    ] {
+        let mut m = model();
+        m["accessors"].as_array_mut().unwrap().push(json!({"bufferView":0,"componentType":component,"count":3,"type":shape,"normalized":normalized}));
+        m["meshes"][0]["primitives"][0]["indices"] = json!(1);
+        has(m, "index_layout");
+    }
+}
+
+#[test]
+fn rejects_invalid_position_reference_before_schema_hook() {
+    let mut m = model();
+    m["meshes"][0]["primitives"][0]["attributes"]["POSITION"] = json!(999);
+    has(m, "invalid_gltf");
+}

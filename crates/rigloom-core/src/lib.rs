@@ -198,6 +198,28 @@ pub fn inspect_glb(bytes: &[u8]) -> Inspection {
             }
         }
     }
+    // gltf-json 1.4.1's primitive hook directly indexes POSITION before returning
+    // reference errors. Guard this input before invoking that validation hook.
+    let accessor_count = raw["accessors"].as_array().map_or(0, Vec::len);
+    if let Some(meshes) = raw["meshes"].as_array() {
+        for (mesh_index, mesh) in meshes.iter().enumerate() {
+            if let Some(primitives) = mesh["primitives"].as_array() {
+                for (primitive_index, primitive) in primitives.iter().enumerate() {
+                    if let Some(index) = primitive["attributes"]["POSITION"].as_u64()
+                        && usize::try_from(index).map_or(true, |index| index >= accessor_count)
+                    {
+                        report.error(
+                            "invalid_gltf",
+                            format!("/meshes/{mesh_index}/primitives/{primitive_index}/attributes/POSITION"),
+                            "POSITION references an accessor that does not exist.",
+                            "Repair the POSITION accessor reference in the source exporter.",
+                        );
+                        return report;
+                    }
+                }
+            }
+        }
+    }
     let gltf = match gltf::Gltf::from_slice(bytes) {
         Ok(g) => g,
         Err(e) => {
@@ -239,6 +261,15 @@ pub fn inspect_glb(bytes: &[u8]) -> Inspection {
     }
     for accessor in gltf.accessors() {
         let path = format!("/accessors/{}", accessor.index());
+        if accessor.count() == 0 {
+            report.error(
+                "accessor_count",
+                &path,
+                "An accessor must contain at least one element.",
+                "Remove unused empty accessors or export nonempty attribute data.",
+            );
+        }
+
         if accessor.sparse().is_some() {
             report.error(
                 "sparse_accessor",
@@ -376,6 +407,38 @@ pub fn inspect_glb(bytes: &[u8]) -> Inspection {
                     "Only triangle primitives are supported.",
                     "Triangulate the source mesh.",
                 );
+            }
+            // Binary readers assume the semantic's exact shape and component type;
+            // gltf's schema checks do not enforce those assumptions for us.
+            if let Some(position) = primitive.get(&gltf::Semantic::Positions)
+                && (position.data_type() != gltf::accessor::DataType::F32
+                    || position.dimensions() != gltf::accessor::Dimensions::Vec3
+                    || position.normalized())
+            {
+                report.error(
+                    "position_layout",
+                    format!("{path}/attributes/POSITION"),
+                    "POSITION must be a non-normalized FLOAT VEC3 accessor.",
+                    "Re-export vertex positions as three floating-point components.",
+                );
+                continue;
+            }
+            if let Some(indices) = primitive.indices()
+                && (!matches!(
+                    indices.data_type(),
+                    gltf::accessor::DataType::U8
+                        | gltf::accessor::DataType::U16
+                        | gltf::accessor::DataType::U32
+                ) || indices.dimensions() != gltf::accessor::Dimensions::Scalar
+                    || indices.normalized())
+            {
+                report.error(
+                    "index_layout",
+                    format!("{path}/indices"),
+                    "Indices must be non-normalized unsigned integer SCALAR values.",
+                    "Re-export indices as UNSIGNED_BYTE, UNSIGNED_SHORT or UNSIGNED_INT scalars.",
+                );
+                continue;
             }
             let reader = primitive.reader(|_| Some(blob));
             let Some(positions) = reader.read_positions() else {

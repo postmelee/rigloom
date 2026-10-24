@@ -102,3 +102,26 @@ test("cancel and replacement ignore stale results", async ({ page }) => {
   );
   await expect(page.locator("#stats")).toContainText("Skins1");
 });
+
+test("invalid accessor layouts return diagnostics and a subsequent valid file still previews", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const [invalidAccessor, code] of [
+    ["zero_count", "accessor_count"],
+    ["position_shape", "position_layout"],
+    ["float_indices", "index_layout"],
+    ["position_reference", "invalid_gltf"],
+  ]) {
+    await upload(page, { invalidAccessor });
+    await expect(page.getByRole("status")).toContainText("Preview blocked");
+    await expect(page.locator("#diagnostics")).toContainText(code);
+    await expect(
+      page.getByRole("button", { name: "Save report" }),
+    ).toBeEnabled();
+  }
+  await upload(page, { rigged: true });
+  await expect(page.getByRole("status")).toHaveText(
+    "Inspection complete. Preview ready.",
+  );
+});

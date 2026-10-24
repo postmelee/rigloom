@@ -5,6 +5,7 @@ export function fixture({
   external = false,
   extension = false,
   multi = false,
+  invalidAccessor = undefined,
 } = {}) {
   const binary = Buffer.alloc(rigged ? 120 : 36);
   [-0.5, 0, 0, 0.5, 0, 0, 0, 1, 0].forEach((n, i) =>
@@ -54,6 +55,19 @@ export function fixture({
   if (external)
     json.buffers[0].uri = "https://example.invalid/private-model.bin";
   if (extension) json.extensionsUsed = ["KHR_draco_mesh_compression"];
+  if (invalidAccessor === "zero_count") json.accessors[0].count = 0;
+  if (invalidAccessor === "position_shape") json.accessors[0].type = "VEC2";
+  if (invalidAccessor === "position_reference")
+    json.meshes[0].primitives[0].attributes.POSITION = 999;
+  if (invalidAccessor === "float_indices") {
+    json.accessors.push({
+      bufferView: 0,
+      componentType: 5126,
+      count: 3,
+      type: "SCALAR",
+    });
+    json.meshes[0].primitives[0].indices = 1;
+  }
   const raw = Buffer.from(JSON.stringify(json));
   const padded = Buffer.alloc(Math.ceil(raw.length / 4) * 4, 32);
   raw.copy(padded);
