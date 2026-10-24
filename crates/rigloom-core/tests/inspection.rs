@@ -198,3 +198,17 @@ fn rejects_invalid_position_reference_before_schema_hook() {
     m["meshes"][0]["primitives"][0]["attributes"]["POSITION"] = json!(999);
     has(m, "invalid_gltf");
 }
+
+#[test]
+fn rejects_matrix_and_trs_before_parser_can_discard_one() {
+    for (key, value) in [
+        ("translation", json!([0, 0, 0])),
+        ("rotation", json!([0, 0, 0, 1])),
+        ("scale", json!([1, 1, 1])),
+    ] {
+        let mut m = model();
+        m["nodes"][0]["matrix"] = json!([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+        m["nodes"][0][key] = value;
+        has(m, "rest_transform_conflict");
+    }
+}
