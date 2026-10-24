@@ -3,6 +3,8 @@
 [이슈 #16](https://github.com/postmelee/rigloom/issues/16) · M0 · 3단계.
 [수행계획](../plans/task_m0_16.md) · [구현계획](../plans/task_m0_16_impl.md) · [승인 범위](../feedback/20261025_documentation-approval.md).
 
+이 보고서 본문은 최초 게시 head `6f9980f3fbe657bb045a169d2b1fae7a7bf50ad5`의 기록이다. 후속 병합 검토는 마지막 절에서 구분한다.
+
 ## 결과와 영향 범위
 
 README를 사용자 탐색 입구로 줄이고 현재 사용법은 docs, 규범 설계는 specs, 작업·조사·검증 증거는 mydocs로 분리했다. 한영 중복은 한국어 단일 문서로 통합했다. 루트 AGENTS는 공통 운영 규칙과 필요한 기준 링크를 제공하며 디렉터리별 README/AGENTS로 책임을 나눈다.
@@ -60,3 +62,9 @@ README를 사용자 탐색 입구로 줄이고 현재 사용법은 docs, 규범 
 외부의 옛 문서 deep link는 자동 리다이렉트되지 않는다. 프레임워크 템플릿의 예시·upstream 경로는 원문으로 유지한다. 모든 외부 URL의 가용성과 Mermaid 브라우저별 렌더링은 이번 검사 범위 밖이다.
 
 문서 작업과 개별 PR 작성은 승인되었다. PR 병합과 #4 제품 구현, 릴리스 태그·Release·배포는 수행하지 않았으며 별도 지시가 필요하다. 이 보고서는 구현·배포 승인을 새로 부여하지 않는다.
+
+## 후속 병합 검토 — 2026-10-25
+
+[후속 소유자 지시](../feedback/20261025_documentation-approval.md)에 따라 #17을 검토하고 `d88ae4d13ff9817f06f1ed7b9418fcfdcb97d21b`로 병합했다. #18은 main으로 재지정했다. 새 main의 트리는 도입 head `478c7a15574efdcfe2b8a92c02189924d21bff37`과 같아 문서 재편 diff만 남는 것을 확인했다.
+
+이번 검토에서는 AGENTS와 승인 기록·날짜 보드를 후속 지시에 맞췄다. 별도 읽기 검토에서 기능·요구사항·권한·고지·원본 보존의 차단 문제는 발견하지 못했다. 정확한 최종 head의 문서 검사·CI·병합 결과는 [PR #18](https://github.com/postmelee/rigloom/pull/18)에 남긴다. #4 구현·릴리스·배포는 수행하지 않는다.
