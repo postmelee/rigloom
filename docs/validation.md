@@ -1,6 +1,6 @@
 # Validation record
 
-Latest review validation: see the PR #14 review section below. The initial 16-test record is historical.
+Latest validation: see the #4 mapping/bind section below. Earlier #3 and PR #14 records are historical and retain their original scope.
 
 Executed 2026-10-24 on macOS arm64 with Rust 1.94.1, Node 24.15.0, npm 11.12.1, wasm-pack 0.15.0 and Playwright Chromium 156.0.8078.4 (software WebGL). Tested implementation commit: `03aa5e895f2885f919d9c33e45a5a990c055ed47`. The subsequent PR review adds accessor hardening; see the later review record for the current tested implementation. GitHub CI is recorded separately in the PR checks.
 
@@ -62,3 +62,35 @@ Executed after the fix:
 - `npm run test:e2e`: 6 passed (5.8 seconds); `RIGLOOM_PREVIEW=1 npm run test:e2e`: 6 passed (5.2 seconds).
 
 The new browser scenario checks all four malformed cases return reports and a subsequent valid rigged input still previews. No new dependencies, model assets, export, humanoid mapping or bind implementation were added. Existing fixture outputs remain unchanged by default. The initial size/timing figures above describe the original build, not a new performance benchmark. Final exact-head CI and merge SHAs are recorded in PR #14 and issue #3.
+
+
+## #4 mapping and bind validation — 2026-10-25
+
+Tested implementation commit: `10e33cc776c03e793c33749b219c07191b03e51e`. This record is a documentation-only follow-up; the final PR head and its CI result are recorded in issue #4 and the linked PR. Local environment: macOS arm64, the repository-pinned Rust/Node/WASM toolchain and Playwright Chromium with software WebGL. No release or deployment was performed.
+
+Executed on the final implementation:
+
+- `cargo test --workspace --locked`: **58 passed** (21 inspection, 25 bind, 12 mapping; empty suites excluded).
+- `cargo clippy --workspace --all-targets --locked -- -D warnings` and `cargo fmt --all -- --check`: passed.
+- `npm run build`: release WASM, TypeScript checking and static build passed.
+- `npm run format:check`: passed.
+- `npm run test:e2e`: **12 passed**, 6.9 seconds.
+- `RIGLOOM_PREVIEW=1 npm run test:e2e`: **12 passed**, 6.6 seconds.
+- 15 Markdown files / 30 local links: no missing file targets; `git diff --check` and staged whitespace checks passed.
+
+New native coverage includes complete/partial/ambiguous mappings, optional-parent and helper-node hierarchy, invalid/duplicate references, explicit null overrides, deterministic JSON round trips and immutable input. Skin coverage includes nonidentity/rotated/nonuniform transforms, multiple mesh instances and skins, common bind-shape versus posed-rest warnings, omitted/surplus inverse binds, all influence sets, integer normalized weights, malformed accessor layout/count, nonfinite/negative/zero/summed weights and joint bounds.
+
+Independent review identified and fixed five gaps before the final runs: raw matrix+TRS conflicts, local matrix shear, singular skinned-mesh transforms in the pinned renderer, inverse-bind stride and unused empty skins. Local shear and conflicting transforms are errors; composed world/IBM shear is permitted. Valid multi-set influences and singular skinned-mesh transforms are explicit preview limitations rather than silently changed source data. Native and release-WASM regressions cover these paths. A separate frontend review found no blocking stale-result, artifact-import or text-injection issue.
+
+The browser scenarios cover the existing inspector plus full humanoid suggestions, manual duplicate/unassigned overrides, stale-report invalidation, SHA256-bound save/load round trips, mismatched/malformed mapping rejection, weight/bind errors, rest-transform and renderer limits, cancellation and replacement recovery. The synthetic mapping round trip emitted no cross-origin HTTP requests; the existing inspection scenario also observes no POST/PUT/PATCH upload requests. Screenshot inspection confirmed the viewport/inspector layout. These observations apply to the tested synthetic sessions.
+
+Original fixtures come from `scripts/rig-fixture.mjs`; no downloaded model binaries or runtime dependencies were added. They use 15 mapped joints, no textures, and one or two triangle meshes (3 or 6 source vertices). The minimal surface is not an anatomical or deformation-quality test.
+
+| Generated input | Bytes | SHA256 |
+|---|---:|---|
+| humanoid | 3020 | `a029591e4d007eb982afb24b9982921795bb6252c6a280aea44928f5adecdb3b` |
+| humanoid-multi | 3164 | `27ff07b03cd0296ee7c19b6b47b709a9e224a001cd2080cba5ebce3c3dc87871` |
+
+Observed final outputs: main JS 650.25 kB (164.99 kB gzip), WASM 538.96 kB (188.09 kB gzip), worker JS 3.51 kB and CSS 5.30 kB. Vite's >500 kB chunk warning remains; wasm-pack used its source-built matching binding CLI. Suite timings are not performance benchmarks.
+
+Remaining boundaries: suggestions use names, not anatomical inference; mapping JSON only preserves node choices for identical source bytes; the `joint_world × inverse_bind` comparison does not establish artist intent or natural deformation. Full VRM serialization/independent viewer round trips, editable project persistence, new skinning, real-character quality and representative memory/performance tests remain unimplemented or unrun. No drum-vrm checkout or integration was modified. M1/M2 are not complete.
