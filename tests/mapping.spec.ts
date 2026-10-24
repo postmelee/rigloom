@@ -7,12 +7,14 @@ import {
   rigFixture,
 } from "../scripts/rig-fixture.mjs";
 
-const uploadRig = (page: Page, options = {}) =>
-  page.getByLabel("Open GLB", { exact: true }).setInputFiles({
+const uploadRig = async (page: Page, options = {}) => {
+  await page.getByLabel("Open GLB", { exact: true }).setInputFiles({
     name: "humanoid.glb",
     mimeType: "model/gltf-binary",
     buffer: rigFixture(options),
   });
+  await page.getByRole("button", { name: "Mapping", exact: true }).click();
+};
 const loadMapping = (page: Page, artifact: unknown) =>
   page.getByLabel("Load mapping", { exact: true }).setInputFiles({
     name: "mapping.json",
@@ -69,9 +71,7 @@ test("reviews transformed multi-mesh rigs and round-trips source-bound mapping d
   await expect(
     page.getByRole("button", { name: "Save mapping", exact: true }),
   ).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "Save report", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#report")).toBeDisabled();
   await page
     .getByRole("button", { name: "Validate mapping", exact: true })
     .click();
@@ -142,9 +142,7 @@ test("reports malformed weights, joint indices and inverse-bind layouts in relea
       "Bind/weight checks failed",
     );
     await expect(page.locator("#diagnostics")).toContainText(code);
-    await expect(
-      page.getByRole("button", { name: "Save report", exact: true }),
-    ).toBeEnabled();
+    await expect(page.locator("#report")).toBeEnabled();
   }
   await uploadRig(page);
   await expectValid(page);
@@ -186,18 +184,14 @@ test("cancelling mapping validation discards the pending worker result", async (
   await page
     .getByRole("button", { name: "Validate mapping", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Cancel inspection", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(page.locator("#status")).toContainText("Cancelled");
   await page.waitForTimeout(600);
   await expect(page.locator("#status")).toContainText("Cancelled");
   await expect(
     page.getByRole("button", { name: "Save mapping", exact: true }),
   ).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "Save report", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#report")).toBeDisabled();
   await uploadRig(page);
   await expectValid(page);
 });

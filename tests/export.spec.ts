@@ -34,6 +34,7 @@ async function upload(page: Page, bytes = exportFixture()) {
   await expect(page.locator("#bind-status")).toContainText(
     "Bind/weight checks passed",
   );
+  await page.getByRole("button", { name: "Export", exact: true }).click();
 }
 async function fillMetadata(page: Page) {
   await page
@@ -64,9 +65,7 @@ async function download(page: Page, label: string) {
   };
 }
 async function expectNoOutput(page: Page) {
-  await expect(
-    page.getByRole("button", { name: "Save VRM", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-vrm")).toBeDisabled();
   await expect(page.locator("#export-status")).not.toContainText("VRM ready");
 }
 const hash = (bytes: Buffer) =>
@@ -248,27 +247,22 @@ test("metadata edits, invalid mapping and source replacement invalidate complete
     .getByLabel("Avatar name", { exact: true })
     .fill("Revised attribution");
   await expectNoOutput(page);
-  await expect(
-    page.getByRole("button", { name: "Save conversion report", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-conversion")).toBeDisabled();
   await exportReady(page);
   const revised = readGlb((await download(page, "Save VRM")).bytes);
   expect(revised.json.extensions.VRMC_vrm.meta.name).toBe(
     "Revised attribution",
   );
 
+  await page.getByRole("button", { name: "Mapping", exact: true }).click();
   await page.getByLabel("Bone hips", { exact: true }).selectOption("");
   await expectNoOutput(page);
-  await expect(
-    page.getByRole("button", { name: "Export VRM 1.0", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#export-vrm")).toBeDisabled();
   await page
     .getByRole("button", { name: "Validate mapping", exact: true })
     .click();
   await expect(page.locator("#diagnostics")).toContainText("mapping_required");
-  await expect(
-    page.getByRole("button", { name: "Export VRM 1.0", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#export-vrm")).toBeDisabled();
 
   await upload(page, exportFixture({ variant: 1 }));
   await expectNoOutput(page);
@@ -350,9 +344,7 @@ test("cancelled exports cannot restore a downloadable artifact", async ({
   await page.waitForTimeout(700);
   await expect(page.locator("#status")).toContainText("Cancelled");
   await expectNoOutput(page);
-  await expect(
-    page.getByRole("button", { name: "Save conversion report", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-conversion")).toBeDisabled();
 });
 
 test("export settings stay locked during work and replacement discards pending results", async ({
@@ -394,7 +386,5 @@ test("export settings stay locked during work and replacement discards pending r
   await page.waitForTimeout(700);
   await expectNoOutput(page);
   await expect(page.getByLabel("Avatar name", { exact: true })).toHaveValue("");
-  await expect(
-    page.getByRole("button", { name: "Save conversion report", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-conversion")).toBeDisabled();
 });

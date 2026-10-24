@@ -1,7 +1,9 @@
 # Release policy / 릴리스 정책
 
 ## English
-Latest owner checkpoint (2026-10-25): implement #5 VRM 1.0 export through its issue and PR. PR #21 for #4 is merged. This authorizes #5 implementation, verification and PR publication only. Its merge, #6 or later implementation, release tags, Releases and deployment require a new owner instruction. Start a local server and request browser interaction if manual input becomes necessary.
+Latest UI instruction (2026-10-25): implement #23’s minimal workspace design and run a localhost preview for review. This does not authorize merging either PR or public deployment.
+
+Previous export checkpoint (2026-10-25): implement #5 VRM 1.0 export through its issue and PR. PR #21 for #4 is merged. This authorizes #5 implementation, verification and PR publication only. Its merge, #6 or later implementation, release tags, Releases and deployment require a new owner instruction. Start a local server and request browser interaction if manual input becomes necessary.
 Repository creation, planning, research, local implementation, verification, issues, documentation and reviewable PRs are authorized. PR automatic merge is not authorized; leave PRs for review. Do not merge without owner direction.
 
 Before creating release tags, publishing GitHub Releases, deploying to Pages/any hosting, or adding model files to public release artifacts, obtain the owner's explicit approval for that exact batch. Previous drum-vrm approval, successful CI, a merge or milestone completion is not approval.
@@ -11,7 +13,9 @@ Prepare first: change summary, tested commit SHA, executed checks, known limitat
 After an actual deployment, record URL and deployed SHA in handoff. A localhost development server is not public deployment. Planned, implemented/unreleased and deployed are separate states.
 
 ## 한국어
-최신 소유자 지시(2026-10-25): #5 VRM 1.0 내보내기를 이슈·PR로 구현합니다. #4의 PR #21은 병합되었습니다. 이번 승인은 #5 구현·검증·PR 작성까지이며 해당 PR 병합, #6 이후 구현, 릴리스 태그·Release·배포에는 소유자의 새로운 지시가 필요합니다. 직접 브라우저 조작이 필요해지면 로컬 서버를 실행하고 요청합니다.
+최신 UI 지시(2026-10-25): #23의 간결한 작업 화면을 구현하고 검토용 localhost 서버를 실행합니다. 두 PR의 병합이나 공개 배포를 승인한 것은 아닙니다.
+
+이전 출력 지시(2026-10-25): #5 VRM 1.0 내보내기를 이슈·PR로 구현합니다. #4의 PR #21은 병합되었습니다. 이번 승인은 #5 구현·검증·PR 작성까지이며 해당 PR 병합, #6 이후 구현, 릴리스 태그·Release·배포에는 소유자의 새로운 지시가 필요합니다. 직접 브라우저 조작이 필요해지면 로컬 서버를 실행하고 요청합니다.
 저장소 생성, 계획, 조사, 로컬 구현, 검증, 이슈·문서·검토 가능한 PR 작성은 승인되었습니다. PR 자동 병합은 승인되지 않았으며 검토를 위해 남깁니다. 소유자의 지시 없이 병합하지 않습니다.
 
 릴리스 태그, GitHub Release, Pages 등 모든 호스팅 배포, 공개 배포물에 모델 파일 편입은 해당 배치에 대한 소유자의 명시적 승인을 먼저 받아야 합니다. 과거 drum-vrm 승인, CI 통과, 병합, 마일스톤 완료는 승인이 아닙니다.

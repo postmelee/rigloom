@@ -15,7 +15,6 @@
     "format:check": "prettier --check src tests scripts *.ts *.json index.html"
   },
   "dependencies": {
-    "lucide": "1.61.0",
     "three": "0.186.1"
   },
   "devDependencies": {
