@@ -28,3 +28,5 @@ See [standards-and-algorithms](standards-and-algorithms.md) and source-snapshot.
 - Private originals/conversations/downloads/credentials: forbidden in commits. `.local/` is ignored.
 
 Before any external-model use, record source/version/hash and separate permission for research, download, local testing, public video and redistribution. A marketplace page or purchase does not establish all rights. Before a release, audit actual shipped code notices, platform bundles and asset inventory and request owner approval for the exact inclusion scope.
+
+CI-only GitHub Actions: actions/checkout v4 pinned to `11d5960a326750d5838078e36cf38b85af677262`, and actions/setup-node v4 pinned to `49933ea5288caeca8642d1e84afbd3f7d6820020`. They are workflow tools, not browser runtime assets.
