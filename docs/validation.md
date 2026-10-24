@@ -112,3 +112,38 @@ After the fix:
 - Whitespace and local documentation targets: passed (15 Markdown files / 30 local links).
 
 New native cases cover relative/absolute/component/vertex alignment, valid padding and interleaving. The new browser case checks five malformed skin layouts fail before loading, then a valid file still previews with no page errors. The separate mapping and frontend reviews found no additional blocking issues. Previous synthetic-model and performance limitations still apply. No dependencies, external assets, exporter or deployment configuration were added. Updated WASM output is 539.77 kB (188.39 kB gzip); the existing Vite chunk warning remains.
+
+## #5 VRM 1.0 export — 2026-10-25
+
+Tested implementation commit: `bf7ea1334644f04b4fe432108b4b41a38f0255a7`. This record is a documentation-only follow-up. The final PR head and CI result are recorded in issue #5 and its linked PR. Environment: macOS arm64, repository-pinned Rust/Node/WASM tooling and Playwright Chromium with software WebGL. The owner approved implementation/PR publication; no merge, release, deployment or #6 integration was performed.
+
+Executed on the final implementation:
+
+- `cargo test --workspace --locked`: **78 passed** (21 inspection, 28 bind, 12 mapping, 17 export; empty suites excluded).
+- Strict workspace/all-target Clippy, Rust formatting and JS formatting: passed.
+- `npm run build`: release WASM, TypeScript and static build passed.
+- `npm run test:e2e`: **19 passed**, 13.2 seconds.
+- `RIGLOOM_PREVIEW=1 npm run test:e2e`: **19 passed**, 12.0 seconds.
+- `git diff --check` / staged whitespace checks and 15 Markdown files / 35 local targets: passed.
+- Static-server screenshots of the metadata form and completed export were visually inspected. Temporary localhost servers were stopped; no manual owner interaction was required.
+
+Native export cases cover actual VRMC_vrm serialization, required attribution and explicit permission/confirmation fields, the complete 55-key mapping, existing reachable skin requirements, source/BIN identity including padding, optional attribution preservation, retained animations/cameras, multi-instance transforms, preview-only influence limits, bind-warning acknowledgement, tangent omission/tangent-only target rejection, malformed retained surface layouts/counts/alignment/finiteness, consistent morph targets/initial weights/base attributes, invalid empty resource arrays and truncated input. Source bytes are not rewritten.
+
+The six new browser scenarios exercise explicit blank-by-default permission choices, real VRM/report downloads, metadata/mapping/source invalidation, bind warnings, blocked tangent-only targets, cancellation and source replacement while work is pending. Export settings are locked during work; changes after completion invalidate downloaded results. The successful export compares the entire parsed source/output JSON, allowing only the expected VRM additions and tangent-reference omissions, plus exact BIN identity and source/output SHA256 values in the report.
+
+The actual Rust/WASM download passed complete glTF JSON and VRMC_vrm schema checks through Ajv 8.20.0 / ajv-formats 3.0.1 using the 47 URL/SHA256-pinned schemas in tests/schemas/manifest.json. Pins: glTF `8e798b02d254cea97659a333cfcb20875b62bdd4`, VRM `94e82dd346fa6cf0337c4421728640e5252dd38e`. An isolated browser page loaded those same bytes through @pixiv/three-vrm 3.5.5, independently of Rust serialization. Assertions cover metadata, all 15 mapped source-node references, original local hip matrix, both skinned mesh instances, inverse binds, weights, PBR color/metalness/roughness, actual decoding of the embedded 1×1 PNG and the preserved animation count. No image-decoder mock or hand-written VRM replaced the downloaded file in this acceptance test. The runtime fixture session emitted no cross-origin HTTP requests, POST/PUT/PATCH requests, page errors or console errors; test-process schema fetching is separate from model processing.
+
+Initial integration exposed inaccessible exact names for permission selects and CSP blocking of the renderer's `fetch(blob:)` image decoding. Added stable accessible names and allowed local blob connections while retaining same-origin HTTP resource policy. The browser test now fails on console errors, including CSP/image-load failures. Native testing also caught accidental insertion of absent JSON properties during mutable indexing; serialization now preserves absent fields. Independent read-only reviews found no remaining blocking issue in exporter/resource preservation, bridge ownership, revision/source guards or form invalidation.
+
+Fixtures are authored by scripts/export-fixture.mjs from the repository's original rig generator, including generated PNG bytes, morphs, animation samples and a camera. They are tiny data-preservation fixtures, not anatomical or motion-quality evidence. No external model/texture/animation binary is committed.
+
+| Generated input | Bytes | SHA256 |
+|---|---:|---|
+| export | 5372 | `03500c47967fee10e123a43e8549537623954183ff21052440a7d77061028d44` |
+| export-multi | 5704 | `d7237c22108a20116645f5d5c92d9edffda1fd952bb064d53e3c891efafa742e` |
+| bind-warning | 5372 | `754379724dca8a60b0fd906e5d39be0bd5a26dae3376066f9c85354f4049d1ef` |
+| tangent-only | 5348 | `dcf07b5d2e58d4633dd74e2643f9d73d37334e8e9154d78e230990d92ef18a68` |
+
+Observed static outputs: main JS 658.68 kB (167.27 kB gzip), WASM 637.62 kB (224.74 kB gzip), worker JS 5.00 kB and CSS 6.25 kB. The existing Vite >500 kB chunk warning remains. Suite timings are not performance benchmarks. The three new direct packages are development-only; the product does not import the schema validator or VRM loader. Schema source text stays in an ignored, hash-verified cache because redistribution rights were not established; see the license ledger.
+
+Remaining limits: source T-pose/+Z/Y-up/meters and permission authority are explicit user assertions. Runtime checks do not exhaustively validate glTF semantics or decode every input image; fixture schema/loader success is not a certificate for each user export. Stored-pose warnings do not establish artist intent or natural deformation. Extra renderer influence/transform limitations remain warnings; preserved data can exceed preview capabilities. Animations/cameras are retained but unused as VRM avatar behavior. No MToon, expressions, look-at, physics, constraints, new skinning, project persistence or joint editing is generated. A second viewer, representative real-character motion/performance and separately arranged drum-vrm integration remain #6 or later work. M1/M2 are not complete.
