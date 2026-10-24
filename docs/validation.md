@@ -1,6 +1,8 @@
 # Validation record
 
-Executed 2026-10-24 on macOS arm64 with Rust 1.94.1, Node 24.15.0, npm 11.12.1, wasm-pack 0.15.0 and Playwright Chromium 156.0.8078.4 (software WebGL). Tested implementation commit: `03aa5e895f2885f919d9c33e45a5a990c055ed47`. Later documentation-only commits do not alter this implementation. GitHub CI is recorded separately in the PR checks.
+Latest review validation: see the PR #14 review section below. The initial 16-test record is historical.
+
+Executed 2026-10-24 on macOS arm64 with Rust 1.94.1, Node 24.15.0, npm 11.12.1, wasm-pack 0.15.0 and Playwright Chromium 156.0.8078.4 (software WebGL). Tested implementation commit: `03aa5e895f2885f919d9c33e45a5a990c055ed47`. The subsequent PR review adds accessor hardening; see the later review record for the current tested implementation. GitHub CI is recorded separately in the PR checks.
 
 | Layer | Scope | State |
 |---|---|---|
@@ -45,3 +47,18 @@ Source: original `scripts/fixtures.mjs` at the tested implementation commit. Fil
 | multi.glb | 536 | `a727203968cd0ac104063cbc0d51377e1e1074b863b6bfd5920c89baff12330e` |
 | rigged.glb | 840 | `5370ec4d85fb76765a7ef389bab5a18646ca4b71a6631c35dcc147fe07d6743a` |
 | surface.glb | 456 | `8b42fd4833a8422b5f41ba2b89fa14446f31a86e441adbcd175e45b07940c78b` |
+
+## PR #14 review — 2026-10-24
+
+Tested fix commit: `53e7647e8b60714753bce02e126bd7ce7d6db3a9`.
+
+Four malformed-input paths were reproduced as native panics at the original PR head: zero accessor count, mismatched POSITION shape, floating-point indices and an out-of-range POSITION accessor reference. The last one occurs inside gltf-json's validation hook; the others violate assumptions in its binary readers. Added explicit preflight checks and stable diagnostic codes, including shape/component/normalization variants.
+
+Executed after the fix:
+- `cargo test --workspace --locked`: 20 integration tests passed.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed; `cargo fmt --all` completed and CI independently checks formatting.
+- `npm run build`: release WASM, TypeScript and static build passed.
+- `npm run format:check`, `git diff --check`: passed.
+- `npm run test:e2e`: 6 passed (5.8 seconds); `RIGLOOM_PREVIEW=1 npm run test:e2e`: 6 passed (5.2 seconds).
+
+The new browser scenario checks all four malformed cases return reports and a subsequent valid rigged input still previews. No new dependencies, model assets, export, humanoid mapping or bind implementation were added. Existing fixture outputs remain unchanged by default. The initial size/timing figures above describe the original build, not a new performance benchmark. Final exact-head CI and merge SHAs are recorded in PR #14 and issue #3.

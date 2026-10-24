@@ -20,6 +20,7 @@ Status: first inspection implementation, unreleased and not publicly deployed. B
 | External or data URI in buffers/images | Blocked; embed buffers in BIN and images in buffer views |
 | Any extension, including compression or special materials | Blocked; prepare a core glTF version and retain original |
 | Sparse accessors or non-triangle primitives | Blocked; export dense attributes and triangulate |
+| Empty accessors, invalid POSITION/index layouts | Blocked with a report; export nonempty FLOAT VEC3 positions and unsigned SCALAR indices without normalization |
 | Truncated files, invalid references, cycles or binary ranges | Blocked; repair/re-export in the source tool |
 | Input animation | Counted, static preview only; keep source animation |
 | FBX, PMX/PMD, BLEND | No direct import; export GLB from a suitable existing tool |

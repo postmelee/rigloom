@@ -1,6 +1,7 @@
 # Release policy / 릴리스 정책
 
 ## English
+Latest owner checkpoint (2026-10-24): sequential merge of reviewed/corrected PRs #13 and #14 is authorized. Starting #4 or subsequent implementation requires a new explicit owner approval. This narrows the earlier implementation authorization; it does not authorize releases or deployments.
 Repository creation, planning, research, local implementation, verification, issues, documentation and reviewable PRs are authorized. PR automatic merge is not authorized; leave PRs for review. Do not merge without owner direction.
 
 Before creating release tags, publishing GitHub Releases, deploying to Pages/any hosting, or adding model files to public release artifacts, obtain the owner's explicit approval for that exact batch. Previous drum-vrm approval, successful CI, a merge or milestone completion is not approval.
@@ -10,6 +11,7 @@ Prepare first: change summary, tested commit SHA, executed checks, known limitat
 After an actual deployment, record URL and deployed SHA in handoff. A localhost development server is not public deployment. Planned, implemented/unreleased and deployed are separate states.
 
 ## 한국어
+최신 소유자 지시(2026-10-24): 검토·수정한 PR #13과 #14의 순차 병합은 승인되었습니다. #4와 이후 구현을 시작하려면 소유자의 새로운 명시적 승인이 필요합니다. 이는 이전의 포괄적 구현 승인을 제한하며 릴리스·배포를 승인하지 않습니다.
 저장소 생성, 계획, 조사, 로컬 구현, 검증, 이슈·문서·검토 가능한 PR 작성은 승인되었습니다. PR 자동 병합은 승인되지 않았으며 검토를 위해 남깁니다. 소유자의 지시 없이 병합하지 않습니다.
 
 릴리스 태그, GitHub Release, Pages 등 모든 호스팅 배포, 공개 배포물에 모델 파일 편입은 해당 배치에 대한 소유자의 명시적 승인을 먼저 받아야 합니다. 과거 drum-vrm 승인, CI 통과, 병합, 마일스톤 완료는 승인이 아닙니다.

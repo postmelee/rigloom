@@ -25,3 +25,5 @@ Current `preview_allowed` means this inspector permits a static display attempt.
 No arbitrary size cutoff is presented as a product standard. Current File.arrayBuffer/WASM copy/JSON report and renderer allocate memory; representative browser measurements are required before public use. A full retained source is necessary for future fidelity-preserving serialization; do not reconstruct a VRM from the rendered scene alone.
 
 Development Vite CSS injection requires an inline-style allowance only in the dev-server HTML transform. Production build CSS stays same-origin. Both modes have executed browser tests.
+
+PR #14 review hardening: gltf-json 1.4.1 directly indexes a POSITION reference inside a validation hook, so that reference is bounds-checked before calling the parser. Empty accessor counts and the exact POSITION/index component type, dimensions and normalization are checked before native binary readers, whose assumptions are not enforced by the parser. These checks return diagnostics instead of Rust panics and are exercised in native and release-WASM browser tests. They do not implement #4 humanoid mapping or bind validation.
