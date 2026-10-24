@@ -181,6 +181,90 @@
   },
   {
     "ecosystem": "npm",
+    "name": "@pixiv/three-vrm",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-core",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-materials-hdr-emissive-multiplier",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-materials-mtoon",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-materials-v0compat",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-node-constraint",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/three-vrm-springbone",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrm-0.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-materials-hdr-emissive-multiplier-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-materials-mtoon-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-node-constraint-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-springbone-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-springbone-extended-collider-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@pixiv/types-vrmc-vrm-1.0",
+    "version": "3.5.5",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
     "name": "@playwright/test",
     "version": "1.64.1",
     "license": "Apache-2.0"
@@ -229,9 +313,33 @@
   },
   {
     "ecosystem": "npm",
+    "name": "ajv",
+    "version": "8.20.0",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "ajv-formats",
+    "version": "3.0.1",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
     "name": "detect-libc",
     "version": "2.1.2",
     "license": "Apache-2.0"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "fast-deep-equal",
+    "version": "3.1.3",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "fast-uri",
+    "version": "3.1.9",
+    "license": "BSD-3-Clause"
   },
   {
     "ecosystem": "npm",
@@ -249,6 +357,12 @@
     "ecosystem": "npm",
     "name": "fsevents",
     "version": "2.3.3",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
+    "name": "json-schema-traverse",
+    "version": "1.0.0",
     "license": "MIT"
   },
   {
@@ -319,6 +433,12 @@
   },
   {
     "ecosystem": "npm",
+    "name": "require-from-string",
+    "version": "2.0.2",
+    "license": "MIT"
+  },
+  {
+    "ecosystem": "npm",
     "name": "rolldown",
     "version": "1.2.15",
     "license": "MIT"
@@ -351,12 +471,6 @@
     "ecosystem": "npm",
     "name": "vite",
     "version": "8.3.5",
-    "license": "MIT"
-  },
-  {
-    "ecosystem": "npm",
-    "name": "vscode-jsonrpc",
-    "version": "9.0.0",
     "license": "MIT"
   }
 ]

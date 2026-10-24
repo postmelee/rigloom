@@ -422,3 +422,73 @@ fieldset {
   white-space: nowrap;
   border: 0;
 }
+
+.export-field {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+  font-size: 11px;
+}
+.export-field input,
+.export-field select,
+.export-field textarea {
+  width: 100%;
+  min-width: 0;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 8px;
+  font: inherit;
+}
+.export-field textarea {
+  resize: vertical;
+}
+.export-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.export-confirm input {
+  flex: none;
+  margin-top: 3px;
+}
+.export-confirm[hidden] {
+  display: none;
+}
+#export-vrm,
+#save-vrm,
+#save-conversion {
+  width: 100%;
+  margin-top: 10px;
+}
+#export-status {
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+}
+#export-summary {
+  padding-left: 16px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.diagnostic-list {
+  list-style: none;
+  padding: 0;
+  font-size: 11px;
+}
+.diagnostic-list li {
+  border-left: 2px solid #7b929f;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.diagnostic-list li.error {
+  border-color: #ff9f90;
+}
+.diagnostic-list p {
+  font-size: 11px;
+  margin: 6px 0;
+}

@@ -15,3 +15,31 @@ pub fn inspect_glb_with_mapping(bytes: &[u8], mapping_json: &str) -> Result<Stri
     serde_json::to_string(&rigloom_core::inspect_glb_with_mapping(bytes, &mapping))
         .map_err(|error| JsValue::from_str(&error.to_string()))
 }
+
+/// Binary bytes stay binary across the bridge; the report is independently serializable.
+#[wasm_bindgen]
+pub struct VrmExport {
+    report: String,
+    bytes: Vec<u8>,
+}
+#[wasm_bindgen]
+impl VrmExport {
+    pub fn report_json(&self) -> String {
+        self.report.clone()
+    }
+    pub fn vrm_bytes(&self) -> Vec<u8> {
+        self.bytes.clone()
+    }
+}
+#[wasm_bindgen]
+pub fn export_vrm(bytes: &[u8], request_json: &str) -> Result<VrmExport, JsValue> {
+    let request = serde_json::from_str(request_json)
+        .map_err(|error| JsValue::from_str(&format!("Invalid export request: {error}")))?;
+    let result = rigloom_core::export::export_vrm(bytes, &request);
+    let report = serde_json::to_string(&result.report)
+        .map_err(|error| JsValue::from_str(&error.to_string()))?;
+    Ok(VrmExport {
+        report,
+        bytes: result.bytes.unwrap_or_default(),
+    })
+}

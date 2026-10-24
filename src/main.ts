@@ -8,12 +8,19 @@ import {
   ScanLine,
 } from "lucide";
 import { Viewer } from "./viewer";
-import type { Inspection, Mapping, WorkerReply } from "./protocol";
+import type {
+  ExportRequest,
+  ExportWorkerReply,
+  Inspection,
+  Mapping,
+  WorkerReply,
+} from "./protocol";
+import { ExportPanel } from "./export-panel";
 import { MappingPanel, downloadJSON } from "./mapping-panel";
 import "./style.css";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<header><a class="brand" href="./"><i data-lucide="box"></i>Rigloom</a><span class="badge">M1 · local development</span><div class="spacer"></div><button id="theme" aria-label="Toggle light or dark theme"><i data-lucide="sun-moon"></i></button></header>
-<main><aside><div class="eyebrow">CHARACTER WORKSPACE</div><h1>Inspect your model</h1><p>Start with a self-contained GLB. Review its structure before preparing a humanoid rig.</p><label class="upload"><i data-lucide="upload"></i>Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><button id="cancel" disabled><i data-lucide="x"></i>Cancel inspection</button><ol class="steps"><li aria-current="step"><b>01</b> Inspect GLB <span>Available</span></li><li><b>02</b> Map humanoid <span>Available</span></li><li><b>03</b> Prepare skin <span>Planned</span></li><li><b>04</b> Export VRM <span>Planned</span></li></ol><div class="note">Mapping and bind checks do not certify deformation quality or VRM validity. Joint editing and export are not available yet.</div><a href="https://github.com/postmelee/rigloom" target="_blank" rel="noreferrer">Project & documentation ↗</a></aside>
+<main><aside><div class="eyebrow">CHARACTER WORKSPACE</div><h1>Inspect your model</h1><p>Start with a self-contained GLB. Review its structure before preparing a humanoid rig.</p><label class="upload"><i data-lucide="upload"></i>Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><button id="cancel" disabled><i data-lucide="x"></i>Cancel inspection</button><ol class="steps"><li aria-current="step"><b>01</b> Inspect GLB <span>Available</span></li><li><b>02</b> Map humanoid <span>Available</span></li><li><b>03</b> Prepare skin <span>Planned</span></li><li><b>04</b> Export VRM <span>Available</span></li></ol><div class="note">Mapping and bind checks do not certify deformation quality or VRM validity. Joint editing and weight generation are not available yet.</div><a href="https://github.com/postmelee/rigloom" target="_blank" rel="noreferrer">Project & documentation ↗</a></aside>
 <section class="viewport" aria-label="3D model preview"><div class="view-tools"><button data-view="front">Front</button><button data-view="side">Side</button><button data-view="free">Free</button></div><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><div class="empty" id="empty"><i data-lucide="scan-line"></i><strong>Your model, ready for a closer look</strong><span>Open a GLB to inspect meshes, nodes and existing skins.</span></div><div class="view-hint">Drag to orbit · Scroll to zoom · Right-drag to pan</div></section>
 <aside class="inspector"><div class="eyebrow">INSPECTION</div><h2 id="filename">No model selected</h2><p id="status" role="status" aria-live="polite">Waiting for a GLB file.</p><dl id="stats"></dl><button id="report" disabled><i data-lucide="download"></i>Save report</button><h3>Diagnostics</h3><ul id="diagnostics"><li>Model details will appear here.</li></ul><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details></aside></main><footer>Local development · No public deployment <span>File processing runs in this browser. No upload service is configured.</span></footer>`;
 createIcons({ icons: { Upload, X, SunMoon, Download, Box, ScanLine } });
@@ -32,11 +39,20 @@ try {
 let worker: Worker | undefined,
   revision = 0,
   latest: Inspection | undefined,
-  sourceBytes: ArrayBuffer | undefined;
+  sourceBytes: ArrayBuffer | undefined,
+  sourceSha: string | undefined;
+const exportPanel = new ExportPanel((settings) => {
+  if (!sourceBytes || !sourceSha || !latest?.rig) return;
+  const mapping = Object.fromEntries(
+    latest.rig.mapping.bones.map((bone) => [bone.bone, bone.node]),
+  );
+  startExport({ ...settings, mapping });
+});
 const mappingPanel = new MappingPanel(
   () => {
     latest = undefined;
     save.disabled = true;
+    exportPanel.waitForMapping();
   },
   (mapping) => {
     if (!sourceBytes) return;
@@ -46,13 +62,16 @@ const mappingPanel = new MappingPanel(
   },
 );
 el("report").after(mappingPanel.root);
+mappingPanel.root.after(exportPanel.root);
 const stop = () => {
   revision++;
   worker?.terminate();
   worker = undefined;
   cancel.disabled = true;
   sourceBytes = undefined;
+  sourceSha = undefined;
   mappingPanel.reset();
+  exportPanel.reset();
   viewer?.clear();
   el("empty").hidden = false;
 };
@@ -107,6 +126,7 @@ const runInspection = (
   save.disabled = true;
   cancel.disabled = false;
   mappingPanel.busy();
+  exportPanel.inspecting();
   status.textContent = "Inspecting GLB in Rust…";
   try {
     worker = new Worker(new URL("./inspect.worker.ts", import.meta.url), {
@@ -120,6 +140,7 @@ const runInspection = (
       worker = undefined;
       cancel.disabled = true;
       mappingPanel.reset();
+      exportPanel.reset();
     };
     worker.onmessage = async ({ data }: { data: WorkerReply }) => {
       if (data.revision !== revision) return;
@@ -133,11 +154,14 @@ const runInspection = (
         status.textContent = data.message;
         cancel.disabled = true;
         mappingPanel.reset();
+        exportPanel.reset();
         return;
       }
       sourceBytes = data.bytes;
+      sourceSha = data.source_sha256;
       showReport(data.report);
       mappingPanel.show(data.report, data.source_sha256);
+      exportPanel.setSource(data.report);
       if (!data.report.preview_allowed) {
         viewer?.clear();
         el("empty").hidden = false;
@@ -169,7 +193,67 @@ const runInspection = (
       status.textContent = `Could not inspect file: ${String(error)}`;
       cancel.disabled = true;
       mappingPanel.reset();
+      exportPanel.reset();
     }
+  }
+};
+const startExport = (requestData: ExportRequest) => {
+  if (!sourceBytes || !sourceSha || !latest) return;
+  revision++;
+  const request = revision;
+  worker?.terminate();
+  cancel.disabled = false;
+  save.disabled = true;
+  mappingPanel.busy("Preparing VRM export…");
+  exportPanel.busy();
+  status.textContent = "Exporting VRM in Rust…";
+  const restoreControls = () => {
+    if (latest && sourceSha) mappingPanel.show(latest, sourceSha);
+    save.disabled = !latest;
+    cancel.disabled = true;
+  };
+  const fail = (message: string) => {
+    if (request !== revision) return;
+    worker?.terminate();
+    worker = undefined;
+    restoreControls();
+    exportPanel.failed(message);
+    status.textContent = "VRM export failed. See export diagnostics.";
+  };
+  try {
+    worker = new Worker(new URL("./inspect.worker.ts", import.meta.url), {
+      type: "module",
+    });
+    worker.onerror = () =>
+      fail(
+        "Export worker failed. Rebuild WASM and retry if developing locally.",
+      );
+    worker.onmessage = ({ data }: { data: ExportWorkerReply }) => {
+      if (data.revision !== revision) return;
+      if (data.phase === "exporting") return;
+      if (data.phase === "error") {
+        fail(data.message);
+        return;
+      }
+      worker?.terminate();
+      worker = undefined;
+      if (data.report.source_sha256 !== sourceSha) {
+        fail("The source changed. Inspect the current GLB and export again.");
+        return;
+      }
+      restoreControls();
+      exportPanel.complete(data.report, data.bytes);
+      status.textContent = data.report.export_allowed
+        ? "VRM export complete. Original GLB unchanged."
+        : "Export blocked. See conversion diagnostics.";
+    };
+    const bytes = sourceBytes.slice(0);
+    worker.postMessage(
+      { operation: "export", revision: request, bytes, request: requestData },
+      [bytes],
+    );
+  } catch (error) {
+    fail(`Could not export VRM: ${String(error)}`);
   }
 };
 el<HTMLInputElement>("file").onchange = async (event) => {
