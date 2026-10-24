@@ -4,9 +4,9 @@
 
 An independent browser tool for preparing humanoid characters with Rust, WebAssembly and Three.js. Planned workflow: **GLB → inspect or place joints → skin → preview and correct → VRM 1.0**.
 
-**Status: early development, not released or deployed.** The first implementation PR provides read-only GLB inspection and a 3D preview. Humanoid mapping, joint dragging, automatic weights, project save/restore and VRM export are not implemented. M2 semi-automatic rigging is the core MVP; M1 is only a prerequisite.
+**Status: early development, not released or deployed.** The current [#4 implementation](https://github.com/postmelee/rigloom/issues/4) adds reviewable humanoid mapping and existing bind/weight validation to GLB inspection and 3D preview. Mapping choices can be saved separately for the exact source GLB. Joint dragging, generated weights, project save/restore and VRM export remain unimplemented. M2 semi-automatic rigging is the core MVP; M1 is only a prerequisite.
 
-Initial product scope is a self-contained glTF 2.0 GLB containing one character, possibly multiple meshes, with an existing rig or an unrigged T/A-pose surface. The current inspector is narrower: one scene, dense triangle geometry, embedded BIN/resources, core glTF materials, no extensions or URI resources (including data URIs). It inventories skins but does not certify weight/bind correctness. See the [supported formats and troubleshooting guide](docs/guide/en.md).
+Initial product scope is a self-contained glTF 2.0 GLB containing one character, possibly multiple meshes, with an existing rig or an unrigged T/A-pose surface. The current inspector is narrower: one scene, dense triangle geometry, embedded BIN/resources, core glTF materials, no extensions or URI resources (including data URIs). It checks existing skin data without rewriting it; passing checks does not certify deformation quality or VRM conformance. See the [supported formats and troubleshooting guide](docs/guide/en.md).
 
 ## Local development
 

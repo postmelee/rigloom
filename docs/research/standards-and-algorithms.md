@@ -6,8 +6,8 @@ Research snapshot: 2026-10-24. Exact upstream repository revisions and GitHub li
 
 | Reference | Decision / gate |
 |---|---|
-| [VRM specification](https://github.com/vrm-c/vrm-specification/tree/master/specification) | Target VRMC_vrm 1.0. Required humanoid mapping and metadata are separate exporter checks; use pinned schemas before #5, including unique bone references and hierarchy. Specification licensing needs file-level review before copying schema text. |
-| [glTF 2.0](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html) | Read GLB framing, scenes, buffers/accessors, skins and transforms. GLB alone does not guarantee all resources are embedded. First slice explicitly rejects URI resources/extensions. |
+| [VRM 1.0 humanoid reference](https://github.com/vrm-c/vrm-specification/blob/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/humanoid.md) | #4 uses revision `94e82dd346fa6cf0337c4421728640e5252dd38e` to define bone keys and required/unique/parent rules. No schema/code is vendored. #5 still needs full exporter/metadata schema qualification and file-level licensing review before copying schema text. |
+| [glTF 2.0 skin rules](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#skins) | #4 checks skin hierarchy, inverse binds and all influence sets. Omitted inverse binds are identity; matrix count may exceed joint count. General bind-shape and posed-source interpretation prevent a false identity-only validity rule. Core URI/extension restrictions remain. |
 | [gltf 1.4.1](https://docs.rs/gltf/1.4.1/gltf/) / [gltf-json 1.4.1](https://docs.rs/gltf-json/1.4.1/gltf_json/) | Adopt gltf without default import/image features; gltf-json is transitive schema support. Additional binary/policy validation remains ours; parsing does not certify skin quality. |
 | [wasm-bindgen](https://wasm-bindgen.github.io/wasm-bindgen/) | Adopt pinned bridge for byte input/string report; single worker initially. No assumption of threading/isolation. |
 | [Three.js](https://threejs.org/docs/) | Adopt pinned renderer and core GLTFLoader; no renderer-owned conversion authority. Measure bundle and memory rather than assuming they are small. |
@@ -15,6 +15,8 @@ Research snapshot: 2026-10-24. Exact upstream repository revisions and GitHub li
 | [VRM Add-on for Blender](https://github.com/saturday06/VRM-Addon-for-Blender) | Candidate independent viewer/export reference. No code copied; release/version and environment must be recorded when actually used. |
 | [UniVRM](https://github.com/vrm-c/UniVRM) | Candidate independent Unity implementation for cross-check. Not a browser dependency. No local validation executed. |
 | [MMD Tools](https://github.com/MMD-Blender/blender_mmd_tools) | Future offline input-preparation route only. GPL license metadata; no code copied or bundled. Model rights remain distinct. |
+
+The #4 references above were checked on 2026-10-25. The glTF registry document identifies revision `8e798b02d254cea97659a333cfcb20875b62bdd4`. These are specification references, not newly adopted libraries.
 
 The repository snapshot includes recent pushed_at metadata for comparison, not a claim of support quality. No additional reference library is adopted simply because it appears in this list.
 

@@ -1,5 +1,15 @@
 //! Pure, read-only inspection. No file system, network, DOM or renderer dependencies.
 use serde::Serialize;
+use std::collections::BTreeMap;
+
+pub mod bind;
+pub mod mapping;
+
+#[derive(Debug, Serialize)]
+pub struct RigReview {
+    pub mapping: mapping::MappingReview,
+    pub binds: bind::BindValidation,
+}
 use serde_json::Value;
 
 #[derive(Debug, Serialize, PartialEq)]
@@ -38,6 +48,7 @@ pub struct Inventory {
 }
 #[derive(Debug, Serialize)]
 pub struct Inspection {
+    pub rig: Option<RigReview>,
     pub schema_version: u32,
     pub preview_allowed: bool,
     pub inventory: Inventory,
@@ -47,7 +58,8 @@ pub struct Inspection {
 impl Default for Inspection {
     fn default() -> Self {
         Self {
-            schema_version: 1,
+            schema_version: 2,
+            rig: None,
             preview_allowed: false,
             inventory: Inventory::default(),
             nodes: vec![],
@@ -146,6 +158,15 @@ fn inspect_json(value: &Value, path: &str, report: &mut Inspection) {
 }
 /// Does not modify input. Preview eligibility is intentionally narrower than glTF conformance.
 pub fn inspect_glb(bytes: &[u8]) -> Inspection {
+    inspect_glb_with_mapping(bytes, &BTreeMap::new())
+}
+
+/// Mapping overrides are semantic keys and stable source node indices; null clears a suggestion.
+/// Input bytes and existing transforms, binds and weights are never rewritten.
+pub fn inspect_glb_with_mapping(
+    bytes: &[u8],
+    overrides: &BTreeMap<String, Option<usize>>,
+) -> Inspection {
     let mut report = Inspection::default();
     let json = match framing(bytes) {
         Ok(j) => j,
@@ -217,6 +238,25 @@ pub fn inspect_glb(bytes: &[u8]) -> Inspection {
                         return report;
                     }
                 }
+            }
+        }
+    }
+    // gltf-json permits both representations and gltf then silently favors matrix.
+    // Reject contradictory rest data instead of hiding the source transform.
+    if let Some(nodes) = raw["nodes"].as_array() {
+        for (index, node) in nodes.iter().enumerate() {
+            if node.get("matrix").is_some()
+                && ["translation", "rotation", "scale"]
+                    .iter()
+                    .any(|key| node.get(key).is_some())
+            {
+                report.error(
+                    "rest_transform_conflict",
+                    format!("/nodes/{index}"),
+                    "A node must use either matrix or TRS, never both.",
+                    "Export one unambiguous rest transform per node.",
+                );
+                return report;
             }
         }
     }
@@ -510,10 +550,26 @@ pub fn inspect_glb(bytes: &[u8]) -> Inspection {
             "Keep the source; export animation disposition is a later M1 task.",
         );
     }
-    report.issue(Severity::Warning,"inspection_only","/","Preview eligibility does not certify humanoid mapping, weights, bind consistency or VRM conformance.","Complete the mapping, skin validation and export workflow when implemented.");
+    report.issue(Severity::Warning,"inspection_only","/","Preview and structural rig checks do not certify deformation quality or VRM conformance.","Review mapping and bind warnings; VRM serialization and independent compatibility validation are still pending.");
     report.preview_allowed = !report
         .diagnostics
         .iter()
         .any(|d| d.severity == Severity::Error);
+    if report.preview_allowed {
+        let binds = bind::validate(&gltf);
+        // Three.js currently renders only the first four influences. Never display
+        // a silently truncated skin as if all validated source influences were used.
+        report.preview_allowed = binds.valid
+            && !binds.diagnostics.iter().any(|d| {
+                matches!(
+                    d.code.as_str(),
+                    "preview_influence_limit" | "preview_mesh_transform"
+                )
+            });
+        report.rig = Some(RigReview {
+            mapping: mapping::review(&gltf, overrides),
+            binds,
+        });
+    }
     report
 }
