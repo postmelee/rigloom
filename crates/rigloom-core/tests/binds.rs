@@ -480,3 +480,98 @@ fn unused_skin_must_still_have_at_least_one_joint() {
     // gltf-json 1.4.1 accepts the empty array; our validator must reject it.
     has(&doc, &bin, "skin_joints_empty");
 }
+
+// Retain the original values while relocating dense data into a padded view.
+fn relocate_accessor(
+    doc: &mut Value,
+    bin: &mut Vec<u8>,
+    accessor: usize,
+    view_padding: usize,
+    relative_offset: usize,
+) {
+    let view = doc["accessors"][accessor]["bufferView"].as_u64().unwrap() as usize;
+    let old_start = doc["bufferViews"][view]["byteOffset"].as_u64().unwrap() as usize;
+    let length = doc["bufferViews"][view]["byteLength"].as_u64().unwrap() as usize;
+    let data = bin[old_start..old_start + length].to_vec();
+    while !bin.len().is_multiple_of(4) {
+        bin.push(0);
+    }
+    bin.extend(vec![0; view_padding]);
+    let start = bin.len();
+    bin.extend(vec![0; relative_offset]);
+    bin.extend(data);
+    doc["buffers"][0]["byteLength"] = json!(bin.len());
+    doc["bufferViews"][view]["byteOffset"] = json!(start);
+    doc["bufferViews"][view]["byteLength"] = json!(length + relative_offset);
+    doc["accessors"][accessor]["byteOffset"] = json!(relative_offset);
+}
+
+#[test]
+fn inverse_bind_relative_and_absolute_offsets_must_be_component_aligned() {
+    // Last case aligns the absolute address by cancellation; relative offset is still invalid.
+    for (view_padding, relative_offset) in [(0, 1), (1, 0), (1, 3)] {
+        let (mut doc, mut bin) = fixture();
+        relocate_accessor(&mut doc, &mut bin, 3, view_padding, relative_offset);
+        has(&doc, &bin, "inverse_bind_layout");
+        let result = rigloom_core::inspect_glb(&glb(&doc, &bin));
+        assert!(!result.preview_allowed, "{result:?}");
+        assert!(
+            result
+                .rig
+                .unwrap()
+                .binds
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "inverse_bind_layout")
+        );
+    }
+    let (mut doc, mut bin) = fixture();
+    relocate_accessor(&mut doc, &mut bin, 3, 4, 4);
+    assert!(check(&doc, &bin).valid);
+}
+
+#[test]
+fn skin_attribute_alignment_checks_relative_absolute_and_vertex_boundaries() {
+    for (accessor, view_padding, relative_offset, code) in [
+        (1, 0, 1, "joints_layout"),
+        (1, 1, 0, "joints_layout"),
+        (1, 1, 1, "joints_layout"),
+        (1, 0, 2, "joints_layout"),
+        (2, 0, 1, "weights_layout"),
+        (2, 1, 0, "weights_layout"),
+        (2, 1, 3, "weights_layout"),
+    ] {
+        let (mut doc, mut bin) = fixture();
+        relocate_accessor(&mut doc, &mut bin, accessor, view_padding, relative_offset);
+        has(&doc, &bin, code);
+        assert!(!rigloom_core::inspect_glb(&glb(&doc, &bin)).preview_allowed);
+    }
+    // Vertex alignment is relative to the view, absolute alignment is component-sized.
+    let (mut doc, mut bin) = fixture();
+    relocate_accessor(&mut doc, &mut bin, 1, 2, 4);
+    assert!(check(&doc, &bin).valid);
+}
+
+#[test]
+fn aligned_interleaved_joints_and_weights_preserve_values() {
+    let (mut doc, mut bin) = fixture();
+    let start = bin.len();
+    for _ in 0..3 {
+        bin.extend([0; 8]); // four u16 joint indices
+        for weight in [1f32, 0., 0., 0.] {
+            bin.extend(weight.to_le_bytes());
+        }
+    }
+    doc["buffers"][0]["byteLength"] = json!(bin.len());
+    doc["bufferViews"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({"buffer":0,"byteOffset":start,"byteLength":72,"byteStride":24}));
+    doc["accessors"][1]["bufferView"] = json!(4);
+    doc["accessors"][1]["byteOffset"] = json!(0);
+    doc["accessors"][2]["bufferView"] = json!(4);
+    doc["accessors"][2]["byteOffset"] = json!(8);
+    let result = rigloom_core::inspect_glb(&glb(&doc, &bin));
+    assert!(result.preview_allowed, "{result:?}");
+    assert!(result.rig.unwrap().binds.valid);
+}

@@ -45,6 +45,23 @@ impl BindValidation {
         self.issue(Severity::Warning, code, path, message, remedy);
     }
 }
+// glTF alignment applies both inside the view and at the absolute buffer offset.
+// Vertex elements additionally need four-byte relative offsets and strides.
+fn accessor_aligned(accessor: &gltf::Accessor<'_>, vertex: bool) -> bool {
+    let Some(view) = accessor.view() else {
+        return false;
+    };
+    let component = accessor.data_type().size();
+    let offset = accessor.offset();
+    let stride = view.stride().unwrap_or(accessor.size());
+    offset.is_multiple_of(component)
+        && view
+            .offset()
+            .checked_add(offset)
+            .is_some_and(|absolute| absolute.is_multiple_of(component))
+        && stride.is_multiple_of(component)
+        && (!vertex || (offset.is_multiple_of(4) && stride.is_multiple_of(4)))
+}
 fn multiply(a: Matrix, b: Matrix) -> Matrix {
     std::array::from_fn(|c| std::array::from_fn(|r| (0..4).map(|k| a[k][r] * b[c][k]).sum()))
 }
@@ -265,11 +282,12 @@ pub fn validate(gltf: &gltf::Gltf) -> BindValidation {
                 || accessor.dimensions() != Dimensions::Mat4
                 || accessor.normalized()
                 || accessor.view().is_some_and(|view| view.stride().is_some())
+                || !accessor_aligned(&accessor, false)
             {
                 report.error(
                     "inverse_bind_layout",
                     format!("{path}/inverseBindMatrices"),
-                    "Inverse binds must be tightly packed, non-normalized FLOAT MAT4 values without bufferView.byteStride.",
+                    "Inverse binds must be tightly packed, non-normalized FLOAT MAT4 values without bufferView.byteStride, with relative and absolute offsets aligned to four bytes.",
                 );
             } else if accessor.count() < joints.len() {
                 report.error(
@@ -403,11 +421,12 @@ fn validate_weights(
         if joints.dimensions() != Dimensions::Vec4
             || !matches!(joints.data_type(), DataType::U8 | DataType::U16)
             || joints.normalized()
+            || !accessor_aligned(joints, true)
         {
             report.error(
                 "joints_layout",
                 format!("{path}/attributes/JOINTS_{set}"),
-                "Joint attributes must be non-normalized unsigned byte/short VEC4 values.",
+                "Joint attributes must be non-normalized unsigned byte/short VEC4 values with component-aligned absolute offsets and four-byte relative offsets/strides.",
             );
             layout_ok = false;
         }
@@ -416,11 +435,14 @@ fn validate_weights(
             DataType::U8 | DataType::U16 => weights.normalized(),
             _ => false,
         };
-        if weights.dimensions() != Dimensions::Vec4 || !weights_type {
+        if weights.dimensions() != Dimensions::Vec4
+            || !weights_type
+            || !accessor_aligned(weights, true)
+        {
             report.error(
                 "weights_layout",
                 format!("{path}/attributes/WEIGHTS_{set}"),
-                "Weights must be FLOAT VEC4 or normalized unsigned byte/short VEC4 values.",
+                "Weights must be FLOAT VEC4 or normalized unsigned byte/short VEC4 values with component-aligned absolute offsets and four-byte relative offsets/strides.",
             );
             layout_ok = false;
         }

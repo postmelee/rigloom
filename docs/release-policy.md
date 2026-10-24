@@ -1,7 +1,7 @@
 # Release policy / 릴리스 정책
 
 ## English
-Latest owner checkpoint (2026-10-25): implement #4 humanoid mapping and existing bind/weight validation through its issue and a reviewable PR. This authorizes #4 implementation, verification and documentation. PR merge, #5 or later implementation, release tags, Releases and deployment still require new explicit owner approval.
+Latest owner checkpoint (2026-10-25): review PR #21 for #4, fix and revalidate any findings, then merge if sound. This authorizes this PR merge only. #5 or later implementation, future merges, release tags, Releases and deployment still require new explicit owner approval.
 Repository creation, planning, research, local implementation, verification, issues, documentation and reviewable PRs are authorized. PR automatic merge is not authorized; leave PRs for review. Do not merge without owner direction.
 
 Before creating release tags, publishing GitHub Releases, deploying to Pages/any hosting, or adding model files to public release artifacts, obtain the owner's explicit approval for that exact batch. Previous drum-vrm approval, successful CI, a merge or milestone completion is not approval.
@@ -11,7 +11,7 @@ Prepare first: change summary, tested commit SHA, executed checks, known limitat
 After an actual deployment, record URL and deployed SHA in handoff. A localhost development server is not public deployment. Planned, implemented/unreleased and deployed are separate states.
 
 ## 한국어
-최신 소유자 지시(2026-10-25): #4 휴머노이드 매핑과 기존 바인드·가중치 검증을 이슈와 검토 가능한 PR로 진행합니다. #4 구현·검증·문서화는 승인되었습니다. PR 병합, #5 이후 구현, 릴리스 태그·Release·배포에는 소유자의 새로운 명시적 승인이 필요합니다.
+최신 소유자 지시(2026-10-25): #4의 PR #21을 검토하고 발견한 문제를 수정·재검증한 뒤 문제가 없으면 병합합니다. 이번 PR 병합만 승인되었으며 #5 이후 구현, 후속 병합, 릴리스 태그·Release·배포에는 소유자의 새로운 명시적 승인이 필요합니다.
 저장소 생성, 계획, 조사, 로컬 구현, 검증, 이슈·문서·검토 가능한 PR 작성은 승인되었습니다. PR 자동 병합은 승인되지 않았으며 검토를 위해 남깁니다. 소유자의 지시 없이 병합하지 않습니다.
 
 릴리스 태그, GitHub Release, Pages 등 모든 호스팅 배포, 공개 배포물에 모델 파일 편입은 해당 배치에 대한 소유자의 명시적 승인을 먼저 받아야 합니다. 과거 drum-vrm 승인, CI 통과, 병합, 마일스톤 완료는 승인이 아닙니다.

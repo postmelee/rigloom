@@ -20,7 +20,7 @@ Status: GLB inspection and #4 mapping/bind validation implementation, unreleased
 | Dense triangle geometry, embedded BIN, ordinary core PBR | Inspected and sent to the viewer; rendering can still fail |
 | Existing skin / no skin | Existing joint references, weights, transforms and inverse binds are checked / no skin to validate; neither is automatically repaired or rigged |
 | Missing, duplicate or incorrectly parented humanoid assignments | Correct choices under Humanoid mapping; helper nodes between mapped bones are allowed |
-| Invalid weight values, sums, joint indices or inverse-bind layout | Preview blocked; repair in the source tool; data is not normalized or rewritten automatically |
+| Invalid weight values, sums, joint indices or skin-accessor layout/alignment | Preview blocked; repair in the source tool; data is not normalized or rewritten automatically |
 | More than one JOINTS/WEIGHTS set | All sets are checked, but preview is withheld because the current renderer uses only four influences |
 | Singular skinned-mesh world transform | Bind checks may pass, but preview is withheld because the current renderer cannot safely invert that transform |
 | Matrix combined with TRS fields, or shear in an explicit local node matrix | Blocked; repair the local transform in the source tool |

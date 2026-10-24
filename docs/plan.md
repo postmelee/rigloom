@@ -18,4 +18,4 @@ Implemented boundary: immutable GLB inspection, one Worker and Three.js static p
 
 The first implementation, #3, was verified and merged through PR #14 (`4e1e11cda89518281c16facf5ecc2a098de6c8d5`). #4 is the current implementation/review task; its issue and PR record executed checks and remaining limits. #5–#12 remain implementation/research work, and neither M1 nor M2 is complete. See validation.md and handoff.md.
 
-Owner checkpoint (2026-10-25): proceed with #4 implementation through an issue and PR. PR merge, #5 or later implementation, releases and deployment remain unapproved. The earlier documentation rollback is complete through #20; retain the restored documentation structure. This checkpoint takes precedence over the execution sequence above.
+Owner checkpoint (2026-10-25): review PR #21 for #4, fix/revalidate any findings and merge if sound. After this PR, wait for owner direction before #5 or later implementation. Future merges, releases and deployment remain unapproved. The earlier documentation rollback is complete through #20; retain the restored documentation structure. This checkpoint takes precedence over the execution sequence above.

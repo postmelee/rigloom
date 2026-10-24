@@ -77,7 +77,7 @@ export function rigFixture({ multi = false, defect = "", variant = 0 } = {}) {
   }
 
   const inverseBindOffset = 120;
-  const binary = Buffer.alloc(
+  let binary = Buffer.alloc(
     inverseBindOffset +
       requiredBones.length * 64 +
       (defect === "extra_influences" ? 72 : 0),
@@ -199,6 +199,44 @@ export function rigFixture({ multi = false, defect = "", variant = 0 } = {}) {
     }
   }
 
+  // Keep the matrix/weight bytes themselves valid; only their storage alignment
+  // is malformed so the regression cannot pass via an unrelated value error.
+  if (["bind_offset", "bind_absolute_offset"].includes(defect)) {
+    binary = Buffer.concat([
+      binary.subarray(0, inverseBindOffset),
+      Buffer.alloc(1),
+      binary.subarray(inverseBindOffset),
+      Buffer.alloc(3),
+    ]);
+    if (defect === "bind_offset") {
+      json.accessors[3].byteOffset = 1;
+      json.bufferViews[3].byteLength++;
+    } else {
+      json.bufferViews[3].byteOffset++;
+    }
+  }
+  if (defect === "bind_compensated_offset") {
+    json.bufferViews[3].byteOffset--;
+    json.bufferViews[3].byteLength++;
+    json.accessors[3].byteOffset = 1;
+  }
+  if (defect === "joints_offset") {
+    json.accessors[1].byteOffset = 1;
+    json.bufferViews[1].byteLength++;
+  }
+  if (defect === "weights_offset") {
+    const offset = binary.length;
+    binary = Buffer.concat([
+      binary,
+      Buffer.alloc(1),
+      binary.subarray(72, 120),
+      Buffer.alloc(3),
+    ]);
+    json.bufferViews[2].byteOffset = offset;
+    json.bufferViews[2].byteLength = 49;
+    json.accessors[2].byteOffset = 1;
+  }
+  json.buffers[0].byteLength = binary.length;
   const raw = Buffer.from(JSON.stringify(json));
   const padded = Buffer.alloc(Math.ceil(raw.length / 4) * 4, 32);
   raw.copy(padded);

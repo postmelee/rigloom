@@ -232,3 +232,31 @@ test("rest-transform errors and renderer limits are diagnosed without silently c
     "Inspection complete. Preview ready.",
   );
 });
+
+test("misaligned skin accessors return layout errors before the preview loader", async ({
+  page,
+}) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(String(error)));
+  await page.goto("/");
+  for (const [defect, code] of [
+    ["bind_offset", "inverse_bind_layout"],
+    ["bind_absolute_offset", "inverse_bind_layout"],
+    ["bind_compensated_offset", "inverse_bind_layout"],
+    ["joints_offset", "joints_layout"],
+    ["weights_offset", "weights_layout"],
+  ]) {
+    await uploadRig(page, { defect });
+    await expect(page.locator("#status")).toContainText("Preview blocked");
+    await expect(page.locator("#bind-status")).toContainText(
+      "Bind/weight checks failed",
+    );
+    await expect(page.locator("#diagnostics")).toContainText(code);
+  }
+  await uploadRig(page);
+  await expectValid(page);
+  await expect(page.locator("#status")).toHaveText(
+    "Inspection complete. Preview ready.",
+  );
+  expect(pageErrors).toEqual([]);
+});
