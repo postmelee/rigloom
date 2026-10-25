@@ -67,3 +67,47 @@ export interface MappingFile {
   source_sha256: string;
   mapping: Mapping;
 }
+
+export interface ExportMeta {
+  name: string;
+  authors: string[];
+  version?: string;
+  avatarPermission: string;
+  commercialUsage: string;
+  creditNotation: string;
+  modification: string;
+  allowExcessivelyViolentUsage: boolean;
+  allowExcessivelySexualUsage: boolean;
+  allowPoliticalOrReligiousUsage: boolean;
+  allowAntisocialOrHateUsage: boolean;
+  allowRedistribution: boolean;
+}
+export interface ExportRequest {
+  mapping: Mapping;
+  meta: ExportMeta;
+  source_pose_confirmed: boolean;
+  rights_confirmed: boolean;
+  acknowledge_bind_warning: boolean;
+}
+export interface ConversionReport {
+  schema_version: 1;
+  export_allowed: boolean;
+  diagnostics: Diagnostic[];
+  changes: string[];
+  preserved: string[];
+  limitations: string[];
+  source_byte_length: number;
+  output_byte_length: number;
+  humanoid_bones: number;
+  source_sha256: string;
+  output_sha256: string | null;
+}
+export type ExportWorkerReply =
+  | { revision: number; phase: "exporting" }
+  | {
+      revision: number;
+      phase: "exported";
+      report: ConversionReport;
+      bytes: ArrayBuffer | null;
+    }
+  | { revision: number; phase: "error"; message: string };

@@ -6,19 +6,27 @@ Research snapshot: 2026-10-24. Exact upstream repository revisions and GitHub li
 
 | Reference | Decision / gate |
 |---|---|
-| [VRM 1.0 humanoid reference](https://github.com/vrm-c/vrm-specification/blob/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/humanoid.md) | #4 uses revision `94e82dd346fa6cf0337c4421728640e5252dd38e` to define bone keys and required/unique/parent rules. No schema/code is vendored. #5 still needs full exporter/metadata schema qualification and file-level licensing review before copying schema text. |
+| [VRM 1.0 humanoid reference](https://github.com/vrm-c/vrm-specification/blob/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/humanoid.md) | #4 uses revision `94e82dd346fa6cf0337c4421728640e5252dd38e` for bone keys and required/unique/parent rules. #5 uses the same revision for VRMC_vrm 1.0, metadata and resource disposition. Schema text is not vendored; no redistribution grant was established. Tests fetch exact URL/SHA256-pinned schemas into an ignored cache; see the license ledger. |
 | [glTF 2.0 skin rules](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#skins) | #4 checks skin hierarchy, inverse binds and all influence sets. Omitted inverse binds are identity; matrix count may exceed joint count. General bind-shape and posed-source interpretation prevent a false identity-only validity rule. Core URI/extension restrictions remain. |
 | [gltf 1.4.1](https://docs.rs/gltf/1.4.1/gltf/) / [gltf-json 1.4.1](https://docs.rs/gltf-json/1.4.1/gltf_json/) | Adopt gltf without default import/image features; gltf-json is transitive schema support. Additional binary/policy validation remains ours; parsing does not certify skin quality. |
 | [wasm-bindgen](https://wasm-bindgen.github.io/wasm-bindgen/) | Adopt pinned bridge for byte input/string report; single worker initially. No assumption of threading/isolation. |
 | [Three.js](https://threejs.org/docs/) | Adopt pinned renderer and core GLTFLoader; no renderer-owned conversion authority. Measure bundle and memory rather than assuming they are small. |
-| [three-vrm](https://github.com/pixiv/three-vrm) | Candidate independent-of-exporter loader for #6, not yet a dependency or executed test. A second viewer must not merely wrap the same loader. |
+| [three-vrm](https://github.com/pixiv/three-vrm) | Adopt @pixiv/three-vrm 3.5.5 (MIT) only for #5 development verification, with actual browser image decoding and source-index/bind/material assertions. It is independent of the Rust serializer but shares Three.js with the preview; it does not complete #6's second-viewer/integration work. Executed evidence belongs in validation.md. |
 | [VRM Add-on for Blender](https://github.com/saturday06/VRM-Addon-for-Blender) | Candidate independent viewer/export reference. No code copied; release/version and environment must be recorded when actually used. |
 | [UniVRM](https://github.com/vrm-c/UniVRM) | Candidate independent Unity implementation for cross-check. Not a browser dependency. No local validation executed. |
 | [MMD Tools](https://github.com/MMD-Blender/blender_mmd_tools) | Future offline input-preparation route only. GPL license metadata; no code copied or bundled. Model rights remain distinct. |
 
-The #4 references above were checked on 2026-10-25. The glTF registry document identifies revision `8e798b02d254cea97659a333cfcb20875b62bdd4`. These are specification references, not newly adopted libraries.
+The #4/#5 references above were checked on 2026-10-25. The glTF registry document identifies revision `8e798b02d254cea97659a333cfcb20875b62bdd4`. The schema manifest pins this revision and the VRM revision above, including their transitive JSON Schema references. Ajv 8.20.0 and ajv-formats 3.0.1 (MIT) are development-only validators. Schema checks complement native semantic/binary checks; they are not complete VRM conformance certification.
 
 The repository snapshot includes recent pushed_at metadata for comparison, not a claim of support quality. No additional reference library is adopted simply because it appears in this list.
+
+## VRM 1.0 export decisions
+
+The pinned [root specification](https://github.com/vrm-c/vrm-specification/blob/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/README.md) and [metadata rules](https://github.com/vrm-c/vrm-specification/blob/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/meta.md) require a GLB with VRMC_vrm 1.0, humanoid mapping, a name, authors and the fixed VRM Public License 1.0 URL. The upstream schema does not constrain the exact version/license URL, so the exporter writes those values explicitly. Rigloom requires every usage choice and authority confirmation even though the specification defines restrictive defaults for omitted optional permissions.
+
+The [official model guidance](https://vrm.dev/en/vrm/vrm_features/) requires a T-pose with +Z facing and glTF's right-handed Y-up metric coordinates. VRM 1.0 does not require rebaking all transforms to identity. #5 preserves source transforms/binds and asks the user to confirm preparation; it does not establish those geometric conditions automatically. Humanoid scale components must remain positive.
+
+Core PBR is permitted without MToon. Optional expressions, look-at, first-person, spring-bone and constraint data are not generated. Animations/cameras are defined as unused by VRM, not prohibited source data, so their original references/payload remain and the report explains this limit. Mesh/morph tangent references are omitted per the export guidance, with counts and unchanged BIN bytes; tangent-only morph targets are blocked to preserve target indices. License findings and the distinction between model rights, dependency licenses and schema text are recorded in [the ledger](licenses.md#schema-reference-audit).
 
 ## Skinning candidates (not implemented)
 

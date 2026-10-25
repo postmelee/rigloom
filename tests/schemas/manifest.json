@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "purpose": "Test-only pinned schema verification. Source schema text is not redistributed. Fetch and SHA256-check into ignored .local/schema-cache.",
+  "sources": {
+    "gltf": {
+      "repository": "KhronosGroup/glTF",
+      "commit": "8e798b02d254cea97659a333cfcb20875b62bdd4",
+      "directory": "specification/2.0/schema/"
+    },
+    "vrm": {
+      "repository": "vrm-c/vrm-specification",
+      "commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "directory": "specification/VRMC_vrm-1.0/schema/"
+    }
+  },
+  "files": [
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.expressions.expression.materialColorBind.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.materialColorBind.schema.json",
+      "sha256": "3106d724bf5f680f40e76a4386a7d19d91069edaf942b7a50075e62b92658950"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.expressions.expression.morphTargetBind.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.morphTargetBind.schema.json",
+      "sha256": "32e94d057ee4a590426e92597ba9b0b7ebd527d3be924e5ffbe722d7a6eec4ba"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.expressions.expression.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.schema.json",
+      "sha256": "35671fab00107e0cd95bf7a2675fae4a44aeb5058ea9be3fd88464fb9311beeb"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.expressions.expression.textureTransformBind.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.textureTransformBind.schema.json",
+      "sha256": "692155ed69e8c8ebb6da57d380a11847260064e64dd3ec4bbe57767b42aaef53"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.expressions.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.schema.json",
+      "sha256": "1aafa72830f3ac7cbbb26ca21f9f0e0da2025db453e2df223dbb2750cc848748"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.firstPerson.meshAnnotation.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.meshAnnotation.schema.json",
+      "sha256": "833b4f9309c59925ee46fba4fc2106a37eee31b0ddee8df2de78045a6273cf00"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.firstPerson.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.schema.json",
+      "sha256": "95c524ae48ac6d9163fd1dc7fee6dba1730e86f17f2c370c9239c1486b74c81d"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.humanoid.humanBones.humanBone.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.humanBone.schema.json",
+      "sha256": "1d9c3ffe288e49d38e17048756c35af19b5cb4d3f9b9a9096c91ed51248e6e7a"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.humanoid.humanBones.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.schema.json",
+      "sha256": "eb74f10a7bcae4a4fb44073ffc99b64cadb4c41c000ff137fac651106163f033"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.humanoid.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.schema.json",
+      "sha256": "40f033c9f47d04aae8fa9d5d2ffae6dd5fa2f1592c6885a526a5b4232992f4a0"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.lookAt.rangeMap.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.rangeMap.schema.json",
+      "sha256": "ca423bbb60628a55cd08438201e2dff9f5d0f0fcf939fc69e5e9ebac508fae46"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.lookAt.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.schema.json",
+      "sha256": "a2c5e057f5294e8cae61b51a95a049db46415c818b516f8e2bada98bd5e32c78"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.meta.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.meta.schema.json",
+      "sha256": "8d1d11ce15deedf91da1c5179febf4cc59168a02701e631538962d61f0e146f2"
+    },
+    {
+      "source": "vrm",
+      "name": "VRMC_vrm.schema.json",
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_vrm-1.0/schema/VRMC_vrm.schema.json",
+      "sha256": "b852c4ecaf66cc2ba8af00659d1c408f5b1ae06174ba766319ef7e4d8db2f5e0"
+    },
+    {
+      "source": "gltf",
+      "name": "accessor.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/accessor.schema.json",
+      "sha256": "86f9aacb0b616e1f6a1d5b8ff81e92294602e9e3c98c7f13d2cefdf987c87e35"
+    },
+    {
+      "source": "gltf",
+      "name": "accessor.sparse.indices.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/accessor.sparse.indices.schema.json",
+      "sha256": "5b2978adfa1b2fc82a2ec4ee7715b6bd6d096ef04d442dc371d84659066d9cc1"
+    },
+    {
+      "source": "gltf",
+      "name": "accessor.sparse.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/accessor.sparse.schema.json",
+      "sha256": "05be0c75ee8ec58f0ba82893a5182c1be1e136b22363c3c2abd0fcd5d7d3d6c7"
+    },
+    {
+      "source": "gltf",
+      "name": "accessor.sparse.values.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/accessor.sparse.values.schema.json",
+      "sha256": "f5b13e8c286e4ed63435618e6e877ca434463725d5817f42b82cbd360ed41293"
+    },
+    {
+      "source": "gltf",
+      "name": "animation.channel.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/animation.channel.schema.json",
+      "sha256": "97fbfb2369d155d23c76ebd8005fda50e97deb20a27780571b56f1e62c2e6c2d"
+    },
+    {
+      "source": "gltf",
+      "name": "animation.channel.target.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/animation.channel.target.schema.json",
+      "sha256": "fd9fa16cfd29b768b38e95968d1e794f8edd97ece1055575e85fb401ef555776"
+    },
+    {
+      "source": "gltf",
+      "name": "animation.sampler.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/animation.sampler.schema.json",
+      "sha256": "169b44c4f2b7baf0b5df9cddfd2614bb8d5b47682509bd413daca9a1431a1624"
+    },
+    {
+      "source": "gltf",
+      "name": "animation.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/animation.schema.json",
+      "sha256": "3428db7cf73590c60c89378af9b97f75e2b14e9753ce8c0fd2b3b75316df3681"
+    },
+    {
+      "source": "gltf",
+      "name": "asset.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/asset.schema.json",
+      "sha256": "8843879e8fb04179a7a10e30b79c5026903313e1cbb4216c7f18d8d3b769dc43"
+    },
+    {
+      "source": "gltf",
+      "name": "buffer.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/buffer.schema.json",
+      "sha256": "83baa6d95d0896777742298247cea823924ec58b08436c307cc83c71eb79a3f7"
+    },
+    {
+      "source": "gltf",
+      "name": "bufferView.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/bufferView.schema.json",
+      "sha256": "4759365edff1635ab00daae35f96073f043eb346fc77a2fd6a89be93cf0e651c"
+    },
+    {
+      "source": "gltf",
+      "name": "camera.orthographic.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/camera.orthographic.schema.json",
+      "sha256": "b6a90766c27a19df52f8015b3db0437ffea0e66ecab5b7f79371d8a62ea09df3"
+    },
+    {
+      "source": "gltf",
+      "name": "camera.perspective.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/camera.perspective.schema.json",
+      "sha256": "ca81653aebe8e0bf4aaf4555c0d7a383d703bc71b1fd92082bea7463211971c2"
+    },
+    {
+      "source": "gltf",
+      "name": "camera.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/camera.schema.json",
+      "sha256": "ab8b3b0c6b0250b52baf22ca49f38bca373aa524ed0741960e0b67aca48762eb"
+    },
+    {
+      "source": "gltf",
+      "name": "extension.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/extension.schema.json",
+      "sha256": "364a331d0a961e226cd836bdc8393d3232ff6800f49666ff922f8981f77dca6a"
+    },
+    {
+      "source": "gltf",
+      "name": "extras.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/extras.schema.json",
+      "sha256": "70db7ccfebe098b0c94e85419dee1202500c3d3c99094fcf542a6d0eafb99613"
+    },
+    {
+      "source": "gltf",
+      "name": "glTF.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/glTF.schema.json",
+      "sha256": "3c6d9e093ccd2673307500591f89502249b74c77d6104108199d5cd21468c733"
+    },
+    {
+      "source": "gltf",
+      "name": "glTFChildOfRootProperty.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/glTFChildOfRootProperty.schema.json",
+      "sha256": "cf84763ae6e2d5a4eea74f8271c7ecd16319a5660369a68037be014dec51aa19"
+    },
+    {
+      "source": "gltf",
+      "name": "glTFProperty.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/glTFProperty.schema.json",
+      "sha256": "879f799d2bfa119c879d262ec318e01c0fe914900e71145531acdebd955f683a"
+    },
+    {
+      "source": "gltf",
+      "name": "glTFid.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/glTFid.schema.json",
+      "sha256": "3091582ad34958ec416ff21ccac1118a7281167a6330288e2e08fb176dc9b930"
+    },
+    {
+      "source": "gltf",
+      "name": "image.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/image.schema.json",
+      "sha256": "b1d355646881bf1fd4a038914949739416a5b4877e2a3a82bf04fee4969d4023"
+    },
+    {
+      "source": "gltf",
+      "name": "material.normalTextureInfo.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/material.normalTextureInfo.schema.json",
+      "sha256": "7dd6237e6f349e3eac5aadb9b34184c849e0cff49991083fee4e505a4dcd322d"
+    },
+    {
+      "source": "gltf",
+      "name": "material.occlusionTextureInfo.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/material.occlusionTextureInfo.schema.json",
+      "sha256": "0fe5c84bc48d464947803ab7a66c239f0f6bafd1ff5b81e745701d4327948f6b"
+    },
+    {
+      "source": "gltf",
+      "name": "material.pbrMetallicRoughness.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/material.pbrMetallicRoughness.schema.json",
+      "sha256": "e305b23e11ef0fb3082d3751d018e70db1d6b137a0eaae3b6cc92838589d60bc"
+    },
+    {
+      "source": "gltf",
+      "name": "material.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/material.schema.json",
+      "sha256": "ff9135fc894a7e194361d509f531bcf34d122b1f144986af94cf69364a09658b"
+    },
+    {
+      "source": "gltf",
+      "name": "mesh.primitive.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/mesh.primitive.schema.json",
+      "sha256": "cc51065a4d7b6ff7e74bead51d3ec3de50fb050a89913b5f9d70ed8f5a6fc8b2"
+    },
+    {
+      "source": "gltf",
+      "name": "mesh.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/mesh.schema.json",
+      "sha256": "710ce2660f292361c604cc5bfc044c38c477b790b8e5b5f5fc6251394bfd7b1d"
+    },
+    {
+      "source": "gltf",
+      "name": "node.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/node.schema.json",
+      "sha256": "bd4463cf13f1154fb83fc39b311d8e9d0af1f263115c3f47cd93416b12a5b30a"
+    },
+    {
+      "source": "gltf",
+      "name": "sampler.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/sampler.schema.json",
+      "sha256": "6fe32a8c14eab529583510b4310ed465d8c900acd7ebbd20ee4653aa98bc3b9c"
+    },
+    {
+      "source": "gltf",
+      "name": "scene.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/scene.schema.json",
+      "sha256": "44798bc160abcd8f4bb5e11937c14bc5a88d205932e17c91c5dc337d66bac38c"
+    },
+    {
+      "source": "gltf",
+      "name": "skin.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/skin.schema.json",
+      "sha256": "f553f717a85e728097201ec474500796e81fb321a06ec1d8bcc05d53435296fe"
+    },
+    {
+      "source": "gltf",
+      "name": "texture.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/texture.schema.json",
+      "sha256": "4d1e10668a535a74bed558d365a4ab2fe1a76627ff8aed7ad2b59a5a37a8b0ed"
+    },
+    {
+      "source": "gltf",
+      "name": "textureInfo.schema.json",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/8e798b02d254cea97659a333cfcb20875b62bdd4/specification/2.0/schema/textureInfo.schema.json",
+      "sha256": "f0f4a9b96cfde24c24f63ba336235f3b6c18c2771083db207d262ba8a919bd11"
+    }
+  ]
+}

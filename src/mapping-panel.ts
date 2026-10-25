@@ -74,11 +74,11 @@ export class MappingPanel {
     this.root.querySelector("#bind-status")!.textContent = "";
     this.message.textContent = "";
   }
-  busy() {
+  busy(message = "Validating mapping and existing skin…") {
     this.epoch++;
     this.fields.disabled = true;
     this.save.disabled = true;
-    this.status.textContent = "Validating mapping and existing skin…";
+    this.status.textContent = message;
   }
   show(report: Inspection, sha: string) {
     this.epoch++;

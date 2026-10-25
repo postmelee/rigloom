@@ -4,9 +4,9 @@
 
 An independent browser tool for preparing humanoid characters with Rust, WebAssembly and Three.js. Planned workflow: **GLB → inspect or place joints → skin → preview and correct → VRM 1.0**.
 
-**Status: early development, not released or deployed.** The current [#4 implementation](https://github.com/postmelee/rigloom/issues/4) adds reviewable humanoid mapping and existing bind/weight validation to GLB inspection and 3D preview. Mapping choices can be saved separately for the exact source GLB. Joint dragging, generated weights, project save/restore and VRM export remain unimplemented. M2 semi-automatic rigging is the core MVP; M1 is only a prerequisite.
+**Status: early development, not released or deployed.** The [#5 implementation](https://github.com/postmelee/rigloom/issues/5) adds VRM 1.0 export for existing rigs to GLB inspection, humanoid mapping and bind/weight checks; it awaits PR review. Enter attribution and every usage permission, confirm the source pose and rights, then save the VRM and conversion report. Mapping choices can also be saved for the exact source GLB. Joint dragging, generated weights and project save/restore remain unimplemented. M2 semi-automatic rigging is the core MVP; M1 is only a prerequisite.
 
-Initial product scope is a self-contained glTF 2.0 GLB containing one character, possibly multiple meshes, with an existing rig or an unrigged T/A-pose surface. The current inspector is narrower: one scene, dense triangle geometry, embedded BIN/resources, core glTF materials, no extensions or URI resources (including data URIs). It checks existing skin data without rewriting it; passing checks does not certify deformation quality or VRM conformance. See the [supported formats and troubleshooting guide](docs/guide/en.md).
+Initial product scope is a self-contained glTF 2.0 GLB containing one character, possibly multiple meshes, with an existing rig or an unrigged T/A-pose surface. The current inspector is narrower: one scene, dense triangle geometry, embedded BIN/resources, core glTF materials, no extensions or URI resources (including data URIs). Export requires an existing skin and a source prepared in T-pose, facing +Z, with right-handed Y-up coordinates in meters. These conditions are user-confirmed, not automatically verified or corrected. The exporter preserves the original BIN, skin and supported PBR data, reports omitted tangent references and retains animations/cameras as unused VRM data. Passing checks does not certify deformation quality or compatibility with every VRM application. See the [supported formats and troubleshooting guide](docs/guide/en.md).
 
 ## Local development
 
@@ -31,7 +31,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Files are inspected in a browser Worker and rendered locally. No model upload service, telemetry or external runtime CDN is configured. External resource URIs are rejected before rendering; the browser tests check network behavior for synthetic fixtures. This is not a universal privacy/performance guarantee for every future integration. Development setup downloads dependencies.
+Files are inspected in a browser Worker and rendered locally. No model upload service, telemetry or external runtime CDN is configured. External resource URIs are rejected before rendering; the browser tests check network behavior for synthetic fixtures. This is not a universal privacy/performance guarantee for every future integration. Development setup downloads dependencies. Export tests also fetch hash-pinned upstream schemas into an ignored cache; test-only schema and VRM loader dependencies are not part of the product bundle.
 
 Rigloom prepares standard avatars; [drum-vrm](https://github.com/postmelee/drum-vrm) performs music-driven animation. Neither character-specific conversion rules nor a drum-vrm-only VRM dialect belong here.
 

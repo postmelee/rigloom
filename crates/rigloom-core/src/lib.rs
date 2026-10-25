@@ -3,6 +3,7 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 
 pub mod bind;
+pub mod export;
 pub mod mapping;
 
 #[derive(Debug, Serialize)]
@@ -547,10 +548,10 @@ pub fn inspect_glb_with_mapping(
             "animations_static",
             "/animations",
             "Animations are inventoried but not played in this preview.",
-            "Keep the source; export animation disposition is a later M1 task.",
+            "Keep the source animations; the conversion report explains their disposition when exporting VRM.",
         );
     }
-    report.issue(Severity::Warning,"inspection_only","/","Preview and structural rig checks do not certify deformation quality or VRM conformance.","Review mapping and bind warnings; VRM serialization and independent compatibility validation are still pending.");
+    report.issue(Severity::Warning,"inspection_only","/","Preview and structural rig checks do not certify deformation quality or VRM conformance.","Review mapping and bind warnings before exporting; application compatibility and natural deformation require separate checks.");
     report.preview_allowed = !report
         .diagnostics
         .iter()
