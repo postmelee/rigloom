@@ -43,3 +43,7 @@ Core PBR is permitted without MToon. Optional expressions, look-at, first-person
 ## Evidence required before adopting weights
 
 Generate original connected/disconnected meshes and poses covering long arms/short legs, asymmetry, thin/open geometry, hand near thigh, armpits/groin, overlapping clothes, rigid parts and tiny extremities. Record algorithm/configuration, source hash, vertex/texture/bone counts, CPU/browser, elapsed time and peak-memory method. Assert normalized finite nonnegative influences, valid indices, nonempty weights, neutral-pose preservation and reproducibility. Compare simple baseline with a quality method and an existing tool's recorded output before accepting M2.
+
+## #6 viewer adoption
+
+The independent-viewer requirement uses the official Godot VRM editor importer in Godot 4.5.1, not another three-vrm wrapper. Pin and license gates are recorded in [licenses.md](licenses.md#6-independent-compatibility-tools); numerical evidence/reproduction is in [compatibility.md](../compatibility.md). Adoption is limited to local generated-fixture verification, with no runtime dependency or downloaded character inclusion. It does not resolve #2's skinning algorithm gates.

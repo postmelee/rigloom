@@ -16,7 +16,7 @@
 
 기존 리그의 흐름은 지금 테스트할 수 있습니다: GLB 열기 → 매핑 검토 → 검증 → 출력 정보·이용 조건 입력 → VRM과 변환 보고서 저장. 직접 만들었거나 사용 권한이 있는 작은 T 자세 휴머노이드로 시작하세요. 기존 뼈대·가중치, 필수 휴머노이드 매핑 15개, 장면 하나, 내장 PNG/JPEG 텍스처가 필요합니다. 확장·압축 없이 기본 PBR을 사용하고, 입력 전에 +Z 정면·Y-up·미터 단위를 준비하세요. 파일 크기 한도는 아직 실측하지 않았습니다.
 
-Blender에서 메시와 텍스처를 단일 glTF Binary (`.glb`)로 출력할 수 있습니다. [공식 출력 문서](https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst#file-format-variations)를 참고하고 결과가 아래 지원 범위에 맞는지 확인하세요. `.vrm` 입력이나 확장자만 `.glb`로 바꾸는 방법은 지원하지 않습니다. 자체 생성 출력 fixture는 조작·데이터 보존 확인용이며 해부학적 T 자세나 변형 품질 검증용이 아닙니다. 리그 없는 입력은 검사만 가능하고 관절 배치·가중치 생성은 M2에 남아 있습니다. 폭넓은 뷰어·실제 캐릭터 호환성과 로컬 drum-vrm 연동은 승인 대기 중인 #6 범위입니다.
+Blender에서 메시와 텍스처를 단일 glTF Binary (`.glb`)로 출력할 수 있습니다. [공식 출력 문서](https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst#file-format-variations)를 참고하고 결과가 아래 지원 범위에 맞는지 확인하세요. `.vrm` 입력이나 확장자만 `.glb`로 바꾸는 방법은 지원하지 않습니다. 자체 생성 출력 fixture는 조작·데이터 보존 확인용이며 해부학적 T 자세나 변형 품질 검증용이 아닙니다. 리그 없는 입력은 검사만 가능하고 관절 배치·가중치 생성은 M2에 남아 있습니다. #6 검증은 자체 생성 모델 3종을 three-vrm·별도의 Godot VRM 뷰어·고정된 로컬 drum-vrm 복사본에서 확인합니다. 구현 후 PR 검토 대기 중이며 실제 캐릭터 품질, 모든 뷰어 호환성, 손가락 그립, 충돌 없는 동작이나 성능 한도를 인증하지 않습니다. [호환성 검증 기록](../compatibility.md)을 참고하세요.
 
 ## 현재 지원 범위와 오류
 

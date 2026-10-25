@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-25",
+  "scope": "Generated fixtures only; implemented/unreleased; final tested commit and CI in issue/PR",
+  "environment": {
+    "os": "macOS 26.5.2 (25F84)",
+    "hardware": "Apple M4 Pro",
+    "node": "24.15.0",
+    "rust": "1.94.1",
+    "three": "0.186.1",
+    "threeVrm": "3.5.5"
+  },
+  "inputs": [
+    {
+      "variant": "standard",
+      "sourceSha256": "3767f3e8231da538fd1040b4c8d1c655cd4120428f80ca0a6e4613339544e507",
+      "outputSha256": "e0d0a13aae12c33b83383f8c8706a8a3a0c616e7929d7c3848d69711962907ee",
+      "sourceBytes": 23056,
+      "outputBytes": 23956,
+      "vertices": 120,
+      "neutralError": 5.7220459037665705e-8,
+      "poseErrors": {
+        "leftLowerArm": 5.7220459037665705e-8,
+        "rightLowerLeg": 5.7220459037665705e-8
+      }
+    },
+    {
+      "variant": "short-wide",
+      "sourceSha256": "4ab7b9e4920a11583747743cbcfb59ce0990f9248bfcde6b12e46c5b521864ae",
+      "outputSha256": "369f1d240b1307d077a8a1ed0c18e0fac085795b6e01c7454efce08d42806239",
+      "sourceBytes": 23364,
+      "outputBytes": 24120,
+      "vertices": 120,
+      "neutralError": 7.152557368605983e-8,
+      "poseErrors": {
+        "leftLowerArm": 7.152557368605983e-8,
+        "rightLowerLeg": 7.152557368605983e-8
+      }
+    },
+    {
+      "variant": "asymmetric",
+      "sourceSha256": "efec82b6f45b3b36537d873f16192a4774e0b134cf5fc263164cd6b1d86525dc",
+      "outputSha256": "1eb086e7061d1f3e1f2c7babfb9bcdfd905fecdbe2facbbc2c3534486d418c92",
+      "sourceBytes": 23092,
+      "outputBytes": 23968,
+      "vertices": 120,
+      "neutralError": 5.7220459037665705e-8,
+      "poseErrors": {
+        "leftLowerArm": 5.7220459037665705e-8,
+        "rightLowerLeg": 5.7220459037665705e-8
+      }
+    }
+  ],
+  "godot": [
+    {
+      "variant": "standard",
+      "outputSha256": "e0d0a13aae12c33b83383f8c8706a8a3a0c616e7929d7c3848d69711962907ee",
+      "engine": "4.5.1-stable (official)",
+      "addon": "9c7436f100d62a8c0c84a1db3fa307be788ad792",
+      "errors": {
+        "neutral": 2.5906694496168994e-5,
+        "reset": 2.5906694496168994e-5,
+        "elbow": 2.6896804995653173e-5,
+        "knee": 2.5906694496168994e-5
+      },
+      "rendered": true
+    },
+    {
+      "variant": "short-wide",
+      "outputSha256": "369f1d240b1307d077a8a1ed0c18e0fac085795b6e01c7454efce08d42806239",
+      "engine": "4.5.1-stable (official)",
+      "addon": "9c7436f100d62a8c0c84a1db3fa307be788ad792",
+      "errors": {
+        "neutral": 2.1856053952773803e-5,
+        "reset": 2.1856053952773803e-5,
+        "elbow": 2.249239666352689e-5,
+        "knee": 2.1856053952773803e-5
+      },
+      "rendered": true
+    },
+    {
+      "variant": "asymmetric",
+      "outputSha256": "1eb086e7061d1f3e1f2c7babfb9bcdfd905fecdbe2facbbc2c3534486d418c92",
+      "engine": "4.5.1-stable (official)",
+      "addon": "9c7436f100d62a8c0c84a1db3fa307be788ad792",
+      "errors": {
+        "neutral": 2.5906694496168994e-5,
+        "reset": 2.5906694496168994e-5,
+        "elbow": 2.644185259269421e-5,
+        "knee": 2.5906694496168994e-5
+      },
+      "rendered": true
+    }
+  ],
+  "drumVrm": {
+    "commit": "d8dfab38cefc3bffd6edc0b88643d02ff829af73",
+    "browser": "156.0.8078.4",
+    "results": [
+      {
+        "variant": "standard",
+        "outputSha256": "e0d0a13aae12c33b83383f8c8706a8a3a0c616e7929d7c3848d69711962907ee",
+        "requiredBones": 15,
+        "missing": [],
+        "fingers": {
+          "left": 0,
+          "right": 0
+        },
+        "hits": 193,
+        "diagnostics": {},
+        "sampleTimes": [1, 0, 0.25, 0.5, 2, 5, 10, 20, 29, 1],
+        "repeatError": 0,
+        "movement": 0.3623285685137001,
+        "maxContactError": 1.1094446036124596e-7,
+        "uiImportAndPlayback": true,
+        "errors": [],
+        "externalRequests": []
+      },
+      {
+        "variant": "short-wide",
+        "outputSha256": "369f1d240b1307d077a8a1ed0c18e0fac085795b6e01c7454efce08d42806239",
+        "requiredBones": 15,
+        "missing": [],
+        "fingers": {
+          "left": 0,
+          "right": 0
+        },
+        "hits": 193,
+        "diagnostics": {},
+        "sampleTimes": [1, 0, 0.25, 0.5, 2, 5, 10, 20, 29, 1],
+        "repeatError": 0,
+        "movement": 1.0295592692027564,
+        "maxContactError": 6.97257677870598e-8,
+        "uiImportAndPlayback": true,
+        "errors": [],
+        "externalRequests": []
+      },
+      {
+        "variant": "asymmetric",
+        "outputSha256": "1eb086e7061d1f3e1f2c7babfb9bcdfd905fecdbe2facbbc2c3534486d418c92",
+        "requiredBones": 15,
+        "missing": [],
+        "fingers": {
+          "left": 0,
+          "right": 0
+        },
+        "hits": 193,
+        "diagnostics": {},
+        "sampleTimes": [1, 0, 0.25, 0.5, 2, 5, 10, 20, 29, 1],
+        "repeatError": 0,
+        "movement": 0.35623190836263163,
+        "maxContactError": 5.39032534692904e-8,
+        "uiImportAndPlayback": true,
+        "errors": [],
+        "externalRequests": []
+      }
+    ]
+  }
+}
