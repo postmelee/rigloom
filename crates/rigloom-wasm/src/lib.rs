@@ -58,3 +58,39 @@ pub fn validate_placement(joints_json: &str) -> Result<(), JsValue> {
         .map_err(|e| JsValue::from_str(&format!("Invalid joints: {e}")))?;
     rigloom_core::placement::validate(&joints).map_err(|e| JsValue::from_str(&e))
 }
+
+#[wasm_bindgen]
+pub fn skin_parts(bytes: &[u8], frame_json: &str) -> Result<String, JsValue> {
+    let frame = serde_json::from_str(frame_json)
+        .map_err(|e| JsValue::from_str(&format!("Invalid frame: {e}")))?;
+    let parts =
+        rigloom_core::skinning::list_parts(bytes, &frame).map_err(|e| JsValue::from_str(&e))?;
+    serde_json::to_string(&parts).map_err(|e| JsValue::from_str(&e.to_string()))
+}
+#[wasm_bindgen]
+pub fn generate_skin(bytes: &[u8], request_json: &str) -> Result<GeneratedSkin, JsValue> {
+    let request = serde_json::from_str(request_json)
+        .map_err(|e| JsValue::from_str(&format!("Invalid skin request: {e}")))?;
+    let result =
+        rigloom_core::skinning::generate(bytes, &request).map_err(|e| JsValue::from_str(&e))?;
+    Ok(GeneratedSkin {
+        report: serde_json::to_string(&result.report)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?,
+        bytes: result.bytes,
+    })
+}
+
+#[wasm_bindgen]
+pub struct GeneratedSkin {
+    report: String,
+    bytes: Vec<u8>,
+}
+#[wasm_bindgen]
+impl GeneratedSkin {
+    pub fn report_json(&self) -> String {
+        self.report.clone()
+    }
+    pub fn glb_bytes(&self) -> Vec<u8> {
+        self.bytes.clone()
+    }
+}
