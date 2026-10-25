@@ -1,3 +1,4 @@
+import { RigPanel } from "./rig-panel";
 import { Viewer } from "./viewer";
 import type {
   ExportRequest,
@@ -12,7 +13,7 @@ import "./style.css";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<header class="toolbar">
 <h1>Rigloom</h1><label class="upload">Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><span id="filename"></span>
-<nav aria-label="Workspace"><button data-panel="model" aria-controls="panel-model" aria-expanded="false">Model</button><button data-panel="mapping" aria-controls="panel-mapping" aria-expanded="false">Mapping</button><button data-panel="export" aria-controls="panel-export" aria-expanded="false">Export</button><button id="theme" aria-label="Switch to dark mode">Dark</button></nav></header>
+<nav aria-label="Workspace"><button data-panel="model" aria-controls="panel-model" aria-expanded="false">Model</button><button data-panel="rig" aria-controls="panel-rig" aria-expanded="false">Rig</button><button data-panel="mapping" aria-controls="panel-mapping" aria-expanded="false">Mapping</button><button data-panel="export" aria-controls="panel-export" aria-expanded="false">Export</button><button id="theme" aria-label="Switch to dark mode">Dark</button></nav></header>
 <main class="workspace"><section class="studio" aria-label="3D model preview"><div class="stage-bar"><p id="status" role="status" aria-live="polite">Ready.</p><button id="cancel" disabled>Cancel</button><div class="view-tools" aria-label="Camera view"><button data-view="front" aria-pressed="false">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="free" aria-pressed="true">Free</button></div></div>
 <div class="viewport"><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><p class="empty" id="empty">Open a GLB to preview it.</p></div></section>
 <aside id="inspector" class="inspector" hidden><div class="inspector-heading"><h2 id="panel-title">Model</h2><button id="close-panel" aria-label="Close panel" title="Close (Esc)">×</button></div>
@@ -20,7 +21,7 @@ app.innerHTML = `<header class="toolbar">
 <details id="diagnostic-details" class="diagnostics" hidden><summary id="diagnostic-summary">Diagnostics</summary><ul id="diagnostics"></ul></details></aside></main>`;
 const el = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
-type Panel = "model" | "mapping" | "export";
+type Panel = "model" | "rig" | "mapping" | "export";
 let activePanel: Panel | null = null;
 const panelButtons = [
   ...document.querySelectorAll<HTMLButtonElement>("[data-panel]"),
@@ -88,9 +89,13 @@ const mappingPanel = new MappingPanel(
     runInspection(sourceBytes.slice(0), revision, mapping);
   },
 );
+const rigPanel = new RigPanel(viewer, () => {
+  exportPanel.waitForMapping();
+});
+rigPanel.root.id = "panel-rig";
 mappingPanel.root.id = "panel-mapping";
 exportPanel.root.id = "panel-export";
-for (const panel of [mappingPanel.root, exportPanel.root]) {
+for (const panel of [mappingPanel.root, exportPanel.root, rigPanel.root]) {
   panel.className = "panel";
   panel.hidden = true;
   el("diagnostic-details").before(panel);
@@ -104,6 +109,7 @@ const stop = () => {
   sourceSha = undefined;
   mappingPanel.reset();
   exportPanel.reset();
+  rigPanel.reset();
   viewer?.clear();
   el("empty").hidden = false;
   el("diagnostic-details").hidden = true;
@@ -223,6 +229,8 @@ const runInspection = (
             );
         }
         if (request !== revision) return;
+        if (data.report.inventory.skins === 0)
+          rigPanel.load(data.bytes, data.source_sha256);
         status.textContent = viewer
           ? "Inspection complete. Preview ready."
           : "Inspection complete. WebGL preview unavailable.";

@@ -1,7 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { PlacementOverlay } from "./placement-overlay";
+import type { Placement } from "./placement";
 export class Viewer {
+  readonly placement: PlacementOverlay;
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(40, 1, 0.01, 10000);
@@ -23,6 +26,12 @@ export class Viewer {
     this.grid.visible = false;
     this.scene.add(this.grid);
     this.controls = new OrbitControls(this.camera, canvas);
+    this.placement = new PlacementOverlay(
+      this.scene,
+      this.camera,
+      canvas,
+      this.controls,
+    );
     this.camera.position.set(3, 2, 4);
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement!);
     this.renderer.setAnimationLoop(() => {
@@ -73,7 +82,38 @@ export class Viewer {
         texture.image.close();
     }
   }
+  setPlacement(data: Placement | null, selected = 0, translucent = false) {
+    this.placement.show(data, selected);
+    if (this.current) {
+      this.current.matrixAutoUpdate = false;
+      if (data) this.current.matrix.fromArray(data.matrix.flat());
+      else this.current.matrix.identity();
+      this.current.updateMatrixWorld(true);
+      this.current.traverse((node) => {
+        if (node instanceof THREE.Mesh)
+          for (const m of Array.isArray(node.material)
+            ? node.material
+            : [node.material]) {
+            m.userData.rigOpacity ??= m.opacity;
+            m.userData.rigTransparent ??= m.transparent;
+            m.opacity = translucent ? 0.35 : m.userData.rigOpacity;
+            m.transparent = translucent || m.userData.rigTransparent;
+            m.needsUpdate = true;
+          }
+      });
+      const box = new THREE.Box3().setFromObject(this.current);
+      box.getCenter(this.center);
+      this.radius = Math.max(
+        box.getSize(new THREE.Vector3()).length() / 2,
+        0.1,
+      );
+      this.camera.near = this.radius / 1000;
+      this.camera.far = this.radius * 100;
+      this.camera.updateProjectionMatrix();
+    }
+  }
   clear() {
+    this.placement.show(null);
     ++this.generation;
     this.grid.visible = false;
     if (this.current) {

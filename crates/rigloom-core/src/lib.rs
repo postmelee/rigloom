@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 pub mod bind;
 pub mod export;
 pub mod mapping;
+pub mod placement;
 
 #[derive(Debug, Serialize)]
 pub struct RigReview {

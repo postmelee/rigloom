@@ -66,3 +66,7 @@ Joint drag, weight generation, diagnostic motions and project restore remain pla
 No upload service is configured. Runtime resources are same-origin and model URI resources are blocked before loading. Tests cover generated inputs, not every future deployment. Development export tests download pinned upstream schemas into an ignored cache and use a separate test-only VRM loader; the product does not fetch these schemas. Private model files belong in ignored `.local/`, not the repository. Permission to download/test does not grant video use or redistribution.
 
 Public releases/deployments/model release inclusion require exact-batch owner approval. See the [bilingual release policy](../release-policy.md).
+
+## Place joints in an unrigged model
+
+Open a model without skins, then choose **Rig**. Under **Model frame**, choose the up axis, quarter-turn toward +Z, meters per source unit and floor placement. Applying the frame creates a new placement template; Undo restores the previous state. Review Front and Side views, select a joint and drag its world-axis handles or edit X/Y/Z. Mirror left/right and translucent display can be toggled. Undo/Redo, Reset joint and Reset all are available. Validate joints checks finite positions, hierarchy and left/right relationships; it does not prove that joints are inside anatomy. Save/Load placement is bound to the exact source GLB and is not a full rigging project. Existing skins use Mapping instead. Weight generation follows separately.

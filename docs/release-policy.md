@@ -2,7 +2,7 @@
 
 ## English
 
-Latest instruction (2026-10-25): implement #6 compatibility verification through its issue and a reviewable PR. Do not modify drum-vrm; validate only in a pinned isolated local snapshot. PR merge, #7 or later work, release and deployment require a new owner instruction.
+Latest instruction (2026-10-25): review/merge #25 if sound and continue until unrigged-model joint placement and initial weight generation are locally testable. #25 is merged. Work on #7/#8 and necessary preview/state support through PRs; new PR merges, release and deployment remain unauthorized. Keep drum-vrm unchanged.
 Previous review instruction (2026-10-25): review and merge #22 if sound, then retarget #24 to main, revalidate and merge if sound. #6 implementation, release tags, Releases and deployment remain unauthorized. This checkpoint supersedes the earlier merge restrictions for these two PRs only.
 
 Previous export checkpoint (2026-10-25): implement #5 VRM 1.0 export through its issue and PR. PR #21 for #4 is merged. This authorizes #5 implementation, verification and PR publication only. Its merge, #6 or later implementation, release tags, Releases and deployment require a new owner instruction. Start a local server and request browser interaction if manual input becomes necessary.
@@ -16,7 +16,7 @@ After an actual deployment, record URL and deployed SHA in handoff. A localhost 
 
 ## 한국어
 
-최신 지시(2026-10-25): #6 호환성 검증을 이슈·검토 가능한 PR로 진행합니다. drum-vrm은 수정하지 않고 고정 커밋의 별도 로컬 복사본에서만 연동을 검증합니다. PR 병합, #7 이후 작업, 릴리스·배포에는 새로운 소유자 지시가 필요합니다.
+최신 지시(2026-10-25): #25를 검토해 문제가 없으면 병합하고 리그 없는 모델의 관절 배치·초기 가중치를 로컬에서 테스트할 때까지 진행합니다. #25는 병합했습니다. #7/#8 및 필요한 미리보기·상태 저장을 PR로 구현하며 새로운 PR 병합·릴리스·배포는 승인되지 않았습니다. drum-vrm은 수정하지 않습니다.
 이전 검토 지시(2026-10-25): #22를 검토해 문제가 없으면 병합하고, #24를 main으로 재지정해 다시 검증한 후 문제가 없으면 병합합니다. #6 구현, 릴리스 태그·Release·배포는 승인하지 않았습니다. 이 지시는 두 PR에 한해 이전 병합 제한보다 우선합니다.
 
 이전 출력 지시(2026-10-25): #5 VRM 1.0 내보내기를 이슈·PR로 구현합니다. #4의 PR #21은 병합되었습니다. 이번 승인은 #5 구현·검증·PR 작성까지이며 해당 PR 병합, #6 이후 구현, 릴리스 태그·Release·배포에는 소유자의 새로운 지시가 필요합니다. 직접 브라우저 조작이 필요해지면 로컬 서버를 실행하고 요청합니다.
