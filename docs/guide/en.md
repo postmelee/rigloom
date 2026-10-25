@@ -10,7 +10,7 @@ Status: GLB inspection, mapping/bind validation and #5 existing-rig VRM 1.0 expo
 4. Cancel an inspection/export or select a replacement file. Stale results cannot replace the latest selection.
 5. Choose **Mapping** in the toolbar and review the suggested source nodes. Required bones have an asterisk; expand **Optional bones** for the others. Choose a node or **Unassigned**, then press **Validate mapping**. Ambiguous names require a manual choice. Suggestions use names and general aliases, not anatomical detection.
 6. **Save mapping** downloads choices for all 55 supported bones (15 required). Unassigned or invalid choices can be saved after validation to preserve work. **Load mapping** restores choices for the exact same GLB; validate again to apply them. A changed GLB, unsupported schema or malformed mapping is rejected. The file includes a SHA256 source identity and node choices, not model geometry. Keep the original GLB.
-7. **Model → Save report** downloads inspection, mapping and bind/weight results. Editing or loading mapping choices disables both save actions until validation completes. Neither JSON download is an editable project or VRM. Use **Dark / Light** to change the interface and viewport together. The initial theme follows the system; a manual choice is remembered. **Model / Rig / Mapping / Export** open one panel at a time; click the selected button again, **×**, or press **Esc** to close it. Narrow screens place the controls below the preview. File and button controls are keyboard focusable; full keyboard 3D manipulation is future work.
+7. **Model → Save report** downloads inspection, mapping and bind/weight results. Editing or loading mapping choices disables both save actions until validation completes. Neither JSON download is an editable project or VRM. Use **Dark / Light** to change the interface and viewport together. The initial theme follows the system; a manual choice is remembered. **Model / Rig / Mapping / Export** open one panel at a time; click the selected button again, **×**, or press **Esc** to close it. Narrow screens place the controls below the preview. File and button controls are keyboard focusable; joint and camera keyboard controls are described below.
 
 ## Choosing a file for local testing
 
@@ -73,7 +73,7 @@ Open a model without skins, then choose **Rig**. Under **Model frame**, choose t
 
 ## Generate and test initial weights (local, unmerged)
 
-1. Prepare a **static unrigged T/A-pose GLB without morph targets**, using the supported core format above. Start with a small model you authored or may test. Run `node scripts/unrigged-fixture.mjs` to create three original, simple humanoid test surfaces in `.local/initial-skin/`; `unrigged-standard.glb` is the first example. These are coarse test meshes, not artist-quality avatars.
+1. At the local app URL, choose **Open example** in the top toolbar. It loads `unrigged-standard.glb`, opens **Rig** and focuses the model for immediate keyboard editing. No file chooser or generator command is needed; after a fresh page load, Tab twice then Enter also opens it. This is an original coarse test mesh, not an artist-quality avatar. For your own file, choose **Open GLB**, select a **static unrigged T/A-pose GLB without morph targets**, then choose **Rig**. Use a small model you authored or may test. Developers can also run `node scripts/unrigged-fixture.mjs` to generate standard/short-wide/asymmetric variants in ignored `.local/initial-skin/`.
 2. Place and validate joints in **Rig**. **Initial weights → Method** offers a segment-distance baseline and experimental surface smoothing. Both can attach nearby body parts incorrectly. Surface smoothing follows triangle indices within a primitive; it does not bridge UV seams or infer clothes. **Component → Attachment** can rigidly attach an identified connected part to one joint. Unassigned parts deform automatically; separate clothes may need correction in another tool.
 3. Choose **Generate weights**. Worker status reports validation/computation/loading stages; **Cancel** retains placement. Computation has a 200,000 active vertex-instance guard, not a measured performance promise. Existing skins are preserved; animations and morphs block this initial generation path instead of being deleted.
 4. Preview is separate from editing. Choose a left/right elbow or knee and adjust **Angle** (0–120°). **Edit joints** returns to the source and discards generated weights and export downloads; regenerate after edits. This is a basic visual probe, not the full motion-quality suite. Preview bends are never baked into downloads.
@@ -93,6 +93,20 @@ Open **Rig** in edit mode and click the model (or choose **Keyboard shortcuts �
 | Option (Alt)+↓ / ↑ | −Z / +Z |
 | Shift with a movement key | One tenth of the selected move step |
 | [ / ] | Previous / next joint, wrapping at the ends |
-| 1 / 2 / 3 | Front / Side / Free camera |
 
 The default step is **1 cm** in the prepared meter frame. Choose 1 mm, 1 cm or 10 cm under **Keyboard shortcuts → Move step**. Held movement keys form one undo gesture, ending when released or focus changes. Keyboard moves share mirroring, history and output invalidation with pointer/numeric edits. Move step is a session preference, not stored in placement JSON. These shortcuts edit placement, not weights or preview poses.
+
+## Camera keyboard shortcuts
+
+Focus the model by clicking it or using **View keys → Focus model view** above the preview (Tab/Enter also works). **Open example** focuses it automatically. Use English letter keys. These controls work with any loaded model, including generated preview or a closed Rig panel. Form inputs, IME and Cmd/Ctrl/Alt combinations retain native behavior; dragging a joint handle blocks camera keys. Camera changes do not alter joints, weights or placement undo history.
+
+| Key | Action |
+|---|---|
+| + or = / − | Zoom in / out (without Cmd/Ctrl) |
+| I / K | Orbit upward / downward |
+| J / L | Orbit left / right |
+| Shift+I/K/J/L | Move the camera target up/down/left/right in screen axes |
+| F | Recenter and fit the model, keeping the viewing direction |
+| 1 / 2 / 3 | Front / Side / Free view and fit |
+
+To test the full flow: **Open example → select/move joints → Generate weights → Bend/Angle → Edit joints**. Use **[ / ]** to select joints and arrows to move them while the model has focus. Tab reaches the remaining controls; their native keyboard behavior remains available. Refreshing does not restore unsaved edits: save placement before leaving, then reopen the same source and load the placement file.

@@ -20,7 +20,7 @@ npm run build
 npm run dev
 ```
 
-Open the localhost URL printed by Vite. `npm run fixtures` creates original tiny test GLBs in ignored `.local/fixtures/`. They test structure, not humanoid quality.
+Open the localhost URL printed by Vite and choose **Open example** to load the original unrigged test model directly into Rig editing. See the [keyboard and camera controls](docs/guide/en.md#camera-keyboard-shortcuts). `npm run fixtures` creates original tiny test GLBs in ignored `.local/fixtures/`. They test structure, not humanoid quality.
 
 ```sh
 cargo test --workspace --locked

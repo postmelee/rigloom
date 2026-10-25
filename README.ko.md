@@ -20,7 +20,7 @@ npm run build
 npm run dev
 ```
 
-Vite가 출력하는 localhost 주소를 엽니다. `npm run fixtures`는 직접 생성한 작은 GLB를 git 제외 경로 `.local/fixtures/`에 만듭니다. 이 모델은 구조 검사 용도이며 휴머노이드 품질을 증명하지 않습니다.
+Vite가 출력하는 localhost 주소에서 **Open example**을 누르면 자체 생성한 무리그 테스트 모델이 Rig 편집 화면에 바로 열립니다. [관절·카메라 단축키](docs/guide/ko.md#카메라-단축키)도 사용할 수 있습니다. `npm run fixtures`는 직접 생성한 작은 GLB를 git 제외 경로 `.local/fixtures/`에 만듭니다. 이 모델은 구조 검사 용도이며 휴머노이드 품질을 증명하지 않습니다.
 
 ```sh
 cargo test --workspace --locked

@@ -37,6 +37,34 @@ export class Viewer {
       canvas,
       this.controls,
     );
+    canvas.addEventListener("keydown", (event) => {
+      if (
+        event.target !== canvas ||
+        event.defaultPrevented ||
+        event.isComposing ||
+        event.keyCode === 229 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        !this.current ||
+        this.placement.dragging
+      )
+        return;
+      const key = event.key.toLowerCase();
+      if (
+        !["+", "=", "-", "i", "j", "k", "l", "f", "1", "2", "3"].includes(key)
+      )
+        return;
+      if (event.shiftKey && ["f", "1", "2", "3"].includes(key)) return;
+      event.preventDefault();
+      if (["1", "2", "3"].includes(key))
+        this.view(
+          ({ "1": "front", "2": "side", "3": "free" } as const)[
+            key as "1" | "2" | "3"
+          ],
+        );
+      else this.navigate(key, event.shiftKey);
+    });
     this.camera.position.set(3, 2, 4);
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement!);
     this.renderer.setAnimationLoop(() => {
@@ -185,6 +213,53 @@ export class Viewer {
     this.camera.updateProjectionMatrix();
     this.view("free");
     return true;
+  }
+  private navigate(key: string, pan: boolean) {
+    const offset = this.camera.position.clone().sub(this.controls.target);
+    if (offset.lengthSq() === 0) offset.set(0, 0, this.radius * 0.02);
+    if (key === "f") {
+      this.controls.target.copy(this.center);
+      this.camera.position
+        .copy(this.center)
+        .add(offset.setLength(this.fitDistance()));
+    } else if (["+", "=", "-"].includes(key)) {
+      const distance = THREE.MathUtils.clamp(
+        offset.length() * (key === "-" ? 1 / 0.9 : 0.9),
+        this.radius * 0.02,
+        Math.max(this.radius * 50, this.fitDistance() * 2),
+      );
+      this.camera.position
+        .copy(this.controls.target)
+        .add(offset.setLength(distance));
+    } else if (pan) {
+      const vertical = key === "i" || key === "k";
+      const direction = (
+        vertical ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
+      ).applyQuaternion(this.camera.quaternion);
+      const step =
+        offset.length() *
+        Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) *
+        0.1;
+      direction.multiplyScalar(step * (key === "j" || key === "k" ? -1 : 1));
+      this.controls.target.add(direction);
+      this.camera.position.add(direction);
+    } else {
+      const spherical = new THREE.Spherical().setFromVector3(offset);
+      const step = Math.PI / 24;
+      if (key === "j" || key === "l")
+        spherical.theta += key === "j" ? -step : step;
+      else
+        spherical.phi = THREE.MathUtils.clamp(
+          spherical.phi + (key === "i" ? -step : step),
+          0.01,
+          Math.PI - 0.01,
+        );
+      this.camera.position
+        .copy(this.controls.target)
+        .add(new THREE.Vector3().setFromSpherical(spherical));
+      this.onView("free");
+    }
+    this.controls.update();
   }
   private fitDistance() {
     const halfAngle = Math.atan(
