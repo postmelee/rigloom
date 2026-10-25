@@ -9,6 +9,9 @@ export class PlacementOverlay {
   private gizmo: TransformControls;
   private data?: Placement;
   private selected = 0;
+  get dragging() {
+    return this.gizmo.dragging;
+  }
   onSelect: (index: number) => void = () => {};
   onEdit: (index: number, point: Point) => void = () => {};
   constructor(

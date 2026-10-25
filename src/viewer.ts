@@ -18,6 +18,9 @@ export class Viewer {
   private center = new THREE.Vector3();
   private radius = 2;
   constructor(private canvas: HTMLCanvasElement) {
+    canvas.addEventListener("pointerdown", () =>
+      canvas.focus({ preventScroll: true }),
+    );
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.scene.background = new THREE.Color("#111a20");

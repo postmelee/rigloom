@@ -1,3 +1,4 @@
+import { bindRigShortcuts } from "./rig-shortcuts";
 import type { Frame, PlacementState, Point } from "./placement";
 import type { Mapping } from "./protocol";
 import type { Viewer } from "./viewer";
@@ -39,7 +40,8 @@ export class RigPanel {
 <details><summary>Model frame</summary><label class="export-field">Up axis<select id="rig-up"><option>Y</option><option>Z</option><option>X</option></select></label><label class="export-field">Turn to face +Z<select id="rig-turn"><option value="0">0°</option><option value="1">90°</option><option value="2">180°</option><option value="3">270°</option></select></label><label class="export-field">Meters per source unit<input id="rig-scale" type="number" min="0.000001" max="1000000" step="any" value="1"></label><label><input id="rig-floor" type="checkbox" checked> Place on floor</label><button id="rig-frame">Apply frame</button></details>
 <label class="export-field">Joint<select id="rig-joint"></select></label><div class="rig-coordinates">${["X", "Y", "Z"].map((axis) => `<label>${axis}<input id="rig-${axis.toLowerCase()}" aria-label="Joint ${axis}" type="number" step="0.01"></label>`).join("")}</div>
 <label><input id="rig-symmetry" type="checkbox" checked> Mirror left / right</label><label><input id="rig-translucent" type="checkbox" checked> Translucent model</label>
-<div class="button-row"><button id="rig-undo">Undo</button><button id="rig-redo">Redo</button></div><div class="button-row"><button id="rig-reset-joint">Reset joint</button><button id="rig-reset-all">Reset all</button></div>
+<div class="button-row"><button id="rig-undo" aria-keyshortcuts="Meta+Z Control+Z">Undo</button><button id="rig-redo" aria-keyshortcuts="Meta+Shift+Z Control+Shift+Z Control+Y">Redo</button></div><div class="button-row"><button id="rig-reset-joint">Reset joint</button><button id="rig-reset-all">Reset all</button></div>
+<details><summary>Keyboard shortcuts</summary><p>Click the model first. World axes: ←/→ X · ↑/↓ Y · Alt+↑/↓ Z. Shift: ⅒ step.</p><label class="export-field">Move step<select id="rig-move-step" aria-label="Move step"><option value="0.001">1 mm</option><option value="0.01" selected>1 cm</option><option value="0.1">10 cm</option></select></label><p>⌘/Ctrl+Z: undo · +Shift: redo. [ / ]: joint. 1 / 2 / 3: Front / Side / Free.</p><button id="rig-focus">Focus model</button></details>
 <button id="rig-validate">Validate joints</button><div class="button-row"><button id="rig-save">Save placement</button><label class="upload">Load placement<input id="rig-load" type="file" accept=".json" aria-label="Load placement"></label></div><details><summary>Initial weights</summary><label class="export-field">Method<select id="rig-method" aria-label="Method"><option value="surface">Surface smoothing (experimental)</option><option value="segment">Segment distance (baseline)</option></select></label><label class="export-field">Component<select id="rig-part" aria-label="Component"></select></label><label class="export-field">Attachment<select id="rig-attachment" aria-label="Attachment"><option value="">Deform</option></select></label></details>
 <button id="rig-generate">Generate weights</button></fieldset><button id="rig-cancel" hidden>Cancel</button>
 <fieldset id="rig-preview" hidden><p>Initial weights. Check bends before export.</p><label class="export-field">Bend<select id="rig-bend" aria-label="Bend"><option value="leftLowerArm">Left elbow</option><option value="rightLowerArm">Right elbow</option><option value="leftLowerLeg">Left knee</option><option value="rightLowerLeg">Right knee</option></select></label><label class="export-field">Angle<input id="rig-angle" aria-label="Angle" type="range" min="0" max="120" value="0"><output id="rig-angle-value">0°</output></label><button id="rig-edit">Edit joints</button><div class="button-row"><button id="rig-download">Save rigged GLB</button><button id="rig-weight-report">Save weight report</button></div></fieldset>`;
@@ -198,6 +200,33 @@ export class RigPanel {
       if (this.source) void this.restoreSource();
       this.message("Cancelled. Placement retained.");
     };
+    const canvas = document.querySelector<HTMLCanvasElement>("canvas")!;
+    this.get("rig-focus").onclick = () => canvas.focus();
+    bindRigShortcuts({
+      root: this.root,
+      canvas,
+      enabled: () =>
+        !this.root.hidden &&
+        !!this.state &&
+        !this.get<HTMLFieldSetElement>("rig-controls").disabled &&
+        !viewer?.placement.dragging,
+      history: (redo) => this.history(redo),
+      step: () => Number(this.get<HTMLSelectElement>("rig-move-step").value),
+      move: (axis, amount, record) => {
+        if (!this.state) return;
+        const p: Point = [...this.state.data.joints[this.selected]];
+        p[axis] += amount;
+        this.edit(this.selected, p, record);
+      },
+      select: (direction) => {
+        if (!this.state) return;
+        this.selected =
+          (this.selected + direction + this.state.data.joints.length) %
+          this.state.data.joints.length;
+        this.draw();
+      },
+      view: (mode) => viewer?.view(mode),
+    });
     if (viewer) {
       viewer.placement.onSelect = (index) => {
         this.selected = index;
@@ -324,7 +353,7 @@ export class RigPanel {
     const bytes = this.source.slice(0);
     worker.postMessage({ revision, bytes, frame, joints }, [bytes]);
   }
-  private edit(index: number, p: Point) {
+  private edit(index: number, p: Point, record = true) {
     if (!this.state || this.worker || this.preview) return;
     if (!p.every(Number.isFinite)) {
       this.message("Coordinates must be finite numbers.");
@@ -332,7 +361,7 @@ export class RigPanel {
       return;
     }
     this.revision++;
-    this.remember();
+    if (record) this.remember();
     this.state.data.joints[index] = [...p];
     if (this.get<HTMLInputElement>("rig-symmetry").checked) {
       const pair = [

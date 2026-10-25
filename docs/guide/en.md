@@ -79,3 +79,20 @@ Open a model without skins, then choose **Rig**. Under **Model frame**, choose t
 4. Preview is separate from editing. Choose a left/right elbow or knee and adjust **Angle** (0–120°). **Edit joints** returns to the source and discards generated weights and export downloads; regenerate after edits. This is a basic visual probe, not the full motion-quality suite. Preview bends are never baked into downloads.
 5. **Save rigged GLB** keeps the generated rest rig. **Save weight report** records original/output hashes, frame/joints, algorithm, component attachments and numerical checks. **Save placement** in edit mode includes the source hash, placement and weight settings; keep the original GLB. It is not a complete project file.
 6. For VRM, use **Export** and the explicit metadata/permission workflow above. The prepared source must be a T-pose facing +Z, Y-up, in meters. A-pose placement and bending do not rebake the mesh to T-pose. Numeric success does not certify natural deformation, clothing, hands or every viewer.
+
+## Joint-editing keyboard shortcuts
+
+Open **Rig** in edit mode and click the model (or choose **Keyboard shortcuts → Focus model**). Movement uses the prepared **world axes**, independent of camera orientation. Shortcuts are inactive during work, mouse-handle dragging and generated preview. Inputs/selects keep native editing and IME behavior; closing Rig disables these shortcuts.
+
+| Key | Action |
+|---|---|
+| Cmd/Ctrl+Z | Undo placement; also available when a Rig button has focus |
+| Cmd/Ctrl+Shift+Z; Ctrl+Y | Redo placement |
+| ← / → | −X / +X |
+| ↓ / ↑ | −Y / +Y |
+| Option (Alt)+↓ / ↑ | −Z / +Z |
+| Shift with a movement key | One tenth of the selected move step |
+| [ / ] | Previous / next joint, wrapping at the ends |
+| 1 / 2 / 3 | Front / Side / Free camera |
+
+The default step is **1 cm** in the prepared meter frame. Choose 1 mm, 1 cm or 10 cm under **Keyboard shortcuts → Move step**. Held movement keys form one undo gesture, ending when released or focus changes. Keyboard moves share mirroring, history and output invalidation with pointer/numeric edits. Move step is a session preference, not stored in placement JSON. These shortcuts edit placement, not weights or preview poses.
