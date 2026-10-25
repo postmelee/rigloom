@@ -209,3 +209,19 @@ A formatting check initially stopped before the full browser runs; the test form
 Release WASM/TypeScript/static build, JS formatting and **37 browser scenarios on each development/static server** passed. Three new cases cover keyboard-only example entry and canvas focus, exact fixture bytes in both server modes, visible zoom/orbit/pan/fit changes, unchanged saved placement and undo state, generated-preview camera access, fetch errors/cancellation/source replacement, native input/browser/IME exclusions and repeated pole-adjacent orbit with a preset reset. Existing file-input, placement, export, responsive-layout and compatibility scenarios also pass. An initial formatting check caught the new test file before the full suites; it was fixed and the full checks passed.
 
 Manual localhost verification confirmed Open example → Rig with canvas focus, zoom/orbit/pan keys and visible controls. The original MIT example is generated at build/dev time; no downloaded character or dependency was added. Rust semantics are unchanged, so native tests were not rerun locally for this UI-only delta; PR CI runs the full head. Existing wasm-pack fallback/package-metadata and large-JS-chunk build warnings remain. No public release/deployment, new PR merge or drum-vrm source changes.
+
+
+## Ordered review of #26 / #27 / #29 / #31 — 2026-10-25
+
+The owner explicitly authorized these four merges in sequence, with each successor retargeted to main and revalidated. An isolated checkout kept the existing localhost preview and drum-vrm unchanged. No blocking product finding was identified within the documented experimental scope. Before each merge, its exact head and successful verify CI are recorded in that PR review; the final #31 merge result is recorded there rather than predicted in this document.
+
+| PR | Base used for revalidation | Local checks executed again |
+|---|---|---|
+| #26 | ac046acca9e1342b05330542d7b1346a1f38f9f4 | 81 native tests, strict Clippy, Rust/JS formatting, release WASM/TypeScript/static build, 26 browser cases in each dev/static mode |
+| #27 | 17f4bf989b0a31d0b3a301626af0f24cf3a997c2 | 87 native tests, strict Clippy, Rust/JS formatting, release WASM/TypeScript/static build, 31 browser cases per mode |
+| #29 | f0f980003e5989212078c24ca732db75eca14ce3 | release WASM/TypeScript/static build, JS formatting, 34 browser cases per mode |
+| #31 | e17b230499bf9ff3a601560f331b6d8740f7ac26 | release WASM/TypeScript/static build, JS formatting, 37 browser cases per mode |
+
+All listed local checks passed. Each successor incorporated its new main base without changing the original product tree. #31 additionally reconciles stale README/guide/handoff/architecture and approval text with the reviewed batch, preserving historical evidence. English/Korean changed facts were compared; changed Markdown file links, line counts and Git whitespace checks passed. Rigloom does not define a docs:check script. No native implementation changed in #29/#31; their fresh verify CI includes the native suite. Existing build warnings remain.
+
+The review covers prepared-world placement, source-bound history, per-instance binds and normalized weights, immutable source/resources, cancellation/replacement, edit/preview invalidation, keyboard focus/native input guards and example entry. Generated fixtures do not close #8's representative anatomy/clothing/performance gates or full #9/#10. No release/deployment, external assets or drum-vrm changes.
