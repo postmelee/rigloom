@@ -42,3 +42,11 @@ The installed three-vrm, Ajv and ajv-formats packages declare MIT and include th
 Before any external-model use, record source/version/hash and separate permission for research, download, local testing, public video and redistribution. A marketplace page or purchase does not establish all rights. Before a release, audit actual shipped code notices, platform bundles and asset inventory and request owner approval for the exact inclusion scope.
 
 CI-only GitHub Actions: actions/checkout v4 pinned to `11d5960a326750d5838078e36cf38b85af677262`, and actions/setup-node v4 pinned to `49933ea5288caeca8642d1e84afbd3f7d6820020`. They are workflow tools, not browser runtime assets.
+
+## #6 independent compatibility tools
+
+Godot 4.5.1-stable official macOS universal binary, revision `f62fdbde1`, is used only as a local test engine. Engine source is MIT ([license](https://github.com/godotengine/godot/blob/4.5.1-stable/LICENSE.txt)); bundled third-party code has separate notices ([copyright](https://github.com/godotengine/godot/blob/4.5.1-stable/COPYRIGHT.txt)). The official release asset SHA256 is pinned in [tools.json](../../scripts/compatibility/tools.json). No engine files are distributed with Rigloom.
+
+Godot VRM 2.0.1 `only-addon` revision `9c7436f100d62a8c0c84a1db3fa307be788ad792` is an unmodified local test dependency. Its root LICENSE was read: MIT with V-Sekai/VRM Consortium/MToon/Godot contributor notices. Its model-sample exception is explicit; no sample models are used. The official editor importer supports VRM 1.0 and runs in a separate Godot engine. No add-on source, shader, character model or downloaded binary is committed or included in the product bundle. Core PBR fixtures do not use MToon.
+
+The read-only drum-vrm source snapshot at `d8dfab38cefc3bffd6edc0b88643d02ff829af73` supplies local integration code under its existing MIT license; its package-lock and third-party notices apply. The selected demo and character fixtures are original procedural data, with no recorded music or downloaded character. Snapshot files and built outputs stay ignored. The new Rigloom fixture/motion generators are original MIT code, not research implementation adoption. These choices do not close #2 algorithm/license gates.

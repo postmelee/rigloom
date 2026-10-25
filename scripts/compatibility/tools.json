@@ -1,0 +1,19 @@
+{
+  "godot": {
+    "version": "4.5.1-stable",
+    "revision": "f62fdbde1",
+    "url": "https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_macos.universal.zip",
+    "sha256": "65c27959d02aaacfc131ec7ecb90179ba8045200cb02982bf2be96d117010b8a",
+    "license": "MIT (engine); bundled third-party notices also apply"
+  },
+  "godotVrm": {
+    "repository": "https://github.com/V-Sekai/godot-vrm.git",
+    "revision": "9c7436f100d62a8c0c84a1db3fa307be788ad792",
+    "version": "2.0.1",
+    "license": "MIT (add-on code); no sample models used"
+  },
+  "drumVrm": {
+    "revision": "d8dfab38cefc3bffd6edc0b88643d02ff829af73",
+    "license": "MIT; no external model assets used"
+  }
+}

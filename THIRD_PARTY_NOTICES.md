@@ -13,3 +13,9 @@ Rigloom은 MIT이며 의존성에는 각자의 이용 조건이 적용됩니다.
 런타임은 gltf/gltf-json, serde/serde_json, wasm-bindgen(MIT OR Apache-2.0), Three.js(MIT)을 사용합니다. 개발 의존성에는 별도 라이선스가 적용됩니다. 정확한 버전은 [라이선스 대장](docs/research/licenses.md), 해결된 의존성 목록과 잠금 파일을 확인하세요. 이 개발 고지가 향후 배포물을 인증하지는 않으며 릴리스 승인 요청 전에 실제 포함 코드의 전체 라이선스 문구와 추가 자산을 감사해야 합니다.
 
 독립 내보내기 테스트는 @pixiv/three-vrm 3.5.5, Ajv 8.20.0, ajv-formats 3.0.1(MIT)을 사용하며 전이 의존성은 목록에 기록합니다. 모두 개발 의존성이고 제품에서는 가져오지 않습니다. 테스트 스키마 목록은 업스트림 glTF·VRM 스키마 URL과 SHA-256 값을 고정합니다. 다운로드한 스키마 원문은 Git에서 제외된 로컬 캐시에만 보관하며 재배포하지 않습니다. 업스트림 스키마의 미확정 라이선스 근거는 라이선스 대장을 확인하세요.
+
+## Local compatibility verification tools
+
+The #6 test workflow optionally downloads Godot 4.5.1 (MIT engine with separate bundled third-party notices) and Godot VRM 2.0.1 at `9c7436f100d62a8c0c84a1db3fa307be788ad792` (MIT add-on). They remain local test tools and are not included in the Rigloom application. No external character assets are included. Exact pins, source/license links and the isolated drum-vrm integration boundary are in [the license ledger](docs/research/licenses.md#6-independent-compatibility-tools).
+
+#6 로컬 검증은 Godot 4.5.1(MIT 엔진 및 별도 포함 코드 고지)과 Godot VRM 2.0.1의 `9c7436f100d62a8c0c84a1db3fa307be788ad792` 커밋(MIT 애드온)을 선택적으로 내려받습니다. 모두 로컬 검사 도구이며 Rigloom 제품에 포함하지 않습니다. 외부 캐릭터 에셋은 포함하지 않았습니다. 정확한 버전·해시·라이선스 출처와 격리된 drum-vrm 연동 범위는 [라이선스 대장](docs/research/licenses.md#6-independent-compatibility-tools)에 기록합니다.
