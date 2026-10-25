@@ -1,7 +1,7 @@
 # Release policy / 릴리스 정책
 
 ## English
-Latest UI instruction (2026-10-25): implement #23’s minimal workspace design and run a localhost preview for review. This does not authorize merging either PR or public deployment.
+Latest review instruction (2026-10-25): review and merge #22 if sound, then retarget #24 to main, revalidate and merge if sound. #6 implementation, release tags, Releases and deployment remain unauthorized. This checkpoint supersedes the earlier merge restrictions for these two PRs only.
 
 Previous export checkpoint (2026-10-25): implement #5 VRM 1.0 export through its issue and PR. PR #21 for #4 is merged. This authorizes #5 implementation, verification and PR publication only. Its merge, #6 or later implementation, release tags, Releases and deployment require a new owner instruction. Start a local server and request browser interaction if manual input becomes necessary.
 Repository creation, planning, research, local implementation, verification, issues, documentation and reviewable PRs are authorized. PR automatic merge is not authorized; leave PRs for review. Do not merge without owner direction.
@@ -13,7 +13,7 @@ Prepare first: change summary, tested commit SHA, executed checks, known limitat
 After an actual deployment, record URL and deployed SHA in handoff. A localhost development server is not public deployment. Planned, implemented/unreleased and deployed are separate states.
 
 ## 한국어
-최신 UI 지시(2026-10-25): #23의 간결한 작업 화면을 구현하고 검토용 localhost 서버를 실행합니다. 두 PR의 병합이나 공개 배포를 승인한 것은 아닙니다.
+최신 검토 지시(2026-10-25): #22를 검토해 문제가 없으면 병합하고, #24를 main으로 재지정해 다시 검증한 후 문제가 없으면 병합합니다. #6 구현, 릴리스 태그·Release·배포는 승인하지 않았습니다. 이 지시는 두 PR에 한해 이전 병합 제한보다 우선합니다.
 
 이전 출력 지시(2026-10-25): #5 VRM 1.0 내보내기를 이슈·PR로 구현합니다. #4의 PR #21은 병합되었습니다. 이번 승인은 #5 구현·검증·PR 작성까지이며 해당 PR 병합, #6 이후 구현, 릴리스 태그·Release·배포에는 소유자의 새로운 지시가 필요합니다. 직접 브라우저 조작이 필요해지면 로컬 서버를 실행하고 요청합니다.
 저장소 생성, 계획, 조사, 로컬 구현, 검증, 이슈·문서·검토 가능한 PR 작성은 승인되었습니다. PR 자동 병합은 승인되지 않았으며 검토를 위해 남깁니다. 소유자의 지시 없이 병합하지 않습니다.

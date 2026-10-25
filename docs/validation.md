@@ -164,3 +164,11 @@ Executed locally during this change:
 - 15 Markdown files / 35 local link targets checked without missing files; npm reported zero known vulnerabilities after removing lucide.
 
 No Rust semantics changed, so the native suite was not redundantly rerun locally for this UI-only task; the PR CI verifies the complete final head. Existing large JS bundle warnings and real-character/performance/VRM limitations from #5 remain. The requested development preview was started at http://127.0.0.1:5173/ and left running for owner review; later sessions must check availability. No PR merge, #6 implementation, release or public deployment occurred. Final CI and PR reference are recorded in issue #23.
+
+## Owner-authorized review of #22 and #24 — 2026-10-25
+
+Reviewed exporter preservation/error paths, WASM ownership, worker source/revision checks, export form confirmations/invalidation, and UI theme/panel/accessibility changes. No blocking finding remained. No #6 implementation, release or deployment is included.
+
+- PR #22 exact head `f5fa7b994b2681d8ae43951d66f1469122d5f58a`: isolated local checkout passed all 78 native tests, strict Clippy, Rust formatting, npm clean install, TypeScript/release WASM/static build, JS formatting and all 19 browser tests on both development and static servers. Its verify CI was successful. Merged at `0043eb880b7950947bdcce4a2f8869e989faeb98`.
+- PR #24 was retargeted to main after that merge. Local merge commit `be90b4aaa0c25147f635d7eb98f13cb77ac2b9e3` passed release WASM/TypeScript/static build, JS formatting and all 21 browser tests on both development and static servers (11.3 seconds each). This includes actual exported bytes checked by pinned schemas and the independent loader, plus panel/theme/mobile regressions. Follow-up changes only update documentation; the final PR-head CI is recorded in PR #24 / issue #23 before merge.
+- Large-JS-chunk warnings remain. No representative external character, second viewer, natural deformation, measured resource budget or drum-vrm integration is claimed. User-owned existing-rig core GLB testing is available locally; generated fixtures only establish the tested control/data paths.

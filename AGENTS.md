@@ -4,7 +4,7 @@
 Read docs/handoff.md, then product-requirements.md, plan.md and architecture.md; inspect the corresponding GitHub issues/milestones, then applicable ADRs and research adoption gates. Issues govern execution; documents govern design.
 
 ## Scope and authority
-- Latest owner checkpoint (2026-10-25): implement #23 UI simplification referencing drum-vrm, use minimal native HTML-like controls with light/dark modes, and leave a local server running for owner review. #5 is delivered in open PR #22; stack the separate UI PR on it. No merge, #6 or later implementation, release or deployment is authorized.
+- Latest owner checkpoint (2026-10-25): review and merge #22 if sound, then retarget #24 to main, revalidate and merge if sound. #22 merged at 0043eb880b7950947bdcce4a2f8869e989faeb98. Keep the localhost preview available. #6 or later implementation, release and deployment remain unauthorized.
 - Independent project: postmelee/rigloom, local /Users/melee/Documents/ChatGPT/rigloom. Never modify, resume, switch branches in, or clean the drum-vrm checkout. Read-only references are allowed. Integration must use a separately agreed local validation setup.
 - Repository creation, research, planning, local implementation, verification, documents/issues/PRs are authorized. Work in small reviewable PRs on codex/ branches.
 - No automatic PR merge. Do not merge without owner direction. No release tags, GitHub Releases, Pages/other hosting deployment, or model inclusion in public release artifacts without explicit owner approval for that batch. Passing CI or merging is not approval. See docs/release-policy.md.

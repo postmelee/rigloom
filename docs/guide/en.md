@@ -2,7 +2,7 @@
 
 [한국어](ko.md) · [README](../../README.md)
 
-Status: GLB inspection, mapping/bind validation and #5 existing-rig VRM 1.0 export are implemented, awaiting PR review, unreleased and not publicly deployed. Build locally using the README. The interface is currently English; this Korean/English documentation pair describes the same behavior.
+Status: GLB inspection, mapping/bind validation and #5 existing-rig VRM 1.0 export are implemented, unreleased and not publicly deployed. Build locally using the README. The interface is currently English; this Korean/English documentation pair describes the same behavior.
 
 1. Choose **Open GLB** and select a self-contained glTF 2.0 GLB.
 2. **Model** shows counts, node relationships and diagnostics. Structural or skin-data errors block preview. Mapping errors require correction before export but do not hide an otherwise displayable model. Warnings describe remaining limits.
@@ -11,6 +11,12 @@ Status: GLB inspection, mapping/bind validation and #5 existing-rig VRM 1.0 expo
 5. Choose **Mapping** in the toolbar and review the suggested source nodes. Required bones have an asterisk; expand **Optional bones** for the others. Choose a node or **Unassigned**, then press **Validate mapping**. Ambiguous names require a manual choice. Suggestions use names and general aliases, not anatomical detection.
 6. **Save mapping** downloads choices for all 55 supported bones (15 required). Unassigned or invalid choices can be saved after validation to preserve work. **Load mapping** restores choices for the exact same GLB; validate again to apply them. A changed GLB, unsupported schema or malformed mapping is rejected. The file includes a SHA256 source identity and node choices, not model geometry. Keep the original GLB.
 7. **Model → Save report** downloads inspection, mapping and bind/weight results. Editing or loading mapping choices disables both save actions until validation completes. Neither JSON download is an editable project or VRM. Use **Dark / Light** to change the interface and viewport together. The initial theme follows the system; a manual choice is remembered. **Model / Mapping / Export** open one panel at a time; click the selected button again, **×**, or press **Esc** to close it. Narrow screens place the controls below the preview. File and button controls are keyboard focusable; full keyboard 3D manipulation is future work.
+
+## Choosing a file for local testing
+
+The existing-rig workflow can be tested now: open GLB → review mapping → validate → enter export metadata/permissions → save VRM and the conversion report. Start with your own or an authorized small humanoid in T-pose, with an existing skeleton and weights, all 15 required humanoid assignments, one scene and embedded PNG/JPEG textures. Use core PBR and no extensions or compression; prepare +Z facing, Y-up and meters before import. Size limits have not been measured.
+
+Blender can export a single-file glTF Binary (`.glb`) containing meshes and textures; see the [official exporter documentation](https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst#file-format-variations). Verify that the result meets the supported subset below. A `.vrm` input or simply renaming it to `.glb` is not supported. The original generated export fixture exercises controls and data preservation, not anatomical T-pose or deformation quality. Unrigged input supports inspection only; joint placement and generated weights remain M2. Broader viewer/real-character compatibility and local drum-vrm integration remain #6, pending authorization.
 
 ## Current supported subset and errors
 
