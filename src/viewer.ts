@@ -9,6 +9,7 @@ export class Viewer {
   private current: THREE.Group | null = null;
   private skeleton: THREE.SkeletonHelper | null = null;
   private generation = 0;
+  private grid = new THREE.GridHelper(10, 20, 0xb5b5b5, 0xe2e2e2);
   private center = new THREE.Vector3();
   private radius = 2;
   constructor(private canvas: HTMLCanvasElement) {
@@ -19,8 +20,8 @@ export class Viewer {
     const light = new THREE.DirectionalLight(0xffffff, 3);
     light.position.set(3, 5, 4);
     this.scene.add(light);
-    const grid = new THREE.GridHelper(10, 20, 0x537080, 0x263844);
-    this.scene.add(grid);
+    this.grid.visible = false;
+    this.scene.add(this.grid);
     this.controls = new OrbitControls(this.camera, canvas);
     this.camera.position.set(3, 2, 4);
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement!);
@@ -28,6 +29,18 @@ export class Viewer {
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
     });
+  }
+  setTheme(dark: boolean) {
+    this.scene.background = new THREE.Color(dark ? "#101010" : "#ffffff");
+    // GridHelper stores its two line colors as per-vertex colors.
+    const colors = this.grid.geometry.getAttribute("color");
+    const center = new THREE.Color(dark ? "#555555" : "#aaaaaa");
+    const line = new THREE.Color(dark ? "#292929" : "#e3e3e3");
+    for (let i = 0; i < colors.count; i++) {
+      const color = Math.floor(i / 4) === 10 ? center : line;
+      colors.setXYZ(i, color.r, color.g, color.b);
+    }
+    colors.needsUpdate = true;
   }
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.canvas.parentElement!;
@@ -62,6 +75,7 @@ export class Viewer {
   }
   clear() {
     ++this.generation;
+    this.grid.visible = false;
     if (this.current) {
       this.scene.remove(this.current);
       this.dispose(this.current);
@@ -89,6 +103,7 @@ export class Viewer {
       this.dispose(gltf.scene);
       return false;
     }
+    this.grid.visible = true;
     this.current = gltf.scene;
     this.scene.add(this.current);
     this.skeleton = new THREE.SkeletonHelper(this.current);

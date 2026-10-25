@@ -9,7 +9,6 @@ Rigloom source: MIT, copyright 2026 Taegyu Lee (see LICENSE). Pin direct depende
 | serde_json | 1.0.154 | MIT OR Apache-2.0 | JSON policy and report |
 | wasm-bindgen | 0.2.129 | MIT OR Apache-2.0 | WASM glue |
 | Three.js | 0.186.1 | MIT | Viewer |
-| lucide | 1.61.0 | ISC | Consistent SVG icons |
 | @types/three | 0.186.0 | MIT | Type definitions |
 | TypeScript | 7.0.2 | Apache-2.0 | Development type checks |
 | Vite | 8.3.5 | MIT | Development/build |
@@ -35,7 +34,7 @@ The installed three-vrm, Ajv and ajv-formats packages declare MIT and include th
 ## Assets
 
 - scripts/fixtures.mjs, scripts/rig-fixture.mjs, scripts/export-fixture.mjs and Rust test constructors: original generated geometry, humanoid transforms/skins, morphs, motion samples and PNG pixels under repository MIT. The export PNG is encoded from an authored RGBA pixel, not a downloaded image. Produced binaries stay in ignored .local/ or test memory. No model file is committed or included in a release artifact.
-- Icons: selected lucide SVG definitions; retain its ISC notice.
+- UI controls use text/native HTML. The unused lucide dependency was removed in #23.
 - Fonts: system fonts, no downloaded font asset.
 - External character models, motion assets, datasets and learned weights: none acquired or included.
 - Private originals/conversations/downloads/credentials: forbidden in commits. `.local/` is ignored.

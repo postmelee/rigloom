@@ -29,10 +29,8 @@ test("Rust WASM previews multi-mesh geometry and downloads the report without up
   await expect(page.locator("#nodes li")).toHaveCount(2);
   for (const name of ["Front", "Side", "Free"])
     await page.getByRole("button", { name, exact: true }).click();
-  await page
-    .getByRole("button", { name: "Toggle light or dark theme" })
-    .click();
-  await expect(page.locator("html")).toHaveClass("light");
+  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Save report" }).click();
   const download = await downloadPromise;
@@ -92,7 +90,7 @@ test("cancel and replacement ignore stale results", async ({ page }) => {
       ),
   );
   await upload(page);
-  await page.getByRole("button", { name: "Cancel inspection" }).click();
+  await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.getByRole("status")).toContainText("Cancelled");
   await page.waitForTimeout(600);
   await expect(page.getByRole("status")).toContainText("Cancelled");

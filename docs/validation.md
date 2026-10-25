@@ -147,3 +147,28 @@ Fixtures are authored by scripts/export-fixture.mjs from the repository's origin
 Observed static outputs: main JS 658.68 kB (167.27 kB gzip), WASM 637.62 kB (224.74 kB gzip), worker JS 5.00 kB and CSS 6.25 kB. The existing Vite >500 kB chunk warning remains. Suite timings are not performance benchmarks. The three new direct packages are development-only; the product does not import the schema validator or VRM loader. Schema source text stays in an ignored, hash-verified cache because redistribution rights were not established; see the license ledger.
 
 Remaining limits: source T-pose/+Z/Y-up/meters and permission authority are explicit user assertions. Runtime checks do not exhaustively validate glTF semantics or decode every input image; fixture schema/loader success is not a certificate for each user export. Stored-pose warnings do not establish artist intent or natural deformation. Extra renderer influence/transform limitations remain warnings; preserved data can exceed preview capabilities. Animations/cameras are retained but unused as VRM avatar behavior. No MToon, expressions, look-at, physics, constraints, new skinning, project persistence or joint editing is generated. A second viewer, representative real-character motion/performance and separately arranged drum-vrm integration remain #6 or later work. M1/M2 are not complete.
+
+## #23 simplified workspace — 2026-10-25
+
+Implementation commit: `1016fd63c165a63d464666f4b4347a208e707c63`, based on open export PR #22. The owner requested a minimal native-HTML-like design referencing drum-vrm and a running local preview. drum-vrm was read only; its checkout was not changed.
+
+Replaced the decorative left rail, badges, icons and footer with a compact toolbar, large viewport and one Model/Mapping/Export inspector. Shared diagnostics retain actionable errors/warnings; generic disclaimers remain in documentation/downloaded reports. Export rights/pose confirmations and explicit permission choices are unchanged. Downloads appear when ready and long conversion details are collapsed. Light/dark changes both UI and canvas/grid, follows the system initially and remembers manual choices. Escape closes the inspector and restores focus; narrow screens stack the inspector below the viewport. Removed unused lucide and updated the license inventory.
+
+Executed locally during this change:
+
+- TypeScript, release WASM/static build, JS formatting and whitespace checks passed. Final copy-only empty-state reduction also passed type/format checks.
+- Existing 19 browser scenarios passed on the development server (12.1 seconds), including actual schema/independent-loader export acceptance.
+- Two additional development scenarios passed (2.2 seconds): theme persistence/panel keyboard behavior and a 390×844 viewport with mapping validation, export eligibility and no horizontal overflow.
+- All 21 browser scenarios passed on the static server (10.8 seconds).
+- Visually inspected 1440×900 light/dark mapping views, export/empty views and the 390×844 stacked layout. These were original generated fixtures, not downloaded character models.
+- 15 Markdown files / 35 local link targets checked without missing files; npm reported zero known vulnerabilities after removing lucide.
+
+No Rust semantics changed, so the native suite was not redundantly rerun locally for this UI-only task; the PR CI verifies the complete final head. Existing large JS bundle warnings and real-character/performance/VRM limitations from #5 remain. The requested development preview was started at http://127.0.0.1:5173/ and left running for owner review; later sessions must check availability. No PR merge, #6 implementation, release or public deployment occurred. Final CI and PR reference are recorded in issue #23.
+
+## Owner-authorized review of #22 and #24 — 2026-10-25
+
+Reviewed exporter preservation/error paths, WASM ownership, worker source/revision checks, export form confirmations/invalidation, and UI theme/panel/accessibility changes. No blocking finding remained. No #6 implementation, release or deployment is included.
+
+- PR #22 exact head `f5fa7b994b2681d8ae43951d66f1469122d5f58a`: isolated local checkout passed all 78 native tests, strict Clippy, Rust formatting, npm clean install, TypeScript/release WASM/static build, JS formatting and all 19 browser tests on both development and static servers. Its verify CI was successful. Merged at `0043eb880b7950947bdcce4a2f8869e989faeb98`.
+- PR #24 was retargeted to main after that merge. Local merge commit `be90b4aaa0c25147f635d7eb98f13cb77ac2b9e3` passed release WASM/TypeScript/static build, JS formatting and all 21 browser tests on both development and static servers (11.3 seconds each). This includes actual exported bytes checked by pinned schemas and the independent loader, plus panel/theme/mobile regressions. Follow-up changes only update documentation; the final PR-head CI is recorded in PR #24 / issue #23 before merge.
+- Large-JS-chunk warnings remain. No representative external character, second viewer, natural deformation, measured resource budget or drum-vrm integration is claimed. User-owned existing-rig core GLB testing is available locally; generated fixtures only establish the tested control/data paths.

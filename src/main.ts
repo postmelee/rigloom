@@ -1,12 +1,3 @@
-import {
-  createIcons,
-  Upload,
-  X,
-  SunMoon,
-  Download,
-  Box,
-  ScanLine,
-} from "lucide";
 import { Viewer } from "./viewer";
 import type {
   ExportRequest,
@@ -19,13 +10,49 @@ import { ExportPanel } from "./export-panel";
 import { MappingPanel, downloadJSON } from "./mapping-panel";
 import "./style.css";
 const app = document.querySelector<HTMLDivElement>("#app")!;
-app.innerHTML = `<header><a class="brand" href="./"><i data-lucide="box"></i>Rigloom</a><span class="badge">M1 · local development</span><div class="spacer"></div><button id="theme" aria-label="Toggle light or dark theme"><i data-lucide="sun-moon"></i></button></header>
-<main><aside><div class="eyebrow">CHARACTER WORKSPACE</div><h1>Inspect your model</h1><p>Start with a self-contained GLB. Review its structure before preparing a humanoid rig.</p><label class="upload"><i data-lucide="upload"></i>Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><button id="cancel" disabled><i data-lucide="x"></i>Cancel inspection</button><ol class="steps"><li aria-current="step"><b>01</b> Inspect GLB <span>Available</span></li><li><b>02</b> Map humanoid <span>Available</span></li><li><b>03</b> Prepare skin <span>Planned</span></li><li><b>04</b> Export VRM <span>Available</span></li></ol><div class="note">Mapping and bind checks do not certify deformation quality or VRM validity. Joint editing and weight generation are not available yet.</div><a href="https://github.com/postmelee/rigloom" target="_blank" rel="noreferrer">Project & documentation ↗</a></aside>
-<section class="viewport" aria-label="3D model preview"><div class="view-tools"><button data-view="front">Front</button><button data-view="side">Side</button><button data-view="free">Free</button></div><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><div class="empty" id="empty"><i data-lucide="scan-line"></i><strong>Your model, ready for a closer look</strong><span>Open a GLB to inspect meshes, nodes and existing skins.</span></div><div class="view-hint">Drag to orbit · Scroll to zoom · Right-drag to pan</div></section>
-<aside class="inspector"><div class="eyebrow">INSPECTION</div><h2 id="filename">No model selected</h2><p id="status" role="status" aria-live="polite">Waiting for a GLB file.</p><dl id="stats"></dl><button id="report" disabled><i data-lucide="download"></i>Save report</button><h3>Diagnostics</h3><ul id="diagnostics"><li>Model details will appear here.</li></ul><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details></aside></main><footer>Local development · No public deployment <span>File processing runs in this browser. No upload service is configured.</span></footer>`;
-createIcons({ icons: { Upload, X, SunMoon, Download, Box, ScanLine } });
+app.innerHTML = `<header class="toolbar">
+<h1>Rigloom</h1><label class="upload">Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><span id="filename"></span>
+<nav aria-label="Workspace"><button data-panel="model" aria-controls="panel-model" aria-expanded="false">Model</button><button data-panel="mapping" aria-controls="panel-mapping" aria-expanded="false">Mapping</button><button data-panel="export" aria-controls="panel-export" aria-expanded="false">Export</button><button id="theme" aria-label="Switch to dark mode">Dark</button></nav></header>
+<main class="workspace"><section class="studio" aria-label="3D model preview"><div class="stage-bar"><p id="status" role="status" aria-live="polite">Ready.</p><button id="cancel" disabled>Cancel</button><div class="view-tools" aria-label="Camera view"><button data-view="front" aria-pressed="false">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="free" aria-pressed="true">Free</button></div></div>
+<div class="viewport"><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><p class="empty" id="empty">Open a GLB to preview it.</p></div></section>
+<aside id="inspector" class="inspector" hidden><div class="inspector-heading"><h2 id="panel-title">Model</h2><button id="close-panel" aria-label="Close panel" title="Close (Esc)">×</button></div>
+<section id="panel-model" class="panel" hidden><dl id="stats"></dl><button id="report" disabled>Save report</button><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details><p><a href="https://github.com/postmelee/rigloom/blob/main/docs/guide/en.md" target="_blank" rel="noreferrer">Help</a></p></section>
+<details id="diagnostic-details" class="diagnostics" hidden><summary id="diagnostic-summary">Diagnostics</summary><ul id="diagnostics"></ul></details></aside></main>`;
 const el = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
+type Panel = "model" | "mapping" | "export";
+let activePanel: Panel | null = null;
+const panelButtons = [
+  ...document.querySelectorAll<HTMLButtonElement>("[data-panel]"),
+];
+const setPanel = (panel: Panel | null) => {
+  activePanel = panel;
+  el("inspector").hidden = panel === null;
+  for (const button of panelButtons) {
+    const selected = button.dataset.panel === panel;
+    button.setAttribute("aria-expanded", String(selected));
+    el(`panel-${button.dataset.panel}`).hidden = !selected;
+    if (selected) el("panel-title").textContent = button.textContent;
+  }
+};
+for (const button of panelButtons)
+  button.onclick = () =>
+    setPanel(
+      activePanel === button.dataset.panel
+        ? null
+        : (button.dataset.panel as Panel),
+    );
+const closePanel = () => {
+  const trigger = panelButtons.find(
+    (button) => button.dataset.panel === activePanel,
+  );
+  setPanel(null);
+  trigger?.focus();
+};
+el("close-panel").onclick = closePanel;
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && activePanel) closePanel();
+});
 const status = el("status"),
   cancel = el<HTMLButtonElement>("cancel"),
   save = el<HTMLButtonElement>("report");
@@ -61,8 +88,13 @@ const mappingPanel = new MappingPanel(
     runInspection(sourceBytes.slice(0), revision, mapping);
   },
 );
-el("report").after(mappingPanel.root);
-mappingPanel.root.after(exportPanel.root);
+mappingPanel.root.id = "panel-mapping";
+exportPanel.root.id = "panel-export";
+for (const panel of [mappingPanel.root, exportPanel.root]) {
+  panel.className = "panel";
+  panel.hidden = true;
+  el("diagnostic-details").before(panel);
+}
 const stop = () => {
   revision++;
   worker?.terminate();
@@ -74,6 +106,7 @@ const stop = () => {
   exportPanel.reset();
   viewer?.clear();
   el("empty").hidden = false;
+  el("diagnostic-details").hidden = true;
 };
 const showReport = (report: Inspection) => {
   latest = report;
@@ -94,11 +127,17 @@ const showReport = (report: Inspection) => {
     el("stats").append(term, value);
   }
   el("diagnostics").replaceChildren();
-  for (const diagnostic of [
+  const diagnostics = [
     ...report.diagnostics,
     ...(report.rig?.mapping.diagnostics ?? []),
     ...(report.rig?.binds.diagnostics ?? []),
-  ]) {
+  ].filter((d) => !["inspection_only", "animations_static"].includes(d.code));
+  el("diagnostic-details").hidden = diagnostics.length === 0;
+  el<HTMLDetailsElement>("diagnostic-details").open = diagnostics.some(
+    (d) => d.severity === "error",
+  );
+  el("diagnostic-summary").textContent = `Diagnostics (${diagnostics.length})`;
+  for (const diagnostic of diagnostics) {
     const item = document.createElement("li");
     item.className = diagnostic.severity;
     const title = document.createElement("strong"),
@@ -127,7 +166,7 @@ const runInspection = (
   cancel.disabled = false;
   mappingPanel.busy();
   exportPanel.inspecting();
-  status.textContent = "Inspecting GLB in Rust…";
+  status.textContent = "Inspecting…";
   try {
     worker = new Worker(new URL("./inspect.worker.ts", import.meta.url), {
       type: "module",
@@ -145,7 +184,7 @@ const runInspection = (
     worker.onmessage = async ({ data }: { data: WorkerReply }) => {
       if (data.revision !== revision) return;
       if (data.phase === "inspecting") {
-        status.textContent = "Inspecting GLB in Rust…";
+        status.textContent = "Inspecting…";
         return;
       }
       worker?.terminate();
@@ -175,6 +214,13 @@ const runInspection = (
           const loaded = await viewer.load(data.bytes);
           if (request !== revision || !loaded) return;
           el("empty").hidden = true;
+          for (const button of document.querySelectorAll<HTMLButtonElement>(
+            "[data-view]",
+          ))
+            button.setAttribute(
+              "aria-pressed",
+              String(button.dataset.view === "free"),
+            );
         }
         if (request !== revision) return;
         status.textContent = viewer
@@ -206,7 +252,7 @@ const startExport = (requestData: ExportRequest) => {
   save.disabled = true;
   mappingPanel.busy("Preparing VRM export…");
   exportPanel.busy();
-  status.textContent = "Exporting VRM in Rust…";
+  status.textContent = "Exporting…";
   const restoreControls = () => {
     if (latest && sourceSha) mappingPanel.show(latest, sourceSha);
     save.disabled = !latest;
@@ -270,6 +316,8 @@ el<HTMLInputElement>("file").onchange = async (event) => {
   el("diagnostics").replaceChildren();
   el("nodes").replaceChildren();
   el("filename").textContent = file.name;
+  el("filename").title = file.name;
+  setPanel("model");
   status.textContent = "Reading file…";
   try {
     const bytes = await file.arrayBuffer();
@@ -289,16 +337,51 @@ cancel.onclick = () => {
   el("stats").replaceChildren();
   el("diagnostics").replaceChildren();
   el("nodes").replaceChildren();
+  el("filename").textContent = "";
+  el("filename").removeAttribute("title");
   status.textContent = "Cancelled. Select a GLB to start again.";
 };
 save.onclick = () => {
   if (latest) downloadJSON(latest, "rigloom-inspection.json");
 };
+const systemTheme = matchMedia("(prefers-color-scheme: dark)");
+let savedTheme: string | null = null;
+try {
+  savedTheme = localStorage.getItem("rigloom-theme");
+} catch {
+  /* Storage may be disabled. */
+}
+let explicitTheme = savedTheme === "dark" || savedTheme === "light";
+const applyTheme = (dark: boolean) => {
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  el("theme").textContent = dark ? "Light" : "Dark";
+  el("theme").setAttribute(
+    "aria-label",
+    `Switch to ${dark ? "light" : "dark"} mode`,
+  );
+  viewer?.setTheme(dark);
+};
+applyTheme(explicitTheme ? savedTheme === "dark" : systemTheme.matches);
+systemTheme.addEventListener("change", (event) => {
+  if (!explicitTheme) applyTheme(event.matches);
+});
 el("theme").onclick = () => {
-  document.documentElement.classList.toggle("light");
+  const dark = document.documentElement.dataset.theme !== "dark";
+  explicitTheme = true;
+  applyTheme(dark);
+  try {
+    localStorage.setItem("rigloom-theme", dark ? "dark" : "light");
+  } catch {
+    /* Theme still works without storage. */
+  }
 };
 for (const button of document.querySelectorAll<HTMLButtonElement>(
   "[data-view]",
 ))
-  button.onclick = () =>
+  button.onclick = () => {
     viewer?.view(button.dataset.view as "front" | "side" | "free");
+    for (const item of document.querySelectorAll<HTMLButtonElement>(
+      "[data-view]",
+    ))
+      item.setAttribute("aria-pressed", String(item === button));
+  };

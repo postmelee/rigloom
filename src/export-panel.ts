@@ -15,18 +15,18 @@ export class ExportPanel {
   private report?: ConversionReport;
   private eligible = false;
   constructor(private onExport: (settings: ExportSettings) => void) {
-    this.root.innerHTML = `<details open><summary>VRM 1.0 export</summary><p>Export the reviewed existing rig with its PBR materials and original skin data. Choose the model's usage terms explicitly.</p><p id="export-status" aria-live="polite">Open and validate a rigged GLB to prepare an export.</p><form id="export-form"><fieldset id="export-fields" disabled><legend class="sr-only">VRM model information and usage permissions</legend>
+    this.root.innerHTML = `<p id="export-status" aria-live="polite">Validate a rigged GLB first.</p><div class="button-row export-downloads" id="export-downloads" hidden><button id="save-vrm" disabled>Save VRM</button><button id="save-conversion" disabled>Save conversion report</button></div><ul id="export-diagnostics" class="diagnostic-list"></ul>
+<form id="export-form"><fieldset id="export-fields" disabled><legend class="sr-only">VRM model information and usage permissions</legend>
 <label class="export-field">Avatar name<input id="avatar-name" required autocomplete="off"></label>
 <label class="export-field">Authors (one per line)<textarea id="avatar-authors" required rows="2"></textarea></label>
-<label class="export-field">Version<input id="avatar-version" autocomplete="off"></label>
-<div id="permission-fields"></div>
-<p>The export uses the <a href="https://vrm.dev/licenses/1.0/" target="_blank" rel="noreferrer">VRM Public License 1.0</a> with the choices above. Conversion does not grant rights to a model.</p>
+<label class="export-field">Version<input id="avatar-version" autocomplete="off" placeholder="Optional"></label>
+<h3>Usage permissions</h3><div id="permission-fields"></div>
+<p><a href="https://vrm.dev/licenses/1.0/" target="_blank" rel="noreferrer">VRM Public License 1.0</a></p>
 <label class="export-confirm"><input id="rights-confirmed" type="checkbox" required>I can set these usage permissions</label>
 <label class="export-confirm"><input id="pose-confirmed" type="checkbox" required>Source is a T-pose humanoid facing +Z, Y-up, in meters</label>
 <label class="export-confirm" id="bind-confirmation" hidden><input id="bind-confirmed" type="checkbox">I reviewed the bind-pose warning</label>
-<p>Geometry and transforms are not reoriented. Expressions, gaze and physics are not generated. Source animations and cameras are retained but are not VRM avatar behavior.</p>
 <button type="submit" id="export-vrm" disabled>Export VRM 1.0</button></fieldset></form>
-<button id="save-vrm" disabled>Save VRM</button><button id="save-conversion" disabled>Save conversion report</button><ul id="export-diagnostics" class="diagnostic-list"></ul><ul id="export-summary"></ul></details>`;
+<details id="conversion-details" hidden><summary>Conversion details</summary><ul id="export-summary"></ul></details>`;
     const get = <T extends HTMLElement>(id: string) =>
       this.root.querySelector<T>(`#${id}`)!;
     this.form = get<HTMLFormElement>("export-form");
@@ -116,13 +116,9 @@ export class ExportPanel {
       });
     };
     this.form.oninput = () =>
-      this.invalidate(
-        "Export settings changed. Export again to prepare new files.",
-      );
+      this.invalidate("Settings changed. Export again.");
     this.form.onchange = () =>
-      this.invalidate(
-        "Export settings changed. Export again to prepare new files.",
-      );
+      this.invalidate("Settings changed. Export again.");
     this.saveVrm.onclick = () => {
       if (!this.bytes) return;
       const url = URL.createObjectURL(
@@ -143,6 +139,9 @@ export class ExportPanel {
     this.report = undefined;
     this.saveVrm.disabled = true;
     this.saveReport.disabled = true;
+    this.root.querySelector<HTMLElement>("#export-downloads")!.hidden = true;
+    this.root.querySelector<HTMLDetailsElement>("#conversion-details")!.hidden =
+      true;
     this.root.querySelector("#export-diagnostics")!.replaceChildren();
     this.root.querySelector("#export-summary")!.replaceChildren();
     this.status.textContent = message;
@@ -153,7 +152,7 @@ export class ExportPanel {
     this.submit.disabled = true;
     this.eligible = false;
     this.root.querySelector<HTMLElement>("#bind-confirmation")!.hidden = true;
-    this.invalidate("Open and validate a rigged GLB to prepare an export.");
+    this.invalidate("Validate a rigged GLB first.");
   }
   waitForMapping() {
     this.eligible = false;
@@ -176,12 +175,12 @@ export class ExportPanel {
       !report.rig?.binds.diagnostics.some((d) => d.code === "bind_rest_review");
     this.invalidate(
       this.eligible
-        ? "Ready for model information and explicit usage choices."
+        ? "Enter model information and usage permissions."
         : "Resolve mapping and skin errors before export.",
     );
   }
   busy() {
-    this.invalidate("Exporting VRM in Rust…");
+    this.invalidate("Exporting…");
     this.fields.disabled = true;
   }
   complete(report: ConversionReport, bytes: ArrayBuffer | null) {
@@ -191,6 +190,9 @@ export class ExportPanel {
     this.bytes = report.export_allowed && bytes ? bytes : undefined;
     this.saveVrm.disabled = !this.bytes;
     this.saveReport.disabled = false;
+    this.root.querySelector<HTMLElement>("#export-downloads")!.hidden = false;
+    this.root.querySelector<HTMLDetailsElement>("#conversion-details")!.hidden =
+      false;
     this.status.textContent = this.bytes
       ? "VRM ready. Save the model and conversion report."
       : "Export blocked. Review the diagnostics below.";
@@ -219,6 +221,7 @@ export class ExportPanel {
       item.textContent = text;
       summary.append(item);
     }
+    if (!this.root.hidden) this.status.scrollIntoView({ block: "nearest" });
   }
   failed(message: string) {
     this.fields.disabled = false;

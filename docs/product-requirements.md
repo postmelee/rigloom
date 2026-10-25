@@ -27,7 +27,7 @@ Rigloom is an independent, local-first browser workbench: self-contained GLB →
 - Native Rust, WASM, browser interaction, round trip, independent loader/viewer and local drum-vrm integration form separate validation layers. Screenshots are not conformance proof. Determinism and neutral-surface preservation are acceptance criteria.
 
 ## Interaction and data
-- Light/dark appearance, readable type, consistent SVG icons, large viewport, progressive controls and contextual inspector, cancellation, actionable errors, keyboard focus/selection.
+- Light/dark appearance including the viewport, readable system type, native HTML-like controls, a large viewport and one contextual inspector at a time, cancellation, actionable errors and keyboard focus/selection. Owner direction in #23 favors minimal necessary text and no decorative branding or roadmap panels.
 - No model upload service by default. Verify actual requests, not just WASM use. A single Worker reports phases and revisions; stale results cannot replace new work. SharedArrayBuffer/multithreading requires measured justification.
 - Version project settings and source identity; preserve correction data and invalidate stale derived computations. No model redistribution by default.
 

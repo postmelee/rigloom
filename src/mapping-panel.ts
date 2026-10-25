@@ -17,7 +17,7 @@ export class MappingPanel {
     private onChange: () => void,
     private onValidate: (mapping: Mapping) => void,
   ) {
-    this.root.innerHTML = `<details open><summary>Humanoid mapping</summary><p>Review suggested names, choose source nodes, then validate. Mapping never changes the model.</p><p id="mapping-status" aria-live="polite">Open a GLB to review its humanoid mapping.</p><p id="bind-status"></p><p id="mapping-message" role="alert"></p><fieldset id="mapping-fields" disabled><legend class="sr-only">Humanoid bone assignments</legend><div id="required-bones"></div><details><summary>Optional bones</summary><div id="optional-bones"></div></details><button id="validate-mapping" type="button">Validate mapping</button><button id="save-mapping" type="button">Save mapping</button><label class="upload mapping-upload">Load mapping<input id="load-mapping" type="file" accept=".json,application/json" aria-label="Load mapping"></label></fieldset><p>Mapping files contain choices for this exact GLB. They are not an editable project or a VRM export.</p></details>`;
+    this.root.innerHTML = `<p id="mapping-status" aria-live="polite">Open a GLB to map bones.</p><p id="bind-status"></p><p id="mapping-message" role="alert"></p><fieldset id="mapping-fields" disabled><legend class="sr-only">Humanoid bone assignments</legend><div id="required-bones"></div><details><summary>Optional bones</summary><div id="optional-bones"></div></details><button id="validate-mapping" type="button">Validate mapping</button><div class="button-row"><button id="save-mapping" type="button">Save mapping</button><label class="upload mapping-upload">Load mapping<input id="load-mapping" type="file" accept=".json,application/json" aria-label="Load mapping"></label></div></fieldset>`;
     const get = <T extends HTMLElement>(id: string) =>
       this.root.querySelector<T>(`#${id}`)!;
     this.fields = get<HTMLFieldSetElement>("mapping-fields");
@@ -70,7 +70,7 @@ export class MappingPanel {
     this.fields.disabled = true;
     this.root.querySelector("#required-bones")!.replaceChildren();
     this.root.querySelector("#optional-bones")!.replaceChildren();
-    this.status.textContent = "Open a GLB to review its humanoid mapping.";
+    this.status.textContent = "Open a GLB to map bones.";
     this.root.querySelector("#bind-status")!.textContent = "";
     this.message.textContent = "";
   }
@@ -100,14 +100,14 @@ export class MappingPanel {
     );
     this.drawChoices();
     this.status.textContent = rig.mapping.valid
-      ? "Mapping valid. Review the chosen nodes before conversion."
-      : "Mapping needs attention. Resolve the diagnostics below.";
+      ? "Mapping valid."
+      : "Mapping needs attention. See diagnostics.";
     this.root.querySelector("#bind-status")!.textContent =
       report.inventory.skins === 0
         ? "No existing skin to validate."
         : rig.binds.valid
-          ? "Bind/weight checks passed. Review warnings; deformation quality is not certified."
-          : "Bind/weight checks failed. Source data remains unchanged.";
+          ? "Bind/weight checks passed."
+          : "Bind/weight checks failed.";
   }
   private changed() {
     this.epoch++;
