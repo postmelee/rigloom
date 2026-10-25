@@ -1,0 +1,100 @@
+{
+  "base_commit": "95633279a73af602afa535a45b249be01e4a542e",
+  "algorithm": "surface-v2-experimental",
+  "source_blob": "236fe285d7ac04cbe0ae96ee88770f923ba9c7bf",
+  "environment": {
+    "os": "macOS 26.5.2",
+    "arch": "arm64",
+    "cpu": "Apple M4 Pro",
+    "ram_bytes": 25769803776,
+    "node": "24.15.0",
+    "rust": "1.94.1",
+    "browser": "Playwright 1.64.1 Chromium, SwiftShader"
+  },
+  "samples": [
+    {
+      "name": "seed",
+      "source_sha256": "624d0d554bc205bbdc33e22a68a2c3c20edebb3e573011ead8878a65e5329b23",
+      "derived_sha256": "1330a745def38431a5d5c8efef6ead57b0e9a32ea4479acc2e798c05d2504dd1",
+      "vertices": 34059,
+      "primitives": 21,
+      "runs": [
+        {
+          "method": "segment",
+          "elapsed_ms": 35.725083,
+          "vertices": 34059,
+          "components": 1489,
+          "mean_pose_rms_m": 0.09207981698893092
+        },
+        {
+          "method": "surface",
+          "elapsed_ms": 52.235958,
+          "vertices": 34059,
+          "components": 1489,
+          "mean_pose_rms_m": 0.09205815460907797
+        },
+        {
+          "method": "surface",
+          "elapsed_ms": 56.748875,
+          "vertices": 34059,
+          "components": 1489,
+          "mean_pose_rms_m": 0.09111923800233465
+        }
+      ],
+      "browser": {
+        "elapsed_ms": 969,
+        "browser": "Playwright Chromium",
+        "algorithm": "surface-v2-experimental",
+        "vertices": 34059,
+        "sha256": "4e4e0caa5171d89d4c03507885ce9fc93af96d9c1a39aafec5afcde896d6258d",
+        "native_bytes_equal": true
+      }
+    },
+    {
+      "name": "twist",
+      "source_sha256": "12c2b97e95e700783a6a550dc0eee2d7880aeedccef9ae67bc4c5a2f0f2631a2",
+      "derived_sha256": "7904c071ee9022d35034832de85bc7c155c7fe3ecdb86db4d25ecedb1ab45f4d",
+      "vertices": 24951,
+      "primitives": 13,
+      "runs": [
+        {
+          "method": "segment",
+          "elapsed_ms": 15.882750000000001,
+          "vertices": 24951,
+          "components": 292,
+          "mean_pose_rms_m": 0.011843733069415226
+        },
+        {
+          "method": "surface",
+          "elapsed_ms": 37.989250000000006,
+          "vertices": 24951,
+          "components": 292,
+          "mean_pose_rms_m": 0.011554904586368432
+        },
+        {
+          "method": "surface",
+          "elapsed_ms": 40.969666000000004,
+          "vertices": 24951,
+          "components": 292,
+          "mean_pose_rms_m": 0.009939246492846226
+        }
+      ],
+      "browser": {
+        "elapsed_ms": 657,
+        "browser": "Playwright Chromium",
+        "algorithm": "surface-v2-experimental",
+        "vertices": 24951,
+        "sha256": "5a4419869ae15d57b9216ad3e6a22058bdc032184f8c4748a521ad5ce7937361",
+        "native_bytes_equal": true
+      }
+    }
+  ],
+  "explicit_manual_attachment_run": {
+    "method": "surface",
+    "elapsed_ms": 55.892333,
+    "vertices": 34059,
+    "components": 1489,
+    "mean_pose_rms_m": 0.013312449639171133
+  },
+  "poses_file": "weight-quality-2026-10-25.csv"
+}

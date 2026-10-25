@@ -1,6 +1,14 @@
 # Handoff — 2026-10-25
 
-## Current ordered-merge checkpoint
+## Current #8 quality follow-up
+
+The owner authorized actual-model deformation validation and improvement through #8 and a PR on 2026-10-25. Branch `codex/weight-quality` adds surface v2 compact-distance priors and local-only comparison tooling. All four prior PRs (#26/#27/#29/#31) are merged; #31 merge is `95633279a73af602afa535a45b249be01e4a542e`.
+
+[Measured evidence](verification/weight-quality-2026-10-25.md) records two official samples, all 32 poses, native/WASM byte parity, 88 Rust tests and 39 browser tests per dev/static mode. Remote influence is reduced; mechanical attachments and other natural-deformation gates remain unresolved. #8 stays open. The PR owns final head/CI/review status. Next: owner review of the PR and actual-model results; do not merge, release or deploy without a new instruction. Full #9/#10 and #2 remain separate. The user-provided quadruped is outside the humanoid generator's scope and remains unchanged.
+
+Local test copies/placements live in `.local/weight-quality/`; comparison is at `http://127.0.0.1:5173/scripts/quality/viewer.html` while the local dev server runs. Open `twist/source.glb` → Rig → Load placement (`twist/placement.json`) → Generate weights. These geometry-only derivatives intentionally omit textures/morphs/constraints and are not general-purpose conversions. No external models enter Git/public assets.
+
+## Completed ordered-merge checkpoint
 
 The owner authorized #26 → #27 → #29 → #31 review/merge on 2026-10-25, with each successor retargeted to main and revalidated after its predecessor merged. This supersedes historical merge restrictions below, without authorizing release/deployment or further implementation.
 
@@ -10,7 +18,7 @@ The owner authorized #26 → #27 → #29 → #31 review/merge on 2026-10-25, wit
 | #27 | 8878b26afe285dea67c8950b69daf8b4eb0b99ea | f0f980003e5989212078c24ca732db75eca14ce3 | 87 native; build/lint/format; 31 browser cases per mode |
 | #29 | 2e65dfac12b0d055dab435035860ab92e85512d9 | e17b230499bf9ff3a601560f331b6d8740f7ac26 | build/format; 34 browser cases per mode |
 
-Each merged PR passed verify CI on its final head. [PR #31](https://github.com/postmelee/rigloom/pull/31) is the final batch review and owns its exact final head, CI and merge result. On resume, inspect that PR: finish its authorized merge only if still open and all checks pass; if merged, collect owner feedback without starting later implementation. The local app remains the test entrypoint. #7 is closed; #8 stays open for representative deformation/algorithm/performance evidence. Full #9/#10 and #2 remain incomplete. No public release/deployment exists.
+Each merged PR passed verify CI on its final head. [PR #31](https://github.com/postmelee/rigloom/pull/31) is the final batch review and owns its exact final head, CI and merge result. That batch is complete; the newer #8 authorization above governs current work. The local app remains the test entrypoint. #7 is closed; #8 stays open for representative deformation/algorithm/performance evidence. Full #9/#10 and #2 remain incomplete. No public release/deployment exists.
 
 ## Historical implementation checkpoints
 Public MIT repository: https://github.com/postmelee/rigloom. Local target: /Users/melee/Documents/ChatGPT/rigloom. Independent of drum-vrm; do not modify or clean its checkout.
@@ -33,7 +41,7 @@ The owner requested #23: simplify the interface using drum-vrm as a read-only re
 3. Full #9 motion-quality and #10 project editing, #11 corrections/fingers and #12 broad compatibility remain separate. No universal auto-rigging claim.
 
 ## Restrictions and open uncertainty
-No release approval exists. No tag, Release, public hosting deployment or model release inclusion has occurred. No automatic merge. Read docs/release-policy.md before release preparation. The current #7/#8 local testability scope is authorized; later expansion and PR merges outside the explicitly approved #26/#27/#29/#31 batch need owner direction. File/schema/numeric checks do not certify T-pose, rights, artist intent or natural deformation. User exports are not exhaustively schema-certified or independently loaded at runtime. Browser resource budgets and real-model fidelity are unmeasured.
+No release approval exists. No tag, Release, public hosting deployment or model release inclusion has occurred. No automatic merge. Read docs/release-policy.md before release preparation. The current #7/#8 local testability scope is authorized; later expansion and PR merges outside the explicitly approved #26/#27/#29/#31 batch need owner direction. File/schema/numeric checks do not certify T-pose, rights, artist intent or natural deformation. User exports are not exhaustively schema-certified or independently loaded at runtime. The #8 evidence above provides limited actual-model comparisons and two local runtime observations; broader browser budgets and fidelity remain unqualified.
 
 ## Local development
 Use `git status` to confirm the current branch. Source, npm dependencies and generated WASM are available locally. `npm run dev` starts a localhost-only session; automated validation stops its own servers. Generated fixtures, cached pinned schemas and local execution logs live under ignored `.local/`. The dev-only schema/loader checks need the immutable schema URLs on a cold cache; no schema source or downloaded model is committed. There is no mandatory manual browser operation for the generated regression fixtures. Mapping files preserve choices only; they are not editable projects. M1 #6 is merged. M2 has a locally testable initial workflow; algorithm quality, full diagnostic motions/project editing and later corrections remain incomplete.
