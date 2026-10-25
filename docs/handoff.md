@@ -1,12 +1,12 @@
 # Handoff — 2026-10-26
 
-## Current owner-testing checkpoint (#33)
+## Current ordered review and quality follow-up
 
-The owner authorized a small usability issue/PR before continuing #8. Branch `codex/workflow-clarity` stacks on unmerged PR #32 (`codex/weight-quality`, base head `6e09bd99676e39ae3f72e344e25216e472d5e59a`). #33 owns acceptance and its PR owns final validation/CI. This follow-up changes presentation only: next actions in Model, context-specific Rig/Mapping guidance, Preview deformation / Update preview, optional placement checks and expandable diagnostic codes. Existing validation and stale-output gates remain in force.
+The owner authorized review/merge of #32, followed by main retarget/revalidation/merge of #34, then remaining #8 quality through a separate issue and PR. PR #32 merged as `16bc9166eed1cc5aae58580f71d259dd4fb97cbc` after review, 88 native tests, Clippy/rustfmt/build/format and 39 browser cases in each dev/static mode including both actual models. #34 now targets main; its PR records final revalidation and merge status.
 
-Run `npm run dev -- --port 5173 --strictPort` for http://127.0.0.1:5173/. Owner test: Open example → move joints → Preview deformation → Bend/Angle → Edit joints → Update preview. Personal files start in Model with the suggested next action. A generated preview is still discarded on entering edit mode, even before an actual change. No caching or quality algorithm change is included. See the bilingual guide.
+Local test: http://127.0.0.1:5173/ while `npm run dev` runs. Open example → move joints → Preview deformation → Bend/Angle → Edit joints → Update preview. Entering edit currently discards output even without an actual change. The usability follow-up changes no algorithm.
 
-**Next: wait for owner local-test feedback before further #8 quality work or later features.** No merge, release or deployment is authorized. The historical #8 checkpoint below describes PR #32, not authorization to continue it now. Keep drum-vrm unchanged.
+Next: address #8's large rigid-accessory correction workflow with separately recorded actual-model evidence. New implementation PRs need owner review; no further merge, release or deployment is authorized. Keep drum-vrm unchanged. Historical checkpoints below retain their original scope and measured results.
 
 ## Current #8 quality follow-up
 
