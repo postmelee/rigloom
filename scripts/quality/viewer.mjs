@@ -3,7 +3,7 @@ import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const input = Object.fromEntries(
-  ["model", "pose", "view", "framing"].map((id) => [
+  ["comparison", "model", "pose", "view", "framing"].map((id) => [
     id,
     document.getElementById(id),
   ]),
@@ -41,19 +41,41 @@ let revision = 0;
 async function load() {
   const current = ++revision;
   const sample = input.model.value,
-    base = sample === "seed-rigid" ? "seed" : sample,
-    pose = input.pose.value;
-  const root = "/.local/weight-quality/";
-  const paths = [
-    `${base}/reference-${pose}.glb`,
-    `${base}-baseline/surface-${pose}.glb`,
-    `${sample}/surface-${pose}.glb`,
-  ];
+    base = sample === "seed-rigid" ? "seed" : sample;
+  const currentComparison = input.comparison.value === "current";
+  for (const option of input.pose.options) {
+    option.disabled = !currentComparison && option.value.includes("UpperArm");
+  }
+  if (!currentComparison && input.pose.value.includes("UpperArm"))
+    input.pose.value = "leftLowerArm";
+  const pose = input.pose.value;
+  const root = currentComparison
+    ? "/.local/weight-quality-support-2026-10-26/"
+    : "/.local/weight-quality/";
+  const paths = currentComparison
+    ? [
+        `v3/${base}/reference-${pose}.glb`,
+        `v2/${sample}/surface-${pose}.glb`,
+        `v3/${sample}/surface-${pose}.glb`,
+      ]
+    : [
+        `${base}/reference-${pose}.glb`,
+        `${base}-baseline/surface-${pose}.glb`,
+        `${sample}/surface-${pose}.glb`,
+      ];
+  const labels = currentComparison
+    ? ["Authored reference", "Surface v2", "Surface v3"]
+    : ["Authored reference", "Surface v1", "Surface v2"];
+  views.forEach((v, i) => {
+    v.section.querySelector("h3").textContent = labels[i];
+  });
   document.getElementById("status").textContent = "Loading…";
   try {
     const [objects, reference] = await Promise.all([
       Promise.all(paths.map((p) => new GLTFLoader().loadAsync(root + p))),
-      fetch(root + base + "/reference.json").then((r) => {
+      fetch(
+        root + (currentComparison ? "v3/" : "") + base + "/reference.json",
+      ).then((r) => {
         if (!r.ok) throw Error("Prepare the local samples first");
         return r.json();
       }),
@@ -65,7 +87,16 @@ async function load() {
         box.expandByPoint(new T.Vector3(...point));
     const center =
       input.framing.value === "joint"
-        ? new T.Vector3(...reference.joints[pose === "leftLowerArm" ? 10 : 4])
+        ? new T.Vector3(
+            ...reference.joints[
+              {
+                leftUpperArm: 9,
+                rightUpperArm: 12,
+                leftLowerArm: 10,
+                leftLowerLeg: 4,
+              }[pose]
+            ],
+          )
         : box.getCenter(new T.Vector3());
     const size = box.getSize(new T.Vector3());
     const aspect = views[0].section.clientWidth / 620;
@@ -110,7 +141,9 @@ async function load() {
     });
     document.getElementById("status").textContent =
       sample === "seed-rigid"
-        ? "Only v2 includes explicit accessory → spine assignments. This is manual correction, not automatic inference."
+        ? currentComparison
+          ? "Both generated versions include the same explicit accessory → spine assignments. Manual correction is not automatic inference."
+          : "Only v2 includes explicit accessory → spine assignments. This is manual correction, not automatic inference."
         : "Automatic weights; no attachment overrides. Inspect folds and remote motion as well as the numeric report.";
   } catch (error) {
     if (current === revision)

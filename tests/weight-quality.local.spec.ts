@@ -1,6 +1,7 @@
 // Opt-in actual-model verification; no third-party model bytes or automatic downloads in CI.
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { digest } from "../scripts/quality/real-model.mjs";
 for (const sample of ["seed", "twist"])
   test(`local ${sample}: actual-model WASM weights match native and survive bend/edit`, async ({
@@ -11,7 +12,7 @@ for (const sample of ["seed", "twist"])
       "Requires reviewed local benchmark copies",
     );
     test.setTimeout(90000);
-    const dir = `.local/weight-quality/${sample}`;
+    const dir = `${process.env.RIGLOOM_QUALITY_ROOT ?? ".local/weight-quality-support-2026-10-26/v3"}/${sample}`;
     const source = await readFile(`${dir}/source.glb`),
       request = JSON.parse(await readFile(`${dir}/request.json`, "utf8"));
     await page.goto("/");
@@ -57,7 +58,7 @@ for (const sample of ["seed", "twist"])
     const report = JSON.parse(
       (await download("Save weight report")).toString(),
     );
-    expect(report.algorithm).toBe("surface-v2-experimental");
+    expect(report.algorithm).toBe("surface-v3-experimental");
     expect(report.unweighted_vertices).toBe(0);
     expect(report.max_weight_sum_error).toBeLessThan(1e-6);
     await mkdir(`${dir}/browser`, { recursive: true });
@@ -83,6 +84,43 @@ for (const sample of ["seed", "twist"])
       timeout: 60000,
     });
     expect(await download("Save rigged GLB")).toEqual(generated);
+    // Exercise an actual placement edit, not just a repeat of the same request.
+    await page
+      .getByRole("button", { name: "Edit joints", exact: true })
+      .click();
+    await page.getByLabel("Mirror left / right", { exact: true }).uncheck();
+    await page.locator("#rig-joint").selectOption("10");
+    const editedZ =
+      request.joints[10][2] +
+      Math.abs(request.joints[2][1] - request.joints[5][1]) * 0.02;
+    await page.getByLabel("Joint Z", { exact: true }).fill(String(editedZ));
+    await page.getByLabel("Joint Z", { exact: true }).press("Tab");
+    const saved = JSON.parse((await download("Save placement")).toString());
+    const editedRequest = {
+      frame: saved.frame,
+      joints: saved.joints,
+      method: saved.method,
+      rigid: saved.rigid,
+    };
+    await writeFile(
+      `${dir}/edited-request.json`,
+      JSON.stringify(editedRequest),
+    );
+    execFileSync(
+      process.env.RIGLOOM_SKIN_BINARY ?? "target/release/examples/skin_quality",
+      [
+        `${dir}/source.glb`,
+        `${dir}/edited-request.json`,
+        `${dir}/edited-native.glb`,
+      ],
+    );
+    await page
+      .getByRole("button", { name: "Update preview", exact: true })
+      .click();
+    await expect(page.locator("#rig-preview")).toBeVisible({ timeout: 60000 });
+    const edited = await download("Save rigged GLB");
+    expect(edited).not.toEqual(generated);
+    expect(edited).toEqual(await readFile(`${dir}/edited-native.glb`));
     await writeFile(
       `${dir}/browser/result.json`,
       JSON.stringify(
@@ -93,6 +131,8 @@ for (const sample of ["seed", "twist"])
           vertices: report.vertices,
           sha256: digest(generated),
           native_bytes_equal: true,
+          edited_native_bytes_equal: true,
+          edited_sha256: digest(edited),
         },
         null,
         2,
@@ -108,7 +148,9 @@ test("local Seed accessory: three UI groups reproduce the independently configur
     "Requires reviewed local benchmark copies",
   );
   test.setTimeout(90000);
-  const root = ".local/weight-quality-review-2026-10-26";
+  const root =
+    process.env.RIGLOOM_QUALITY_ROOT ??
+    ".local/weight-quality-support-2026-10-26/v3";
   const source = await readFile(`${root}/seed/source.glb`);
   const request = JSON.parse(
     await readFile(`${root}/seed/request.json`, "utf8"),

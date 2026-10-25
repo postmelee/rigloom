@@ -85,7 +85,7 @@ for (const variant of ["standard", "short-wide", "asymmetric"])
     const report = JSON.parse(
       (await download(page, "Save weight report")).toString(),
     );
-    expect(report.algorithm).toBe("surface-v2-experimental");
+    expect(report.algorithm).toBe("surface-v3-experimental");
     expect(report.unweighted_vertices).toBe(0);
     expect(report.max_weight_sum_error).toBeLessThan(1e-6);
     expect(report.components).toHaveLength(10);
