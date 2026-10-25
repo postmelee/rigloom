@@ -406,3 +406,25 @@ code {
     padding: 5px 8px;
   }
 }
+
+.rig-coordinates {
+  display: flex;
+  gap: 6px;
+}
+.rig-coordinates label {
+  min-width: 0;
+  flex: 1;
+}
+.rig-coordinates input {
+  width: 100%;
+}
+#rig-controls {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+#rig-controls details > * {
+  margin-bottom: 8px;
+}

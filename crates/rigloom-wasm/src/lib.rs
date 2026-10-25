@@ -43,3 +43,18 @@ pub fn export_vrm(bytes: &[u8], request_json: &str) -> Result<VrmExport, JsValue
         bytes: result.bytes.unwrap_or_default(),
     })
 }
+
+#[wasm_bindgen]
+pub fn prepare_placement(bytes: &[u8], frame_json: &str) -> Result<String, JsValue> {
+    let frame = serde_json::from_str(frame_json)
+        .map_err(|e| JsValue::from_str(&format!("Invalid frame: {e}")))?;
+    let result =
+        rigloom_core::placement::prepare(bytes, &frame).map_err(|e| JsValue::from_str(&e))?;
+    serde_json::to_string(&result).map_err(|e| JsValue::from_str(&e.to_string()))
+}
+#[wasm_bindgen]
+pub fn validate_placement(joints_json: &str) -> Result<(), JsValue> {
+    let joints: Vec<[f64; 3]> = serde_json::from_str(joints_json)
+        .map_err(|e| JsValue::from_str(&format!("Invalid joints: {e}")))?;
+    rigloom_core::placement::validate(&joints).map_err(|e| JsValue::from_str(&e))
+}
