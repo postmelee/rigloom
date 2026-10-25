@@ -165,6 +165,15 @@ fn prior(points: &[Point], joints: &[Point]) -> Vec<[f64; 15]> {
     distance_prior(points, joints, false)
 }
 fn distance_prior(points: &[Point], joints: &[Point], compact: bool) -> Vec<[f64; 15]> {
+    distance_fields(points, joints, compact)
+        .map(|(prior, _)| prior)
+        .collect()
+}
+fn distance_fields<'a>(
+    points: &'a [Point],
+    joints: &'a [Point],
+    compact: bool,
+) -> impl Iterator<Item = ([f64; 15], [f64; 15])> + 'a {
     let height = (joints[2][1] - joints[5][1]).abs().max(1e-5);
     let children = [
         Some(1),
@@ -183,44 +192,52 @@ fn distance_prior(points: &[Point], joints: &[Point], compact: bool) -> Vec<[f64
         Some(14),
         None,
     ];
-    points
-        .iter()
-        .map(|&p| {
-            let mut distances = [0.; 15];
-            for i in 0..15 {
-                let a = joints[i];
-                let b = if let Some(c) = children[i] {
-                    joints[c]
-                } else if i == 2 {
-                    [a[0], a[1] + height * 0.1, a[2]]
-                } else if i == 5 || i == 8 {
-                    [a[0], a[1], a[2] + height * 0.1]
-                } else {
-                    let parent = joints[PARENTS[i].unwrap()];
-                    std::array::from_fn(|k| a[k] + (a[k] - parent[k]) * 0.2)
-                };
-                distances[i] = segment_distance(p, a, b).max(height * 0.01);
+    points.iter().map(move |&p| {
+        let mut distances = [0.; 15];
+        for i in 0..15 {
+            let a = joints[i];
+            let b = if let Some(c) = children[i] {
+                joints[c]
+            } else if i == 2 {
+                [a[0], a[1] + height * 0.1, a[2]]
+            } else if i == 5 || i == 8 {
+                [a[0], a[1], a[2] + height * 0.1]
+            } else {
+                let parent = joints[PARENTS[i].unwrap()];
+                std::array::from_fn(|k| a[k] + (a[k] - parent[k]) * 0.2)
+            };
+            distances[i] = segment_distance(p, a, b).max(height * 0.01);
+        }
+        let min = distances.iter().copied().fold(f64::INFINITY, f64::min);
+        // Keep full support through twice the nearest distance, then fade to
+        // zero at the existing three-distance boundary. Remote geometry keeps
+        // the same confidence fallback as v2; this is not attachment inference.
+        let confidence = if compact {
+            ((height * 0.2 - min) / (height * 0.1)).clamp(0., 1.)
+        } else {
+            0.
+        };
+        let support = distances.map(|d| {
+            let x = (3. - d / min).clamp(0., 1.);
+            1. - confidence + confidence * x * x * (3. - 2. * x)
+        });
+        let mut w = distances.map(|d| {
+            // Compact support suppresses weak remote influences near the skeleton.
+            // Fade back to the baseline for distant geometry: proximity cannot identify
+            // whether a detached accessory belongs to a hand, torso, or another joint.
+            let falloff = (min / d).powi(4);
+            if !compact {
+                return falloff;
             }
-            let min = distances.iter().copied().fold(f64::INFINITY, f64::min);
-            let mut w = distances.map(|d| {
-                // Compact support suppresses weak remote influences near the skeleton.
-                // Fade back to the baseline for distant geometry: proximity cannot identify
-                // whether a detached accessory belongs to a hand, torso, or another joint.
-                let falloff = (min / d).powi(4);
-                if !compact {
-                    return falloff;
-                }
-                let taper = (1. - (d / (min * 3.)).powi(2)).max(0.).powi(2);
-                let confidence = ((height * 0.2 - min) / (height * 0.1)).clamp(0., 1.);
-                falloff * (1. - confidence + confidence * taper)
-            });
-            let sum: f64 = w.iter().sum();
-            for v in &mut w {
-                *v /= sum;
-            }
-            w
-        })
-        .collect()
+            let taper = (1. - (d / (min * 3.)).powi(2)).max(0.).powi(2);
+            falloff * (1. - confidence + confidence * taper)
+        });
+        let sum: f64 = w.iter().sum();
+        for v in &mut w {
+            *v /= sum;
+        }
+        (w, support)
+    })
 }
 fn diffuse(prior: &[[f64; 15]], edges: &[Vec<usize>]) -> Vec<[f64; 15]> {
     let mut current = prior.to_vec();
@@ -242,6 +259,31 @@ fn diffuse(prior: &[[f64; 15]], edges: &[Vec<usize>]) -> Vec<[f64; 15]> {
             .collect();
     }
     current
+}
+// Diffusion can reintroduce a remote influence even where the compact prior
+// was zero. Reapply continuous local support after smoothing, before top-four
+// truncation. The nearest segment retains its anchored positive mass, so the
+// sum cannot vanish. No edges or source geometry are created or welded.
+fn surface_weights(points: &[Point], joints: &[Point], edges: &[Vec<usize>]) -> Vec<[f64; 15]> {
+    let prior = distance_prior(points, joints, true);
+    let mut weights = diffuse(&prior, edges);
+    // Stream masks rather than retaining another 15-value array per vertex.
+    for (w, (_, mask)) in weights
+        .iter_mut()
+        .zip(distance_fields(points, joints, true))
+    {
+        if mask.iter().all(|m| *m == 1.) {
+            continue;
+        }
+        for (v, m) in w.iter_mut().zip(mask) {
+            *v *= m;
+        }
+        let sum: f64 = w.iter().sum();
+        for v in w {
+            *v /= sum;
+        }
+    }
+    weights
 }
 fn top_four(w: [f64; 15]) -> ([u16; 4], [f32; 4]) {
     let mut order: Vec<_> = (0..15).collect();
@@ -369,15 +411,10 @@ pub fn generate(bytes: &[u8], request: &Request) -> Result<Output, String> {
             raw["skins"].as_array_mut().unwrap().push(json!({"joints":(first..first+15).collect::<Vec<_>>(),"skeleton":first,"inverseBindMatrices":ibm}));
             raw["nodes"][surface.node]["skin"] = json!(skin);
         }
-        let prior = if request.method == "surface" {
-            distance_prior(&surface.points, &request.joints, true)
+        let mut weights = if request.method == "surface" {
+            surface_weights(&surface.points, &request.joints, &surface.edges)
         } else {
             prior(&surface.points, &request.joints)
-        };
-        let mut weights = if request.method == "surface" {
-            diffuse(&prior, &surface.edges)
-        } else {
-            prior
         };
         for (c, indices) in surface.components.iter().enumerate() {
             if let Some(&bone) = request
@@ -455,8 +492,8 @@ pub fn generate(bytes: &[u8], request: &Request) -> Result<Output, String> {
             "Generated bind validation failed. Check the frame scale and joint spacing.".into(),
         );
     }
-    Ok(Output {bytes,report:Report { algorithm:format!("{}-v{}-experimental",request.method, if request.method == "surface" { 2 } else { 1 }),vertices,components:parts,rigid:request.rigid.clone(),max_weight_sum_error:max_error,unweighted_vertices:0,mapping,
-        warnings:vec!["Initial weights need visual review; nearby body parts can receive incorrect influence.".into(),"Diffusion follows triangle indices within each primitive. UV seams, separate clothes and coincident surfaces are not welded or inferred; assign rigid components explicitly where appropriate.".into(),"32 anchored diffusion steps are a local smoothing experiment, not a volumetric solver or final skinning quality.".into()] }})
+    Ok(Output {bytes,report:Report { algorithm:format!("{}-v{}-experimental",request.method, if request.method == "surface" { 3 } else { 1 }),vertices,components:parts,rigid:request.rigid.clone(),max_weight_sum_error:max_error,unweighted_vertices:0,mapping,
+        warnings:vec!["Initial weights need visual review; nearby body parts can receive incorrect influence.".into(),"Diffusion follows triangle indices within each primitive. UV seams, separate clothes and coincident surfaces are not welded or inferred; assign rigid components explicitly where appropriate.".into(),"32 anchored diffusion steps with local support filtering are experimental, not a volumetric solver or final skinning quality.".into()] }})
 }
 
 #[cfg(test)]
@@ -756,6 +793,107 @@ mod tests {
         // A remote accessory has no reliable anatomical proximity: do not sharpen its guess.
         let far = [[2., 2., 2.]];
         assert_eq!(prior(&far, &joints), distance_prior(&far, &joints, true));
+    }
+    fn probe_joints() -> Vec<Point> {
+        vec![
+            [0., 1., 0.],
+            [0., 1.2, 0.],
+            [0., 1.7, 0.],
+            [0.1, 1., 0.],
+            [0.1, 0.5, 0.],
+            [0.1, 0., 0.],
+            [-0.1, 1., 0.],
+            [-0.1, 0.5, 0.],
+            [-0.1, 0., 0.],
+            [0.2, 1.5, 0.],
+            [0.5, 1.5, 0.],
+            [0.8, 1.5, 0.],
+            [-0.2, 1.5, 0.],
+            [-0.5, 1.5, 0.],
+            [-0.8, 1.5, 0.],
+        ]
+    }
+    #[test]
+    fn surface_support_removes_remote_influence_reintroduced_by_edges() {
+        let joints = probe_joints();
+        // Original coarse triangle spans left/right arm probes. Its edge mean
+        // reintroduces opposite-arm mass despite the zero compact-distance prior.
+        let points = [[0.65, 1.54, 0.], [0.66, 1.54, 0.], [-0.65, 1.54, 0.]];
+        let edges = vec![vec![1, 2], vec![0, 2], vec![0, 1]];
+        let baseline = diffuse(&distance_prior(&points, &joints, true), &edges);
+        let output = surface_weights(&points, &joints, &edges);
+        let remote = |w: &[f64; 15]| w[12] + w[13] + w[14];
+        assert!(remote(&baseline[0]) > 0.1);
+        assert_eq!(remote(&output[0]), 0.);
+        assert!(output[0][10] > 0.9);
+        assert_eq!(output, surface_weights(&points, &joints, &edges));
+        for w in output {
+            assert!(w.iter().all(|v| v.is_finite() && *v >= 0.));
+            assert!((w.iter().sum::<f64>() - 1.).abs() < 1e-12);
+            let (ids, values) = top_four(w);
+            assert!(ids.iter().all(|i| *i < 15));
+            assert!((values.iter().sum::<f32>() - 1.).abs() < 1e-6);
+        }
+    }
+    #[test]
+    fn surface_support_preserves_elbow_blending_continuity_and_scale() {
+        let joints = probe_joints();
+        let points: Vec<_> = (0..401)
+            .map(|i| [0.3 + i as f64 * 0.001, 1.54, 0.])
+            .collect();
+        let edges: Vec<Vec<usize>> = (0..points.len())
+            .map(|i| {
+                [i.checked_sub(1), (i + 1 < points.len()).then_some(i + 1)]
+                    .into_iter()
+                    .flatten()
+                    .collect()
+            })
+            .collect();
+        let output = surface_weights(&points, &joints, &edges);
+        assert!(output[200][9] > 0.4 && output[200][10] > 0.4);
+        assert!(
+            output
+                .windows(2)
+                .all(|w| w[0].iter().zip(w[1]).all(|(a, b)| (a - b).abs() < 0.03))
+        );
+        for scale in [0.1, 10.] {
+            let p: Vec<_> = points.iter().map(|p| p.map(|v| v * scale)).collect();
+            let j: Vec<_> = joints.iter().map(|p| p.map(|v| v * scale)).collect();
+            let scaled = surface_weights(&p, &j, &edges);
+            assert!(
+                output
+                    .iter()
+                    .zip(scaled)
+                    .all(|(a, b)| a.iter().zip(b).all(|(x, y)| (x - y).abs() < 1e-12))
+            );
+        }
+    }
+    #[test]
+    fn surface_support_preserves_far_fallback_and_does_not_join_components() {
+        let joints = probe_joints();
+        let far = [[2., 2., 2.], [2.1, 2., 2.], [2., 2.1, 2.]];
+        let edges = vec![vec![1, 2], vec![0, 2], vec![0, 1]];
+        assert_eq!(
+            surface_weights(&far, &joints, &edges),
+            diffuse(&distance_prior(&far, &joints, true), &edges)
+        );
+        let points = [[0.65, 1.54, 0.], [0.66, 1.54, 0.], [0.65, 1.54, 0.]];
+        let separate = vec![vec![1], vec![0], vec![]];
+        let before = surface_weights(&points, &joints, &separate);
+        let mut moved = points;
+        moved[2] = [-0.65, 1.54, 0.];
+        let after = surface_weights(&moved, &joints, &separate);
+        assert_eq!(before[..2], after[..2]);
+        let mut edited = joints.clone();
+        edited[10][2] += 0.08;
+        let edited_weights = surface_weights(&points, &edited, &separate);
+        assert_ne!(edited_weights, before);
+        assert!(
+            edited_weights
+                .iter()
+                .all(|w| w.iter().all(|v| v.is_finite() && *v >= 0.)
+                    && (w.iter().sum::<f64>() - 1.).abs() < 1e-12)
+        );
     }
     #[test]
     fn nearby_segments_can_still_leak_and_are_not_claimed_correct() {

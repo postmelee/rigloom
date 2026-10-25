@@ -1,0 +1,216 @@
+{
+  "base_commit": "c5386caad4b9c53d4823a389c0d9ebd0c14c83b5",
+  "algorithm": "surface-v3-experimental",
+  "baseline_rust_sha256": "964137d4073fac526df75e1377b73277f5663ea271b3797d6798ae8a77da7c19",
+  "candidate_rust_sha256": "d73bb0457e858d5d0344d3ad41874ae5953f90f906995cdea842eb9b6590b238",
+  "environment": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "rustc": "rustc 1.94.1 (e408947bf 2026-03-25)",
+    "node": "v24.15.0"
+  },
+  "samples": {
+    "seed": {
+      "explicit_override_count": 0,
+      "source_sha256": "1330a745def38431a5d5c8efef6ead57b0e9a32ea4479acc2e798c05d2504dd1",
+      "request_sha256": "f9921bf1a6cfead4dd1d435dd3ae3dd8e878237a1ecc50dbead9ae1d10dc0b3a",
+      "reference_sha256": "a8996a5b77c85202ff1d4d3e960ae64c2e7ce21faf639f98903c41340c8e41c5",
+      "provenance_sha256": "91e2f3108a7c8f9e0c995da031407bf078d06477768ce791bcf18451e6ba65da",
+      "segment_output_byte_equal": true,
+      "v2": {
+        "algorithm": "surface-v2-experimental",
+        "output_sha256": "4e4e0caa5171d89d4c03507885ce9fc93af96d9c1a39aafec5afcde896d6258d",
+        "vertices": 34059,
+        "components": 1489,
+        "mean_pose_rms_m": 0.09111923800233465,
+        "mean_relative_edge_error": 0.013987139213510668,
+        "native_repeat_ms": [
+          52.020542000000006,
+          54.726166,
+          53.535584
+        ],
+        "native_median_ms": 53.535584,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.470348358154297e-08
+      },
+      "v3": {
+        "algorithm": "surface-v3-experimental",
+        "output_sha256": "069f86454d67fb8bbca4f069d5dd955b90a4fbf9925e71aed78b882d63510b03",
+        "vertices": 34059,
+        "components": 1489,
+        "mean_pose_rms_m": 0.0911096624801295,
+        "mean_relative_edge_error": 0.013978390321815564,
+        "native_repeat_ms": [
+          56.544958,
+          57.181459,
+          57.407
+        ],
+        "native_median_ms": 57.181459,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.470348358154297e-08
+      },
+      "max_rms_regression": {
+        "joint": "rightUpperArm",
+        "degrees": 120,
+        "increase_m": 5.1257669479547185e-06
+      },
+      "poses_regressed_over_1um": 4,
+      "browser": {
+        "elapsed_ms": 1614,
+        "browser": "Playwright Chromium",
+        "algorithm": "surface-v3-experimental",
+        "vertices": 34059,
+        "sha256": "069f86454d67fb8bbca4f069d5dd955b90a4fbf9925e71aed78b882d63510b03",
+        "native_bytes_equal": true,
+        "edited_native_bytes_equal": true,
+        "edited_sha256": "cc718af6d59a9a4b9cb22eb99e938d81addea46447266cbc71a4e883a35705b2"
+      }
+    },
+    "twist": {
+      "explicit_override_count": 0,
+      "source_sha256": "7904c071ee9022d35034832de85bc7c155c7fe3ecdb86db4d25ecedb1ab45f4d",
+      "request_sha256": "ce926ba172a51ab52d91b5a56701bf964e168a66898ae829f758652d1a3d5c0f",
+      "reference_sha256": "8f5b7357eee477359b6e69fe0b24daa5e7b02b9fb07dc71a7f84a3c55e5c4333",
+      "provenance_sha256": "9f5663ce92c1f093d65328407bdf95474a5b2369e421d0d68733f732fc1ff434",
+      "segment_output_byte_equal": true,
+      "v2": {
+        "algorithm": "surface-v2-experimental",
+        "output_sha256": "5a4419869ae15d57b9216ad3e6a22058bdc032184f8c4748a521ad5ce7937361",
+        "vertices": 24951,
+        "components": 292,
+        "mean_pose_rms_m": 0.009939246492846226,
+        "mean_relative_edge_error": 0.016395584437287877,
+        "native_repeat_ms": [
+          45.53275,
+          67.74991700000001,
+          44.301041999999995
+        ],
+        "native_median_ms": 45.53275,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.563480615615845e-08
+      },
+      "v3": {
+        "algorithm": "surface-v3-experimental",
+        "output_sha256": "d19c46c2cbefb5238bf3c91bfd48a7904eaeca11aafbab13454ce9227e911df9",
+        "vertices": 24951,
+        "components": 292,
+        "mean_pose_rms_m": 0.009926314339007113,
+        "mean_relative_edge_error": 0.016493960578054467,
+        "native_repeat_ms": [
+          43.703667,
+          41.618292000000004,
+          43.886500000000005
+        ],
+        "native_median_ms": 43.703667,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.470348358154297e-08
+      },
+      "max_rms_regression": {
+        "joint": "rightUpperArm",
+        "degrees": 120,
+        "increase_m": 2.9152202979894348e-05
+      },
+      "poses_regressed_over_1um": 8,
+      "browser": {
+        "elapsed_ms": 892,
+        "browser": "Playwright Chromium",
+        "algorithm": "surface-v3-experimental",
+        "vertices": 24951,
+        "sha256": "d19c46c2cbefb5238bf3c91bfd48a7904eaeca11aafbab13454ce9227e911df9",
+        "native_bytes_equal": true,
+        "edited_native_bytes_equal": true,
+        "edited_sha256": "4b1162ce13a3e0daab71b8a40e3cf7280867e396735cc9e0c601e726157fac45"
+      }
+    },
+    "seed-rigid": {
+      "explicit_override_count": 609,
+      "source_sha256": "1330a745def38431a5d5c8efef6ead57b0e9a32ea4479acc2e798c05d2504dd1",
+      "request_sha256": "930a2cadf852d4f725e6b453f894eef31a7437f39fa63e3b299db38a05700923",
+      "reference_sha256": "a8996a5b77c85202ff1d4d3e960ae64c2e7ce21faf639f98903c41340c8e41c5",
+      "provenance_sha256": "91e2f3108a7c8f9e0c995da031407bf078d06477768ce791bcf18451e6ba65da",
+      "segment_output_byte_equal": true,
+      "v2": {
+        "algorithm": "surface-v2-experimental",
+        "output_sha256": "3e41e861dc875748cc783404f1c297cb031005e7de7e18559088368ab25d5540",
+        "vertices": 34059,
+        "components": 1489,
+        "mean_pose_rms_m": 0.013312449639171133,
+        "mean_relative_edge_error": 0.01270873681282678,
+        "native_repeat_ms": [
+          52.499666,
+          57.271166,
+          56.609208
+        ],
+        "native_median_ms": 56.609208,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.470348358154297e-08
+      },
+      "v3": {
+        "algorithm": "surface-v3-experimental",
+        "output_sha256": "98a12e5248dbc351d9ad2a44b2435f75ad3cac0ac10c01a449a5b44877872c1a",
+        "vertices": 34059,
+        "components": 1489,
+        "mean_pose_rms_m": 0.013301324214495786,
+        "mean_relative_edge_error": 0.012699987921131665,
+        "native_repeat_ms": [
+          56.959458,
+          58.430666,
+          55.659792
+        ],
+        "native_median_ms": 56.959458,
+        "repeated_output_bytes_equal": true,
+        "unweighted_vertices": 0,
+        "max_weight_sum_error": 4.470348358154297e-08
+      },
+      "max_rms_regression": {
+        "joint": "rightUpperArm",
+        "degrees": 120,
+        "increase_m": 5.464273534386277e-06
+      },
+      "poses_regressed_over_1um": 7,
+      "browser": {
+        "source_sha256": "1330a745def38431a5d5c8efef6ead57b0e9a32ea4479acc2e798c05d2504dd1",
+        "output_sha256": "98a12e5248dbc351d9ad2a44b2435f75ad3cac0ac10c01a449a5b44877872c1a",
+        "surface_group_assignments": 3,
+        "explicit_component_overrides": 609,
+        "native_bytes_equal": true,
+        "placement_round_trip": true,
+        "preview_rest_bytes_unchanged": true
+      }
+    }
+  },
+  "rejected_candidates": {
+    "candidate": {
+      "seed": {
+        "mean_pose_rms_m": 0.09112234285581436,
+        "elapsed_ms": 83.337833
+      },
+      "twist": {
+        "mean_pose_rms_m": 0.009936503530155514,
+        "elapsed_ms": 60.363667
+      },
+      "seed-rigid": {
+        "mean_pose_rms_m": 0.013323377669144827,
+        "elapsed_ms": 76.463625
+      }
+    },
+    "support-hierarchy": {
+      "seed": {
+        "mean_pose_rms_m": 0.09111614227528343,
+        "elapsed_ms": 53.887208
+      },
+      "twist": {
+        "mean_pose_rms_m": 0.009931421754943739,
+        "elapsed_ms": 39.757416
+      },
+      "seed-rigid": {
+        "mean_pose_rms_m": 0.013309490632646708,
+        "elapsed_ms": 53.593333
+      }
+    }
+  }
+}

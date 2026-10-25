@@ -1,6 +1,15 @@
 # Handoff — 2026-10-26
 
-## Current quality follow-up (#35)
+## Current automatic-weight follow-up (#37)
+
+The owner explicitly authorized #36 review/merge and further #8 automatic quality. #36 merged as `c5386caad4b9c53d4823a389c0d9ebd0c14c83b5` after source review, successful exact-head CI, release build/format and repeated 44-case dev/static runs including private models. No blocking finding.
+
+Branch `codex/geometry-aware-weights` implements #37: `surface-v3-experimental` filters remote influences reintroduced by smoothing using continuous distance support. No manual attachment is added to either automatic sample. All 32 poses and rejected alternatives are recorded in [the evidence](verification/surface-support-2026-10-26.md). Average gains are small; some shoulder/edge metrics regress. #8 remains open for semantic ambiguity, garments, volume and representative resource budgets.
+
+Next: review the new PR and compare locally at http://127.0.0.1:5173/scripts/quality/viewer.html → Current v2 / v3. Product tests use fresh private `.local/weight-quality-support-2026-10-26/v3` inputs; their source and placement files can be opened in the app. Old benchmark folders remain intact. 91 native tests, Clippy, release WASM/build, and 44 browser cases in each dev/static mode passed, including actual elbow-placement edits with native/WASM byte parity. The PR owns the final head and CI result. Do not merge the new PR, release or deploy without a new owner instruction. Keep drum-vrm unchanged.
+
+## Previous rigid-correction checkpoint (#35)
+
 
 The authorized #32 → #34 review/merge batch is complete. #32 merged as `16bc9166eed1cc5aae58580f71d259dd4fb97cbc`; #34 was retargeted to main, incorporated main, revalidated and merged as `b59db3fc5e18da54e0cee82dcc7993659694c6e0`. Local review reran 88 native tests and 39 browser cases per dev/static mode for #32; #34 reran build/format and 42 cases per mode including both actual models. Both final heads passed Verify CI.
 

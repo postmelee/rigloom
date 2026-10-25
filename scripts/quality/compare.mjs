@@ -120,7 +120,7 @@ for (const method of methods) {
         remote_over_1cm: remote.filter((x) => x > 0.01).length,
         mean_relative_edge_error: stretch / edgeCount,
       });
-      if (degrees === 90 && [10, 4].includes(joint)) {
+      if (degrees === 90) {
         await writeFile(
           `${dir}/${method}-${bones[joint]}.glb`,
           encodeSurface(generatedParts),

@@ -55,3 +55,23 @@ For direct app review, Open GLB → `source.glb` → Rig → Load placement → 
 The opt-in `local Seed accessory` test uses fresh copies in `.local/weight-quality-review-2026-10-26/{seed,seed-rigid}` to preserve the earlier measurements. Copy only `source.glb`, `reference.json`, `request.json`, `placement.json` and `provenance.json` from the corresponding reviewed local profiles; then run the current `skin_quality` build and `compare.mjs <directory> surface` for each. The independently configured seed-rigid request must retain the reviewed 609 exact overrides. Nothing downloads or generates that intent automatically.
 
 The browser test starts from the uncorrected Seed placement and assigns surfaces 6/0, 7/0 and 8/0 to spine through the UI. It verifies all 609 overrides, native/WASM byte equality, placement round trip and rest-byte preservation during bends. Private images/result JSON go to the seed-rigid `browser/` directory. See [the new evidence](../../docs/verification/rigid-accessory-2026-10-26.md); CI skips this test without `RIGLOOM_REAL_MODELS=1`.
+
+## Current v2/v3 support comparison
+
+The current implementation reports `surface-v3-experimental`. The local browser tests now default to `.local/weight-quality-support-2026-10-26/v3/{seed,twist,seed-rigid}`; `RIGLOOM_QUALITY_ROOT` overrides that root. The historical instructions above describe older evidence and must not be used to overwrite those outputs with the current algorithm.
+
+Create fresh `v2` and `v3` profile folders by copying only `source.glb`, `reference.json`, `request.json`, `placement.json` and `provenance.json` from the previously reviewed profiles. Preserve the original files and the explicit seed-rigid request. Build the v2 harness from merge `c5386caad4b9c53d4823a389c0d9ebd0c14c83b5` in an isolated checkout; pass its executable using `RIGLOOM_SKIN_BINARY` to the baseline commands. Build the current harness for v3:
+
+```sh
+cargo build --release --locked --example skin_quality
+# Repeat for seed, twist and seed-rigid, in their corresponding version folders:
+RIGLOOM_SKIN_BINARY=/absolute/v2/skin_quality node scripts/quality/compare.mjs .local/weight-quality-support-2026-10-26/v2/twist segment surface
+node scripts/quality/compare.mjs .local/weight-quality-support-2026-10-26/v3/twist segment surface
+npm run build
+RIGLOOM_REAL_MODELS=1 npx playwright test tests/weight-quality.local.spec.ts
+RIGLOOM_REAL_MODELS=1 RIGLOOM_PREVIEW=1 npx playwright test tests/weight-quality.local.spec.ts
+```
+
+The two automatic browser tests additionally change elbow depth by 2% of head-to-foot height, save the actual edited request and compare its WASM GLB against the current native harness. This is boundary validation, not reference quality evidence for a changed skeleton. Native generation must use the same algorithm as the rebuilt WASM. All outputs remain private.
+
+The viewer defaults to **Current v2 / v3**, with knee/elbow and shoulder snapshots at 90°. **Historical v1 / v2** retains the earlier elbow/knee paths. In the current comparison, the seed-rigid profile applies the identical manual settings to both versions. Automatic Seed/Twist have no overrides. See [all results and unfavorable outcomes](../../docs/verification/surface-support-2026-10-26.md); mean gains are small and do not resolve hair/clothing or severe-bend deformation.

@@ -30,6 +30,10 @@
   </style>
   <p>
     Local geometry-only comparison ·
+    <select id="comparison" aria-label="Comparison">
+      <option value="current">Current v2 / v3</option>
+      <option value="historical">Historical v1 / v2</option>
+    </select>
     <select id="model" aria-label="Sample">
       <option value="twist">Twist</option>
       <option value="seed">Seed-san</option>
@@ -38,6 +42,8 @@
     <select id="pose" aria-label="Pose">
       <option value="leftLowerArm">Left elbow 90°</option>
       <option value="leftLowerLeg">Left knee 90°</option>
+      <option value="leftUpperArm">Left shoulder 90°</option>
+      <option value="rightUpperArm">Right shoulder 90°</option>
     </select>
     <select id="view" aria-label="View">
       <option value="front">Front</option>
