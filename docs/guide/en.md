@@ -110,3 +110,7 @@ Focus the model by clicking it or using **View keys → Focus model view** above
 | 1 / 2 / 3 | Front / Side / Free view and fit |
 
 To test the full flow: **Open example → select/move joints → Generate weights → Bend/Angle → Edit joints**. Use **[ / ]** to select joints and arrows to move them while the model has focus. Tab reaches the remaining controls; their native keyboard behavior remains available. Refreshing does not restore unsaved edits: save placement before leaving, then reopen the same source and load the placement file.
+
+### Current weight quality
+
+Surface generation uses `surface-v2-experimental`, which reduces weak distant influences near the skeleton. Regenerating an older surface placement uses the current algorithm; retain the old rigged GLB/report if you need that exact output. Two official local samples showed lower controlled-bend error, but creases, volume loss and wrong accessory motion remain. Check shoulders, elbows, hips and knees from front/side before exporting. The 15-joint generator is for unrigged humanoids; a quadruped or existing animated rig is not a valid replacement input. See the [actual-model evidence and limitations](../verification/weight-quality-2026-10-25.md). Models and local test derivatives are not bundled.

@@ -1,4 +1,4 @@
-//! Original experimental segment prior + edge-only diffusion. No volume solver or external code.
+//! Original distance priors + edge-only diffusion. No volume solver or external code.
 use crate::placement::{self, BONES, Frame, Matrix, PARENTS, Point};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -162,6 +162,9 @@ fn segment_distance(p: Point, a: Point, b: Point) -> f64 {
     placement::distance(p, std::array::from_fn(|i| a[i] + t * ab[i]))
 }
 fn prior(points: &[Point], joints: &[Point]) -> Vec<[f64; 15]> {
+    distance_prior(points, joints, false)
+}
+fn distance_prior(points: &[Point], joints: &[Point], compact: bool) -> Vec<[f64; 15]> {
     let height = (joints[2][1] - joints[5][1]).abs().max(1e-5);
     let children = [
         Some(1),
@@ -199,7 +202,18 @@ fn prior(points: &[Point], joints: &[Point]) -> Vec<[f64; 15]> {
                 distances[i] = segment_distance(p, a, b).max(height * 0.01);
             }
             let min = distances.iter().copied().fold(f64::INFINITY, f64::min);
-            let mut w = distances.map(|d| (min / d).powi(4));
+            let mut w = distances.map(|d| {
+                // Compact support suppresses weak remote influences near the skeleton.
+                // Fade back to the baseline for distant geometry: proximity cannot identify
+                // whether a detached accessory belongs to a hand, torso, or another joint.
+                let falloff = (min / d).powi(4);
+                if !compact {
+                    return falloff;
+                }
+                let taper = (1. - (d / (min * 3.)).powi(2)).max(0.).powi(2);
+                let confidence = ((height * 0.2 - min) / (height * 0.1)).clamp(0., 1.);
+                falloff * (1. - confidence + confidence * taper)
+            });
             let sum: f64 = w.iter().sum();
             for v in &mut w {
                 *v /= sum;
@@ -355,7 +369,11 @@ pub fn generate(bytes: &[u8], request: &Request) -> Result<Output, String> {
             raw["skins"].as_array_mut().unwrap().push(json!({"joints":(first..first+15).collect::<Vec<_>>(),"skeleton":first,"inverseBindMatrices":ibm}));
             raw["nodes"][surface.node]["skin"] = json!(skin);
         }
-        let prior = prior(&surface.points, &request.joints);
+        let prior = if request.method == "surface" {
+            distance_prior(&surface.points, &request.joints, true)
+        } else {
+            prior(&surface.points, &request.joints)
+        };
         let mut weights = if request.method == "surface" {
             diffuse(&prior, &surface.edges)
         } else {
@@ -437,7 +455,7 @@ pub fn generate(bytes: &[u8], request: &Request) -> Result<Output, String> {
             "Generated bind validation failed. Check the frame scale and joint spacing.".into(),
         );
     }
-    Ok(Output {bytes,report:Report { algorithm:format!("{}-v1-experimental",request.method),vertices,components:parts,rigid:request.rigid.clone(),max_weight_sum_error:max_error,unweighted_vertices:0,mapping,
+    Ok(Output {bytes,report:Report { algorithm:format!("{}-v{}-experimental",request.method, if request.method == "surface" { 2 } else { 1 }),vertices,components:parts,rigid:request.rigid.clone(),max_weight_sum_error:max_error,unweighted_vertices:0,mapping,
         warnings:vec!["Initial weights need visual review; nearby body parts can receive incorrect influence.".into(),"Diffusion follows triangle indices within each primitive. UV seams, separate clothes and coincident surfaces are not welded or inferred; assign rigid components explicitly where appropriate.".into(),"32 anchored diffusion steps are a local smoothing experiment, not a volumetric solver or final skinning quality.".into()] }})
 }
 
@@ -692,6 +710,52 @@ mod tests {
             assert!(j.iter().all(|j| *j < 15));
             assert!((w.iter().sum::<f32>() - 1.).abs() < 1e-6);
         }
+    }
+    #[test]
+    fn compact_prior_reduces_remote_motion_without_hardening_the_elbow() {
+        let joints = vec![
+            [0., 1., 0.],
+            [0., 1.2, 0.],
+            [0., 1.7, 0.],
+            [0.1, 1., 0.],
+            [0.1, 0.5, 0.],
+            [0.1, 0., 0.],
+            [-0.1, 1., 0.],
+            [-0.1, 0.5, 0.],
+            [-0.1, 0., 0.],
+            [0.2, 1.5, 0.],
+            [0.5, 1.5, 0.],
+            [0.8, 1.5, 0.],
+            [-0.2, 1.5, 0.],
+            [-0.5, 1.5, 0.],
+            [-0.8, 1.5, 0.],
+        ];
+        // Original cylinder surface samples on the upper arm, elbow and lower arm.
+        let points: Vec<_> = (0..41).map(|i| [0.3 + i as f64 * 0.01, 1.54, 0.]).collect();
+        let old = prior(&points, &joints);
+        let new = distance_prior(&points, &joints, true);
+        // Opposite arm motion must no longer pull this strip when its support is distant.
+        let remote = |v: &[[f64; 15]]| v.iter().map(|w| w[12] + w[13] + w[14]).sum::<f64>();
+        assert!(remote(&old) > 0.);
+        assert_eq!(remote(&new), 0.);
+        assert!(new[20][9] > 0.4 && new[20][10] > 0.4);
+        // No nearest-label step at the elbow; retain a smooth upper/lower transition.
+        assert!(new.windows(2).all(|w| (w[0][10] - w[1][10]).abs() < 0.3));
+        for w in &new {
+            assert!((w.iter().sum::<f64>() - 1.).abs() < 1e-12);
+        }
+        // Uniform model scaling must not change the weights.
+        let scaled_points: Vec<_> = points.iter().map(|p| p.map(|v| v * 10.)).collect();
+        let scaled_joints: Vec<_> = joints.iter().map(|p| p.map(|v| v * 10.)).collect();
+        let scaled = distance_prior(&scaled_points, &scaled_joints, true);
+        assert!(
+            new.iter()
+                .zip(scaled)
+                .all(|(a, b)| a.iter().zip(b).all(|(x, y)| (x - y).abs() < 1e-12))
+        );
+        // A remote accessory has no reliable anatomical proximity: do not sharpen its guess.
+        let far = [[2., 2., 2.]];
+        assert_eq!(prior(&far, &joints), distance_prior(&far, &joints, true));
     }
     #[test]
     fn nearby_segments_can_still_leak_and_are_not_claimed_correct() {

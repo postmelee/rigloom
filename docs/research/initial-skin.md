@@ -2,7 +2,7 @@
 
 Refs #2, #8. This owner-authorized slice makes unrigged placement and weight generation locally testable. It does **not** complete the research/production-quality gate in #2 or every acceptance criterion in #8. No external algorithm, solver, dataset, model weights or character asset was adopted. Implementation and procedural fixtures are original MIT project code. Pinocchio and libigl licensing/adoption gates remain unchanged.
 
-## Implemented comparison
+## Original v1 comparison (historical)
 
 `segment-v1-experimental` computes a normalized inverse-fourth-power prior from distances to the edited bone segments. The distance floor is 1% of head-to-foot height. Head/hand/foot endpoints extend by explicit fixed proportions; they are not inferred anatomy. `surface-v1-experimental` applies 32 deterministic Jacobi steps, each 35% original prior plus 65% neighbor mean. Neighbors are triangle-index edges within one primitive. Sorted adjacency and tie-breaking make repeated output deterministic. Both retain the largest four influences and normalize after truncation. The latter is anchored local smoothing, **not** a geodesic attachment solver, heat method or bounded biharmonic solver.
 
@@ -30,3 +30,11 @@ RIGLOOM_PREVIEW=1 npx playwright test tests/placement.spec.ts tests/skinning.spe
 ```
 
 Open `.local/initial-skin/unrigged-standard.glb` under Rig. Compare Method, inspect Front/Side, adjust joints, generate and bend. Save placement plus the original GLB to reproduce edits/settings; the weight report contains algorithm, source/output hashes and checks. Save rigged GLB to inspect in other tools. Preview angles are never baked into saved rest data. Full project migrations, brush corrections and the #9 motion suite remain separate work.
+
+## Surface v2 follow-up
+
+The #8 actual-model follow-up retains the segment v1 baseline and changes only the surface prior. Let `h` be the existing head-to-foot height, `d_i` each segment distance floored at `0.01h`, and `m = min(d_i)`. The original prior is proportional to `(m/d_i)^4`. V2 multiplies it by `1 - c + c*t_i`, where `t_i = max(0, 1 - (d_i/(3m))^2)^2` and `c = clamp((0.2h - m)/(0.1h), 0, 1)`. Normalize, then run the unchanged 32 anchored smoothing steps and normalized top-four selection. The report identifies `surface-v2-experimental`; method strings and placement schema remain compatible, but regenerating an old `surface` placement now uses v2. Preserve its generated GLB/report for exact old-output reproduction.
+
+This continuous, scale-relative taper removes weak distant influences near the skeleton without hard nearest-bone labels. It fades back to the original prior for distant accessories because distance alone cannot establish their attachment intent. It adds no external algorithm/dependency or closed-volume assumption. Compact support belongs to the **prior**; diffusion can subsequently spread influence along indexed edges. Coincident seams, equally close limbs and disconnected garments remain ambiguous.
+
+[Actual-model evidence](../verification/weight-quality-2026-10-25.md) compares two pinned local official models against authored canonical-weight references, including all 32 poses, browser/native parity, rendered observations, remaining failures and measured runtime. These observations extend rather than rewrite the historical fixture results above. #8 stays open; natural deformation and browser capacity are not certified. [Local tools](../../scripts/quality/README.md) never ship model assets or silently strip a product input.
