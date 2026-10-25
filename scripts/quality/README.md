@@ -48,4 +48,10 @@ The two opt-in tests use local geometry and placement files, assert native/WASM 
 
 Open `http://127.0.0.1:5173/scripts/quality/viewer.html` for reference/v1/v2 comparisons. Prepare both baseline folders first. Choose model, elbow/knee, front/side and full/joint detail; all cameras share a target and pose. Seed's optional manual profile must be generated before selecting it. This viewer uses flattened CPU-posed geometry to isolate weights; product WASM/skin loading is independently exercised by the tests. Missing local files produce a visible error instead of downloading assets.
 
-For direct app review, Open GLB → `source.glb` → Rig → Load placement → `placement.json` → Generate weights. Inspect bends and Edit joints. Save generated GLB/report before changing algorithm versions if exact output matters. The old `surface` method name remains valid but regeneration uses v2.
+For direct app review, Open GLB → `source.glb` → Rig → Load placement → `placement.json` → Preview deformation. Inspect bends and Edit joints. Save generated GLB/report before changing algorithm versions if exact output matters. The old `surface` method name remains valid but regeneration uses v2.
+
+## Grouped correction follow-up
+
+The opt-in `local Seed accessory` test uses fresh copies in `.local/weight-quality-review-2026-10-26/{seed,seed-rigid}` to preserve the earlier measurements. Copy only `source.glb`, `reference.json`, `request.json`, `placement.json` and `provenance.json` from the corresponding reviewed local profiles; then run the current `skin_quality` build and `compare.mjs <directory> surface` for each. The independently configured seed-rigid request must retain the reviewed 609 exact overrides. Nothing downloads or generates that intent automatically.
+
+The browser test starts from the uncorrected Seed placement and assigns surfaces 6/0, 7/0 and 8/0 to spine through the UI. It verifies all 609 overrides, native/WASM byte equality, placement round trip and rest-byte preservation during bends. Private images/result JSON go to the seed-rigid `browser/` directory. See [the new evidence](../../docs/verification/rigid-accessory-2026-10-26.md); CI skips this test without `RIGLOOM_REAL_MODELS=1`.

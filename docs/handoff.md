@@ -1,12 +1,14 @@
 # Handoff — 2026-10-26
 
-## Current ordered review and quality follow-up
+## Current quality follow-up (#35)
 
-The owner authorized review/merge of #32, followed by main retarget/revalidation/merge of #34, then remaining #8 quality through a separate issue and PR. PR #32 merged as `16bc9166eed1cc5aae58580f71d259dd4fb97cbc` after review, 88 native tests, Clippy/rustfmt/build/format and 39 browser cases in each dev/static mode including both actual models. #34 now targets main; its PR records final revalidation and merge status.
+The authorized #32 → #34 review/merge batch is complete. #32 merged as `16bc9166eed1cc5aae58580f71d259dd4fb97cbc`; #34 was retargeted to main, incorporated main, revalidated and merged as `b59db3fc5e18da54e0cee82dcc7993659694c6e0`. Local review reran 88 native tests and 39 browser cases per dev/static mode for #32; #34 reran build/format and 42 cases per mode including both actual models. Both final heads passed Verify CI.
 
-Local test: http://127.0.0.1:5173/ while `npm run dev` runs. Open example → move joints → Preview deformation → Bend/Angle → Edit joints → Update preview. Entering edit currently discards output even without an actual change. The usability follow-up changes no algorithm.
+Branch `codex/rigid-surface-groups` implements #35, a bounded #8 correction slice: Rust-reported surface groups expand to existing component overrides, with mixed-state display and a viewport outline of the containing surface. Selecting a rigid target requires explicit user intent. No automatic weighting, source format or placement schema changes. See [new evidence](verification/rigid-accessory-2026-10-26.md); #8 remains open for automatic close-body/clothing ambiguity, severe bends and browser budgets.
 
-Next: address #8's large rigid-accessory correction workflow with separately recorded actual-model evidence. New implementation PRs need owner review; no further merge, release or deployment is authorized. Keep drum-vrm unchanged. Historical checkpoints below retain their original scope and measured results.
+Local test: http://127.0.0.1:5173/ while `npm run dev` runs. Open example → Rig → Initial weights → Surface group / Target → Attachment → Preview deformation. Use Connected part for individual changes; Deform restores automatic weights. Local actual-model reproduction uses `.local/weight-quality-review-2026-10-26/seed/source.glb` and its placement, then surfaces 6/0, 7/0 and 8/0 → spine. These are explicit reviewed sample choices, not product defaults. Keep sample geometry/screenshots private.
+
+Next: owner review of the #35 PR and local correction workflow, then choose another remaining #8 gate. No merge of the new PR, release or deployment is authorized. Keep drum-vrm unchanged. Historical checkpoints retain their original scope and measured results.
 
 ## Current #8 quality follow-up
 
