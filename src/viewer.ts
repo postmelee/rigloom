@@ -5,6 +5,7 @@ import { PlacementOverlay } from "./placement-overlay";
 import type { Placement } from "./placement";
 export class Viewer {
   readonly placement: PlacementOverlay;
+  onView: (mode: "front" | "side" | "free") => void = () => {};
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(40, 1, 0.01, 10000);
@@ -12,6 +13,7 @@ export class Viewer {
   private current: THREE.Group | null = null;
   private skeleton: THREE.SkeletonHelper | null = null;
   private generation = 0;
+  private nodeObjects = new Map<number, THREE.Object3D>();
   private grid = new THREE.GridHelper(10, 20, 0xb5b5b5, 0xe2e2e2);
   private center = new THREE.Vector3();
   private radius = 2;
@@ -54,7 +56,13 @@ export class Viewer {
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.canvas.parentElement!;
     this.renderer.setSize(w, h, false);
-    this.camera.aspect = w / Math.max(h, 1);
+    const before = this.fitDistance();
+    this.camera.aspect = Math.max(w / Math.max(h, 1), 0.01);
+    if (this.current)
+      this.camera.position
+        .sub(this.controls.target)
+        .multiplyScalar(this.fitDistance() / before)
+        .add(this.controls.target);
     this.camera.updateProjectionMatrix();
   }
   private dispose(group: THREE.Object3D) {
@@ -112,7 +120,16 @@ export class Viewer {
       this.camera.updateProjectionMatrix();
     }
   }
+  pose(node: number | null, axis: "x" | "z", radians: number) {
+    // Only generated translation-only bones are passed by the Rig panel.
+    for (const object of this.nodeObjects.values())
+      if (object instanceof THREE.Bone) object.quaternion.identity();
+    const object = node === null ? undefined : this.nodeObjects.get(node);
+    if (object instanceof THREE.Bone) object.rotation[axis] = radians;
+    this.current?.updateMatrixWorld(true);
+  }
   clear() {
+    this.nodeObjects.clear();
     this.placement.show(null);
     ++this.generation;
     this.grid.visible = false;
@@ -145,6 +162,10 @@ export class Viewer {
     }
     this.grid.visible = true;
     this.current = gltf.scene;
+    gltf.scene.traverse((object) => {
+      const index = gltf.parser.associations.get(object)?.nodes;
+      if (index !== undefined) this.nodeObjects.set(index, object);
+    });
     this.scene.add(this.current);
     this.skeleton = new THREE.SkeletonHelper(this.current);
     for (const material of Array.isArray(this.skeleton.material)
@@ -162,7 +183,15 @@ export class Viewer {
     this.view("free");
     return true;
   }
+  private fitDistance() {
+    const halfAngle = Math.atan(
+      Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) *
+        Math.min(1, this.camera.aspect),
+    );
+    return (this.radius / Math.sin(halfAngle)) * 1.1;
+  }
   view(mode: "front" | "side" | "free") {
+    this.onView(mode);
     const direction =
       mode === "front"
         ? new THREE.Vector3(0, 0, 1)
@@ -171,7 +200,7 @@ export class Viewer {
           : new THREE.Vector3(1, 0.6, 1).normalize();
     this.camera.position
       .copy(this.center)
-      .addScaledVector(direction, this.radius * 3.2);
+      .addScaledVector(direction, this.fitDistance());
     this.controls.target.copy(this.center);
     this.controls.update();
   }

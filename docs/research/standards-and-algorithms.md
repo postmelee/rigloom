@@ -28,7 +28,7 @@ The [official model guidance](https://vrm.dev/en/vrm/vrm_features/) requires a T
 
 Core PBR is permitted without MToon. Optional expressions, look-at, first-person, spring-bone and constraint data are not generated. Animations/cameras are defined as unused by VRM, not prohibited source data, so their original references/payload remain and the report explains this limit. Mesh/morph tangent references are omitted per the export guidance, with counts and unchanged BIN bytes; tangent-only morph targets are blocked to preserve target indices. License findings and the distinction between model rights, dependency licenses and schema text are recorded in [the ledger](licenses.md#schema-reference-audit).
 
-## Skinning candidates (not implemented)
+## Skinning candidates and initial local experiment
 
 | Method | Why investigate | Failure assumptions / acceptance gate |
 |---|---|---|
@@ -39,6 +39,8 @@ Core PBR is permitted without MToon. Optional expressions, look-at, first-person
 [libigl tutorial](https://libigl.github.io/tutorial/) is research on geometry/weights, not proof of Rust/WASM feasibility. The upstream repository contains licensing distinctions; GitHub's aggregate metadata is not sufficient for adopting modules or optional solver dependencies. No libigl source copied or linked. A clean implementation derived from a paper still needs its own numerical validation.
 
 [Baran and Popović, Automatic Rigging and Animation of 3D Characters, SIGGRAPH 2007 (MIT record)](https://dspace.mit.edu/entities/publication/02216671-1424-4552-a2d3-74cec29e2062) establishes a research reference for Pinocchio. The author's original source URL could not be accessed by the web tool in this session. Original implementation origin, separate library/demo/solver licenses and dependencies remain unverified. Do not infer rights from a mirror or the paper. No source, training data, weights or demo assets adopted; no modern-browser timing inferred from the paper.
+
+The owner-authorized local test slice now implements the first two as experimental comparison modes; see [initial-skin.md](initial-skin.md). Local generation is available, but the production quality/research gate below remains open. No libigl/Pinocchio implementation was adopted.
 
 ## Evidence required before adopting weights
 

@@ -60,10 +60,19 @@ const status = el("status"),
 let viewer: Viewer | undefined;
 try {
   viewer = new Viewer(document.querySelector("canvas")!);
+  viewer.onView = (mode) => {
+    for (const button of document.querySelectorAll<HTMLButtonElement>(
+      "[data-view]",
+    ))
+      button.setAttribute("aria-pressed", String(button.dataset.view === mode));
+  };
 } catch {
   status.textContent =
     "WebGL is unavailable. File inspection still works; enable WebGL to see the model.";
 }
+let unriggedSource:
+  { bytes: ArrayBuffer; sha: string; report: Inspection } | undefined;
+let pendingInspection: ((ready: boolean) => void) | undefined;
 let worker: Worker | undefined,
   revision = 0,
   latest: Inspection | undefined,
@@ -89,9 +98,32 @@ const mappingPanel = new MappingPanel(
     runInspection(sourceBytes.slice(0), revision, mapping);
   },
 );
-const rigPanel = new RigPanel(viewer, () => {
-  exportPanel.waitForMapping();
-});
+const rigPanel = new RigPanel(
+  viewer,
+  () => {
+    revision++;
+    worker?.terminate();
+    worker = undefined;
+    pendingInspection?.(false);
+    pendingInspection = undefined;
+    cancel.disabled = true;
+    exportPanel.reset();
+    if (unriggedSource) {
+      sourceBytes = unriggedSource.bytes;
+      sourceSha = unriggedSource.sha;
+      showReport(unriggedSource.report);
+      mappingPanel.show(unriggedSource.report, unriggedSource.sha);
+      exportPanel.setSource(unriggedSource.report);
+    }
+  },
+  (bytes, mapping) => {
+    revision++;
+    worker?.terminate();
+    return new Promise<boolean>((resolve) =>
+      runInspection(bytes, revision, mapping, resolve),
+    );
+  },
+);
 rigPanel.root.id = "panel-rig";
 mappingPanel.root.id = "panel-mapping";
 exportPanel.root.id = "panel-export";
@@ -101,6 +133,9 @@ for (const panel of [mappingPanel.root, exportPanel.root, rigPanel.root]) {
   el("diagnostic-details").before(panel);
 }
 const stop = () => {
+  unriggedSource = undefined;
+  pendingInspection?.(false);
+  pendingInspection = undefined;
   revision++;
   worker?.terminate();
   worker = undefined;
@@ -135,7 +170,9 @@ const showReport = (report: Inspection) => {
   el("diagnostics").replaceChildren();
   const diagnostics = [
     ...report.diagnostics,
-    ...(report.rig?.mapping.diagnostics ?? []),
+    ...(report.inventory.skins > 0
+      ? (report.rig?.mapping.diagnostics ?? [])
+      : []),
     ...(report.rig?.binds.diagnostics ?? []),
   ].filter((d) => !["inspection_only", "animations_static"].includes(d.code));
   el("diagnostic-details").hidden = diagnostics.length === 0;
@@ -166,7 +203,16 @@ const runInspection = (
   bytes: ArrayBuffer,
   request: number,
   mapping?: Mapping,
+  done?: (ready: boolean) => void,
 ) => {
+  pendingInspection?.(false);
+  pendingInspection = done;
+  const finish = (ready: boolean) => {
+    if (request === revision) {
+      pendingInspection?.(ready);
+      pendingInspection = undefined;
+    }
+  };
   latest = undefined;
   save.disabled = true;
   cancel.disabled = false;
@@ -181,6 +227,7 @@ const runInspection = (
       if (request !== revision) return;
       status.textContent =
         "Inspection worker failed. Reload the app and rebuild WASM if developing locally.";
+      finish(false);
       worker?.terminate();
       worker = undefined;
       cancel.disabled = true;
@@ -196,12 +243,19 @@ const runInspection = (
       worker?.terminate();
       worker = undefined;
       if (data.phase === "error") {
+        finish(false);
         status.textContent = data.message;
         cancel.disabled = true;
         mappingPanel.reset();
         exportPanel.reset();
         return;
       }
+      if (data.report.inventory.skins === 0 && data.report.preview_allowed)
+        unriggedSource = {
+          bytes: data.bytes,
+          sha: data.source_sha256,
+          report: data.report,
+        };
       sourceBytes = data.bytes;
       sourceSha = data.source_sha256;
       showReport(data.report);
@@ -210,6 +264,7 @@ const runInspection = (
       if (!data.report.preview_allowed) {
         viewer?.clear();
         el("empty").hidden = false;
+        finish(false);
         status.textContent = "Preview blocked. Resolve the diagnostics below.";
         cancel.disabled = true;
         return;
@@ -220,21 +275,16 @@ const runInspection = (
           const loaded = await viewer.load(data.bytes);
           if (request !== revision || !loaded) return;
           el("empty").hidden = true;
-          for (const button of document.querySelectorAll<HTMLButtonElement>(
-            "[data-view]",
-          ))
-            button.setAttribute(
-              "aria-pressed",
-              String(button.dataset.view === "free"),
-            );
         }
         if (request !== revision) return;
         if (data.report.inventory.skins === 0)
           rigPanel.load(data.bytes, data.source_sha256);
+        finish(true);
         status.textContent = viewer
           ? "Inspection complete. Preview ready."
           : "Inspection complete. WebGL preview unavailable.";
       } catch (error) {
+        finish(false);
         if (request === revision)
           status.textContent = `Preview failed: ${String(error)}. Inspection report remains available.`;
       } finally {
@@ -244,6 +294,7 @@ const runInspection = (
     worker.postMessage({ revision: request, bytes, mapping }, [bytes]);
   } catch (error) {
     if (request === revision) {
+      finish(false);
       status.textContent = `Could not inspect file: ${String(error)}`;
       cancel.disabled = true;
       mappingPanel.reset();

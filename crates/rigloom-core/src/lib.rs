@@ -1,4 +1,5 @@
 //! Pure, read-only inspection. No file system, network, DOM or renderer dependencies.
+pub mod skinning;
 use serde::Serialize;
 use std::collections::BTreeMap;
 
@@ -539,8 +540,8 @@ pub fn inspect_glb_with_mapping(
             Severity::Warning,
             "unrigged",
             "/skins",
-            "No existing skin found. Semi-automatic rigging is planned for M2.",
-            "Inspect the surface now; joint placement is not implemented yet.",
+            "No existing skin found.",
+            "Use Rig to place joints and generate experimental initial weights.",
         );
     }
     if report.inventory.animations > 0 {
