@@ -12,10 +12,10 @@ import { MappingPanel, downloadJSON } from "./mapping-panel";
 import "./style.css";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<header class="toolbar">
-<h1>Rigloom</h1><label class="upload">Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><span id="filename"></span>
+<h1>Rigloom</h1><label class="upload">Open GLB<input id="file" type="file" accept=".glb" aria-label="Open GLB"></label><button id="example">Open example</button><span id="filename"></span>
 <nav aria-label="Workspace"><button data-panel="model" aria-controls="panel-model" aria-expanded="false">Model</button><button data-panel="rig" aria-controls="panel-rig" aria-expanded="false">Rig</button><button data-panel="mapping" aria-controls="panel-mapping" aria-expanded="false">Mapping</button><button data-panel="export" aria-controls="panel-export" aria-expanded="false">Export</button><button id="theme" aria-label="Switch to dark mode">Dark</button></nav></header>
-<main class="workspace"><section class="studio" aria-label="3D model preview"><div class="stage-bar"><p id="status" role="status" aria-live="polite">Ready.</p><button id="cancel" disabled>Cancel</button><div class="view-tools" aria-label="Camera view"><button data-view="front" aria-pressed="false">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="free" aria-pressed="true">Free</button></div></div>
-<div class="viewport"><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><p class="empty" id="empty">Open a GLB to preview it.</p></div></section>
+<main class="workspace"><section class="studio" aria-label="3D model preview"><div class="stage-bar"><p id="status" role="status" aria-live="polite">Ready.</p><button id="cancel" disabled>Cancel</button><div class="view-tools" aria-label="Camera view"><button data-view="front" aria-pressed="false">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="free" aria-pressed="true">Free</button></div><details class="view-help"><summary>View keys</summary><div class="view-help-content"><p>Model focus: + / − zoom · I/J/K/L orbit · Shift+I/J/K/L pan · F fit · 1/2/3 Front/Side/Free.</p><button id="focus-view">Focus model view</button></div></details></div>
+<div class="viewport"><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><p class="empty" id="empty">Open a GLB or choose Open example.</p></div></section>
 <aside id="inspector" class="inspector" hidden><div class="inspector-heading"><h2 id="panel-title">Model</h2><button id="close-panel" aria-label="Close panel" title="Close (Esc)">×</button></div>
 <section id="panel-model" class="panel" hidden><dl id="stats"></dl><button id="report" disabled>Save report</button><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details><p><a href="https://github.com/postmelee/rigloom/blob/main/docs/guide/en.md" target="_blank" rel="noreferrer">Help</a></p></section>
 <details id="diagnostic-details" class="diagnostics" hidden><summary id="diagnostic-summary">Diagnostics</summary><ul id="diagnostics"></ul></details></aside></main>`;
@@ -72,6 +72,8 @@ try {
 }
 let unriggedSource:
   { bytes: ArrayBuffer; sha: string; report: Inspection } | undefined;
+let focusExample = false;
+let exampleAbort: AbortController | undefined;
 let pendingInspection: ((ready: boolean) => void) | undefined;
 let worker: Worker | undefined,
   revision = 0,
@@ -133,6 +135,9 @@ for (const panel of [mappingPanel.root, exportPanel.root, rigPanel.root]) {
   el("diagnostic-details").before(panel);
 }
 const stop = () => {
+  exampleAbort?.abort();
+  exampleAbort = undefined;
+  focusExample = false;
   unriggedSource = undefined;
   pendingInspection?.(false);
   pendingInspection = undefined;
@@ -278,7 +283,8 @@ const runInspection = (
         }
         if (request !== revision) return;
         if (data.report.inventory.skins === 0)
-          rigPanel.load(data.bytes, data.source_sha256);
+          rigPanel.load(data.bytes, data.source_sha256, focusExample);
+        focusExample = false;
         finish(true);
         status.textContent = viewer
           ? "Inspection complete. Preview ready."
@@ -361,34 +367,61 @@ const startExport = (requestData: ExportRequest) => {
     fail(`Could not export VRM: ${String(error)}`);
   }
 };
-el<HTMLInputElement>("file").onchange = async (event) => {
-  const input = event.target as HTMLInputElement,
-    file = input.files?.[0];
-  input.value = "";
-  if (!file) return;
+const openSource = async (
+  name: string,
+  read: () => Promise<ArrayBuffer>,
+  example = false,
+) => {
   stop();
   const request = revision;
+  focusExample = example;
   latest = undefined;
   save.disabled = true;
   cancel.disabled = false;
   el("stats").replaceChildren();
   el("diagnostics").replaceChildren();
   el("nodes").replaceChildren();
-  el("filename").textContent = file.name;
-  el("filename").title = file.name;
-  setPanel("model");
-  status.textContent = "Reading file…";
+  el("filename").textContent = name;
+  el("filename").title = name;
+  setPanel(example ? "rig" : "model");
+  status.textContent = example ? "Loading example…" : "Reading file…";
   try {
-    const bytes = await file.arrayBuffer();
+    const bytes = await read();
     if (request !== revision) return;
     runInspection(bytes, request);
   } catch (error) {
     if (request === revision) {
-      status.textContent = `Could not read file: ${String(error)}`;
+      focusExample = false;
+      status.textContent = `Could not read ${example ? "example" : "file"}: ${String(error)}`;
       cancel.disabled = true;
     }
   }
 };
+el<HTMLInputElement>("file").onchange = (event) => {
+  const input = event.target as HTMLInputElement,
+    file = input.files?.[0];
+  input.value = "";
+  if (file) void openSource(file.name, () => file.arrayBuffer());
+};
+el("example").onclick = () =>
+  void openSource(
+    "unrigged-standard.glb",
+    async () => {
+      const abort = (exampleAbort = new AbortController());
+      const response = await fetch(
+        `${import.meta.env.BASE_URL}examples/unrigged-standard.glb`,
+        { signal: abort.signal },
+      );
+      if (!response.ok)
+        throw new Error(`HTTP ${response.status}. Try Open example again.`);
+      return response.arrayBuffer();
+    },
+    true,
+  );
+el("focus-view").onclick = () =>
+  document
+    .querySelector<HTMLCanvasElement>("canvas")
+    ?.focus({ preventScroll: true });
 cancel.onclick = () => {
   stop();
   latest = undefined;

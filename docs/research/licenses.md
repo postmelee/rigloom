@@ -54,3 +54,8 @@ The read-only drum-vrm source snapshot at `d8dfab38cefc3bffd6edc0b88643d02ff829a
 ## Initial-skin local test slice
 
 The segment prior, anchored edge diffusion, joint template, generated skeleton/binds and unrigged fixture adapter are original Rigloom MIT code. No new dependency, copied research implementation, downloaded character, dataset or model weights are introduced. Generated test files remain ignored under `.local/initial-skin/`. Existing pinned Three.js TransformControls is used for joint interaction; existing schema/three-vrm development dependencies verify output. [Experiment scope](initial-skin.md) does not resolve the Pinocchio/libigl adoption gates or certify production skin quality.
+
+
+## #30 in-app example provenance
+
+`Open example` serves/emits the standard output of `scripts/unrigged-fixture.mjs`, derived from the original procedural geometry and one-pixel texture in `scripts/compatibility/fixture.mjs` and `scripts/export-fixture.mjs`. These generators and this synthetic output use Rigloom's MIT license. No external character, texture, dataset, learned weight or dependency is added. Development and local static builds now contain `examples/unrigged-standard.glb`; other generated variants remain ignored local outputs. No public release/deployment or approval for future public model inclusion is implied.

@@ -7,7 +7,6 @@ export function bindRigShortcuts(options: {
   move: (axis: number, amount: number, record: boolean) => void;
   step: () => number;
   select: (direction: number) => void;
-  view: (mode: "front" | "side" | "free") => void;
 }) {
   const held = new Set<string>();
   const endGesture = () => held.clear();
@@ -65,17 +64,10 @@ export function bindRigShortcuts(options: {
       return;
     }
     if (event.altKey || event.shiftKey) return;
-    if (key === "[" || key === "]" || ["1", "2", "3"].includes(key)) {
+    if (key === "[" || key === "]") {
       event.preventDefault();
       endGesture();
-      if (event.repeat) return;
-      if (key === "[" || key === "]") options.select(key === "[" ? -1 : 1);
-      else
-        options.view(
-          ({ "1": "front", "2": "side", "3": "free" } as const)[
-            key as "1" | "2" | "3"
-          ],
-        );
+      if (!event.repeat) options.select(key === "[" ? -1 : 1);
     }
   });
 }

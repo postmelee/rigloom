@@ -428,3 +428,25 @@ code {
 #rig-controls details > * {
   margin-bottom: 8px;
 }
+
+.view-help {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0;
+}
+.view-help-content {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  z-index: 30;
+  width: 240px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.view-help-content p {
+  margin: 0 0 8px;
+}
+.view-help-content button {
+  width: 100%;
+}
