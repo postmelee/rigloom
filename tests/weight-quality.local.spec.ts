@@ -99,3 +99,120 @@ for (const sample of ["seed", "twist"])
       ),
     );
   });
+
+test("local Seed accessory: three UI groups reproduce the independently configured 609-part correction", async ({
+  page,
+}) => {
+  test.skip(
+    process.env.RIGLOOM_REAL_MODELS !== "1",
+    "Requires reviewed local benchmark copies",
+  );
+  test.setTimeout(90000);
+  const root = ".local/weight-quality-review-2026-10-26";
+  const source = await readFile(`${root}/seed/source.glb`);
+  const request = JSON.parse(
+    await readFile(`${root}/seed/request.json`, "utf8"),
+  );
+  const expected = JSON.parse(
+    await readFile(`${root}/seed-rigid/request.json`, "utf8"),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await page.getByLabel("Open GLB", { exact: true }).setInputFiles({
+    name: "source.glb",
+    mimeType: "model/gltf-binary",
+    buffer: source,
+  });
+  await page.getByRole("button", { name: "Rig", exact: true }).click();
+  await expect(page.locator("#rig-status")).toContainText("Place joints");
+  await page.getByLabel("Load placement", { exact: true }).setInputFiles({
+    name: "placement.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(
+      JSON.stringify({
+        ...request,
+        schema_version: 1,
+        source_sha256: digest(source),
+      }),
+    ),
+  });
+  await expect(page.locator("#rig-status")).toContainText(
+    "Joint checks passed",
+  );
+  const out = `${root}/seed-rigid/browser`;
+  await mkdir(out, { recursive: true });
+  await page
+    .getByRole("button", { name: "Preview deformation", exact: true })
+    .click();
+  await expect(page.locator("#rig-preview")).toBeVisible({ timeout: 60000 });
+  await page.getByLabel("Angle", { exact: true }).press("End");
+  await page.screenshot({ path: `${out}/automatic-elbow-120.png` });
+  await page.getByRole("button", { name: "Edit joints", exact: true }).click();
+  await page.getByText("Initial weights", { exact: true }).click();
+  for (const node of [6, 7, 8]) {
+    await page
+      .getByLabel("Attachment target", { exact: true })
+      .selectOption(`surface:${node}:0`);
+    await page.getByLabel("Attachment", { exact: true }).selectOption("1");
+  }
+  const download = async (name: string) => {
+    const pending = page.waitForEvent("download");
+    await page.getByRole("button", { name, exact: true }).click();
+    return readFile((await (await pending).path())!);
+  };
+  const placement = await download("Save placement");
+  expect(JSON.parse(placement.toString()).rigid).toEqual(expected.rigid);
+  expect(Object.keys(expected.rigid)).toHaveLength(609);
+  await page
+    .getByLabel("Attachment target", { exact: true })
+    .selectOption("surface:6:0");
+  await page.getByLabel("Attachment", { exact: true }).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${out}/selection.png` });
+  await page
+    .getByRole("button", { name: "Update preview", exact: true })
+    .click();
+  await expect(page.locator("#rig-preview")).toBeVisible({ timeout: 60000 });
+  const generated = await download("Save rigged GLB");
+  expect(generated).toEqual(await readFile(`${root}/seed-rigid/surface.glb`));
+  const report = JSON.parse((await download("Save weight report")).toString());
+  expect(report.rigid).toEqual(expected.rigid);
+  expect(report.max_weight_sum_error).toBeLessThan(1e-6);
+  expect(report.unweighted_vertices).toBe(0);
+  for (const bend of ["leftLowerArm", "leftLowerLeg"]) {
+    await page.getByLabel("Bend", { exact: true }).selectOption(bend);
+    await page.getByLabel("Angle", { exact: true }).press("End");
+    await expect(page.locator("#rig-angle-value")).toHaveText("120°");
+    await page.screenshot({ path: `${out}/${bend}-120.png` });
+    expect(await download("Save rigged GLB")).toEqual(generated);
+  }
+  await page.getByRole("button", { name: "Edit joints", exact: true }).click();
+  await page.getByLabel("Load placement", { exact: true }).setInputFiles({
+    name: "placement.json",
+    mimeType: "application/json",
+    buffer: placement,
+  });
+  await expect(page.locator("#rig-status")).toContainText(
+    "Joint checks passed",
+  );
+  await page
+    .getByRole("button", { name: "Update preview", exact: true })
+    .click();
+  await expect(page.locator("#rig-preview")).toBeVisible({ timeout: 60000 });
+  expect(await download("Save rigged GLB")).toEqual(generated);
+  await writeFile(
+    `${out}/result.json`,
+    JSON.stringify(
+      {
+        source_sha256: digest(source),
+        output_sha256: digest(generated),
+        surface_group_assignments: 3,
+        explicit_component_overrides: 609,
+        native_bytes_equal: true,
+        placement_round_trip: true,
+        preview_rest_bytes_unchanged: true,
+      },
+      null,
+      2,
+    ),
+  );
+});

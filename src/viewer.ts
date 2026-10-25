@@ -13,6 +13,8 @@ export class Viewer {
   private current: THREE.Group | null = null;
   private skeleton: THREE.SkeletonHelper | null = null;
   private generation = 0;
+  private surfaceObjects = new Map<string, THREE.Object3D>();
+  private surfaceOutline: THREE.BoxHelper | null = null;
   private nodeObjects = new Map<number, THREE.Object3D>();
   private grid = new THREE.GridHelper(10, 20, 0xb5b5b5, 0xe2e2e2);
   private center = new THREE.Vector3();
@@ -159,7 +161,26 @@ export class Viewer {
     if (object instanceof THREE.Bone) object.rotation[axis] = radians;
     this.current?.updateMatrixWorld(true);
   }
+  outlineSurface(node: number | null, primitive = 0) {
+    if (this.surfaceOutline) {
+      this.scene.remove(this.surfaceOutline);
+      this.surfaceOutline.dispose();
+      this.surfaceOutline = null;
+    }
+    const object =
+      node === null
+        ? undefined
+        : this.surfaceObjects.get(`${node}:${primitive}`);
+    if (!object) return;
+    object.updateWorldMatrix(true, true);
+    this.surfaceOutline = new THREE.BoxHelper(object, 0xe09b24);
+    this.surfaceOutline.material.depthTest = false;
+    this.surfaceOutline.renderOrder = 11;
+    this.scene.add(this.surfaceOutline);
+  }
   clear() {
+    this.outlineSurface(null);
+    this.surfaceObjects.clear();
     this.nodeObjects.clear();
     this.placement.show(null);
     ++this.generation;
@@ -196,6 +217,20 @@ export class Viewer {
     gltf.scene.traverse((object) => {
       const index = gltf.parser.associations.get(object)?.nodes;
       if (index !== undefined) this.nodeObjects.set(index, object);
+    });
+    gltf.scene.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const primitive = gltf.parser.associations.get(object)?.primitives;
+      let parent: THREE.Object3D | null = object;
+      while (parent) {
+        const node = gltf.parser.associations.get(parent)?.nodes;
+        if (node !== undefined) {
+          if (primitive !== undefined)
+            this.surfaceObjects.set(`${node}:${primitive}`, object);
+          break;
+        }
+        parent = parent.parent;
+      }
     });
     this.scene.add(this.current);
     this.skeleton = new THREE.SkeletonHelper(this.current);

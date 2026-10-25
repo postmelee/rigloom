@@ -1,3 +1,9 @@
+import {
+  attachmentTargets,
+  attachmentValue,
+  type SkinPart,
+  type AttachmentTarget,
+} from "./attachment-targets";
 import { bindRigShortcuts } from "./rig-shortcuts";
 import type { Frame, PlacementState, Point } from "./placement";
 import type { Mapping } from "./protocol";
@@ -20,7 +26,8 @@ export class RigPanel {
   };
   private preview = false;
   private hasPreviewed = false;
-  private parts: { id: string; label: string; vertices: number }[] = [];
+  private parts: SkinPart[] = [];
+  private targets: AttachmentTarget[] = [];
   private rigid: Record<string, number> = {};
   private skinError?: string;
   private revision = 0;
@@ -44,7 +51,7 @@ export class RigPanel {
 <label><input id="rig-symmetry" type="checkbox" checked> Mirror left / right</label><label><input id="rig-translucent" type="checkbox" checked> Translucent model</label>
 <div class="button-row"><button id="rig-undo" aria-keyshortcuts="Meta+Z Control+Z">Undo</button><button id="rig-redo" aria-keyshortcuts="Meta+Shift+Z Control+Shift+Z Control+Y">Redo</button></div><div class="button-row"><button id="rig-reset-joint">Reset joint</button><button id="rig-reset-all">Reset all</button></div>
 <details><summary>Keyboard shortcuts</summary><p>Click the model first. World axes: ←/→ X · ↑/↓ Y · Alt+↑/↓ Z. Shift: ⅒ step.</p><label class="export-field">Move step<select id="rig-move-step" aria-label="Move step"><option value="0.001">1 mm</option><option value="0.01" selected>1 cm</option><option value="0.1">10 cm</option></select></label><p>⌘/Ctrl+Z: undo · +Shift: redo. [ / ]: joint. Camera controls: see View keys above the model.</p><button id="rig-focus">Focus model</button></details>
-<details><summary>Additional checks</summary><button id="rig-validate">Check joint placement</button></details><div class="button-row"><button id="rig-save">Save placement</button><label class="upload">Load placement<input id="rig-load" type="file" accept=".json" aria-label="Load placement"></label></div><details><summary>Initial weights</summary><label class="export-field">Method<select id="rig-method" aria-label="Method"><option value="surface">Surface smoothing (experimental)</option><option value="segment">Segment distance (baseline)</option></select></label><label class="export-field">Component<select id="rig-part" aria-label="Component"></select></label><label class="export-field">Attachment<select id="rig-attachment" aria-label="Attachment"><option value="">Deform</option></select></label></details>
+<details><summary>Additional checks</summary><button id="rig-validate">Check joint placement</button></details><div class="button-row"><button id="rig-save">Save placement</button><label class="upload">Load placement<input id="rig-load" type="file" accept=".json" aria-label="Load placement"></label></div><details id="rig-weight-settings"><summary>Initial weights</summary><label class="export-field">Method<select id="rig-method" aria-label="Method"><option value="surface">Surface smoothing (experimental)</option><option value="segment">Segment distance (baseline)</option></select></label><label class="export-field">Select by<select id="rig-part-scope" aria-label="Select by"><option value="surface">Surface group</option><option value="component">Connected part</option></select></label><label class="export-field">Target<select id="rig-part" aria-label="Attachment target"></select></label><p id="rig-part-summary" aria-live="polite"></p><label class="export-field">Attachment<select id="rig-attachment" aria-label="Attachment"><option value="">Deform</option></select></label></details>
 <button id="rig-generate">Preview deformation</button></fieldset><button id="rig-cancel" hidden>Cancel</button>
 <fieldset id="rig-preview" hidden><p>Bend a joint to inspect deformation. Edit joints to change placement.</p><label class="export-field">Bend<select id="rig-bend" aria-label="Bend"><option value="leftLowerArm">Left elbow</option><option value="rightLowerArm">Right elbow</option><option value="leftLowerLeg">Left knee</option><option value="rightLowerLeg">Right knee</option></select></label><label class="export-field">Angle<input id="rig-angle" aria-label="Angle" type="range" min="0" max="120" value="0"><output id="rig-angle-value">0°</output></label><button id="rig-edit">Edit joints</button><div class="button-row"><button id="rig-download">Save rigged GLB</button><button id="rig-weight-report">Save weight report</button></div></fieldset>`;
     this.get("rig-generate").onclick = () => this.generate();
@@ -85,20 +92,27 @@ export class RigPanel {
           "rigloom-weights.json",
         );
     };
-    this.get("rig-part").onchange = () => {
-      const id = this.get<HTMLSelectElement>("rig-part").value;
-      this.get<HTMLSelectElement>("rig-attachment").value =
-        this.rigid[id] === undefined ? "" : String(this.rigid[id]);
-    };
+    this.get("rig-part-scope").onchange = () => this.drawTargets();
+    this.get("rig-part").onchange = () => this.showTarget();
+    this.get<HTMLDetailsElement>("rig-weight-settings").ontoggle = () =>
+      this.outlineTarget();
+    new MutationObserver(() => this.outlineTarget()).observe(this.root, {
+      attributes: true,
+      attributeFilter: ["hidden"],
+    });
     this.get("rig-attachment").onchange = () => {
-      const id = this.get<HTMLSelectElement>("rig-part").value,
-        value = this.get<HTMLSelectElement>("rig-attachment").value;
-      if (value === "") delete this.rigid[id];
-      else this.rigid[id] = Number(value);
+      const target = this.target();
+      const value = this.get<HTMLSelectElement>("rig-attachment").value;
+      if (!target || value === "mixed") return;
+      for (const part of target.parts) {
+        if (value === "") delete this.rigid[part.id];
+        else this.rigid[part.id] = Number(value);
+      }
       this.revision++;
       this.invalidate();
+      this.showTarget();
       this.message(
-        `Weight settings changed. ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the new result.`,
+        `Attachment changed for ${target.parts.length} part(s). ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the result.`,
       );
     };
     this.get("rig-method").onchange = () => {
@@ -262,6 +276,7 @@ export class RigPanel {
     );
     this.get("rig-cancel").hidden = !value;
     this.get("rig-controls").hidden = this.preview || !this.state;
+    this.outlineTarget();
   }
   reset() {
     this.revision++;
@@ -272,6 +287,9 @@ export class RigPanel {
     this.preview = false;
     this.hasPreviewed = false;
     this.parts = [];
+    this.targets = [];
+    this.get<HTMLSelectElement>("rig-part-scope").value = "surface";
+    this.drawTargets();
     this.get<HTMLSelectElement>("rig-method").value = "surface";
     this.rigid = {};
     this.skinError = undefined;
@@ -335,20 +353,16 @@ export class RigPanel {
         this.rigid = settings.rigid;
         this.get<HTMLSelectElement>("rig-method").value = settings.method;
       }
-      this.get<HTMLSelectElement>("rig-part").replaceChildren(
-        ...this.parts.map(
-          (p) => new Option(`${p.label} · ${p.vertices} vertices`, p.id),
-        ),
-      );
+      const mixed = new Option("Mixed — choose to replace", "mixed");
+      mixed.disabled = true;
       this.get<HTMLSelectElement>("rig-attachment").replaceChildren(
         new Option("Deform", ""),
+        mixed,
         ...this.state!.data.names.map(
           (n, i) => new Option(`Rigid: ${n}`, String(i)),
         ),
       );
-      const part = this.get<HTMLSelectElement>("rig-part").value;
-      this.get<HTMLSelectElement>("rig-attachment").value =
-        this.rigid[part] === undefined ? "" : String(this.rigid[part]);
+      this.drawTargets();
       this.invalidate();
       this.busy(false);
       this.draw();
@@ -540,6 +554,49 @@ export class RigPanel {
       [bytes],
     );
   }
+  private target() {
+    return this.targets.find(
+      (t) => t.id === this.get<HTMLSelectElement>("rig-part").value,
+    );
+  }
+  private drawTargets() {
+    const select = this.get<HTMLSelectElement>("rig-part");
+    const previous = select.value;
+    this.targets = attachmentTargets(
+      this.parts,
+      this.get<HTMLSelectElement>("rig-part-scope").value === "surface",
+    );
+    select.replaceChildren(
+      ...this.targets.map((t) => new Option(t.label, t.id)),
+    );
+    if (this.targets.some((t) => t.id === previous)) select.value = previous;
+    select.disabled = !this.targets.length;
+    this.showTarget();
+  }
+  private showTarget() {
+    const target = this.target();
+    const attachment = this.get<HTMLSelectElement>("rig-attachment");
+    attachment.disabled = !target;
+    attachment.value = attachmentValue(target?.parts ?? [], this.rigid);
+    this.get("rig-part-summary").textContent = target
+      ? `${target.parts.length} part(s) · ${target.parts.reduce((sum, p) => sum + p.vertices, 0)} vertices. Outline shows the containing surface. Rigid attaches the selection to one joint; Deform restores automatic weights.`
+      : "No supported surface to attach.";
+    this.outlineTarget();
+  }
+  private outlineTarget() {
+    const part = this.target()?.parts[0];
+    const visible =
+      part &&
+      !this.root.hidden &&
+      !this.preview &&
+      !!this.state &&
+      !this.get<HTMLFieldSetElement>("rig-controls").disabled &&
+      this.get<HTMLDetailsElement>("rig-weight-settings").open;
+    this.viewer?.outlineSurface(
+      visible ? part.node : null,
+      part?.primitive ?? 0,
+    );
+  }
   private draw() {
     if (!this.state) return;
     const { frame, data } = this.state;
@@ -565,5 +622,6 @@ export class RigPanel {
       this.selected,
       this.get<HTMLInputElement>("rig-translucent").checked,
     );
+    this.outlineTarget();
   }
 }
