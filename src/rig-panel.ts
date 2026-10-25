@@ -19,6 +19,7 @@ export class RigPanel {
     };
   };
   private preview = false;
+  private hasPreviewed = false;
   private parts: { id: string; label: string; vertices: number }[] = [];
   private rigid: Record<string, number> = {};
   private skinError?: string;
@@ -43,9 +44,9 @@ export class RigPanel {
 <label><input id="rig-symmetry" type="checkbox" checked> Mirror left / right</label><label><input id="rig-translucent" type="checkbox" checked> Translucent model</label>
 <div class="button-row"><button id="rig-undo" aria-keyshortcuts="Meta+Z Control+Z">Undo</button><button id="rig-redo" aria-keyshortcuts="Meta+Shift+Z Control+Shift+Z Control+Y">Redo</button></div><div class="button-row"><button id="rig-reset-joint">Reset joint</button><button id="rig-reset-all">Reset all</button></div>
 <details><summary>Keyboard shortcuts</summary><p>Click the model first. World axes: ←/→ X · ↑/↓ Y · Alt+↑/↓ Z. Shift: ⅒ step.</p><label class="export-field">Move step<select id="rig-move-step" aria-label="Move step"><option value="0.001">1 mm</option><option value="0.01" selected>1 cm</option><option value="0.1">10 cm</option></select></label><p>⌘/Ctrl+Z: undo · +Shift: redo. [ / ]: joint. Camera controls: see View keys above the model.</p><button id="rig-focus">Focus model</button></details>
-<button id="rig-validate">Validate joints</button><div class="button-row"><button id="rig-save">Save placement</button><label class="upload">Load placement<input id="rig-load" type="file" accept=".json" aria-label="Load placement"></label></div><details><summary>Initial weights</summary><label class="export-field">Method<select id="rig-method" aria-label="Method"><option value="surface">Surface smoothing (experimental)</option><option value="segment">Segment distance (baseline)</option></select></label><label class="export-field">Component<select id="rig-part" aria-label="Component"></select></label><label class="export-field">Attachment<select id="rig-attachment" aria-label="Attachment"><option value="">Deform</option></select></label></details>
-<button id="rig-generate">Generate weights</button></fieldset><button id="rig-cancel" hidden>Cancel</button>
-<fieldset id="rig-preview" hidden><p>Initial weights. Check bends before export.</p><label class="export-field">Bend<select id="rig-bend" aria-label="Bend"><option value="leftLowerArm">Left elbow</option><option value="rightLowerArm">Right elbow</option><option value="leftLowerLeg">Left knee</option><option value="rightLowerLeg">Right knee</option></select></label><label class="export-field">Angle<input id="rig-angle" aria-label="Angle" type="range" min="0" max="120" value="0"><output id="rig-angle-value">0°</output></label><button id="rig-edit">Edit joints</button><div class="button-row"><button id="rig-download">Save rigged GLB</button><button id="rig-weight-report">Save weight report</button></div></fieldset>`;
+<details><summary>Additional checks</summary><button id="rig-validate">Check joint placement</button></details><div class="button-row"><button id="rig-save">Save placement</button><label class="upload">Load placement<input id="rig-load" type="file" accept=".json" aria-label="Load placement"></label></div><details><summary>Initial weights</summary><label class="export-field">Method<select id="rig-method" aria-label="Method"><option value="surface">Surface smoothing (experimental)</option><option value="segment">Segment distance (baseline)</option></select></label><label class="export-field">Component<select id="rig-part" aria-label="Component"></select></label><label class="export-field">Attachment<select id="rig-attachment" aria-label="Attachment"><option value="">Deform</option></select></label></details>
+<button id="rig-generate">Preview deformation</button></fieldset><button id="rig-cancel" hidden>Cancel</button>
+<fieldset id="rig-preview" hidden><p>Bend a joint to inspect deformation. Edit joints to change placement.</p><label class="export-field">Bend<select id="rig-bend" aria-label="Bend"><option value="leftLowerArm">Left elbow</option><option value="rightLowerArm">Right elbow</option><option value="leftLowerLeg">Left knee</option><option value="rightLowerLeg">Right knee</option></select></label><label class="export-field">Angle<input id="rig-angle" aria-label="Angle" type="range" min="0" max="120" value="0"><output id="rig-angle-value">0°</output></label><button id="rig-edit">Edit joints</button><div class="button-row"><button id="rig-download">Save rigged GLB</button><button id="rig-weight-report">Save weight report</button></div></fieldset>`;
     this.get("rig-generate").onclick = () => this.generate();
     this.get("rig-edit").onclick = () => void this.returnToEdit();
     const bend = () => {
@@ -96,10 +97,16 @@ export class RigPanel {
       else this.rigid[id] = Number(value);
       this.revision++;
       this.invalidate();
+      this.message(
+        `Weight settings changed. ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the new result.`,
+      );
     };
     this.get("rig-method").onchange = () => {
       this.revision++;
       this.invalidate();
+      this.message(
+        `Weight settings changed. ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the new result.`,
+      );
     };
     this.get("rig-frame").onclick = () => {
       const frame = {
@@ -237,6 +244,13 @@ export class RigPanel {
   }
   private message(text: string) {
     this.get("rig-status").textContent = text;
+    this.get("rig-generate").textContent = this.hasPreviewed
+      ? "Update preview"
+      : "Preview deformation";
+  }
+  unavailable(message: string) {
+    this.get("rig-controls").hidden = true;
+    this.message(message);
   }
   private busy(value: boolean) {
     this.get<HTMLFieldSetElement>("rig-controls").disabled =
@@ -247,7 +261,7 @@ export class RigPanel {
       this.selected,
     );
     this.get("rig-cancel").hidden = !value;
-    this.get("rig-controls").hidden = this.preview;
+    this.get("rig-controls").hidden = this.preview || !this.state;
   }
   reset() {
     this.revision++;
@@ -256,6 +270,7 @@ export class RigPanel {
     this.source = undefined;
     this.generated = undefined;
     this.preview = false;
+    this.hasPreviewed = false;
     this.parts = [];
     this.get<HTMLSelectElement>("rig-method").value = "surface";
     this.rigid = {};
@@ -340,7 +355,7 @@ export class RigPanel {
       this.message(
         joints
           ? "Joint checks passed."
-          : "Place joints inside the model. Check Front and Side." +
+          : "Place joints inside the model. Check Front and Side, then preview deformation." +
               (this.skinError ? ` ${this.skinError}` : ""),
       );
       this.viewer?.view("front");
@@ -388,7 +403,9 @@ export class RigPanel {
     }
     this.invalidate();
     this.draw();
-    this.message("Placement changed. Validate before generating weights.");
+    this.message(
+      `Placement changed. ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the new result.`,
+    );
   }
   private history(redo: boolean) {
     if (!this.state || this.worker || this.preview) return;
@@ -401,7 +418,9 @@ export class RigPanel {
     this.state = next;
     this.invalidate();
     this.draw();
-    this.message("Placement changed.");
+    this.message(
+      `Placement changed. ${this.hasPreviewed ? "Update preview" : "Preview deformation"} to check the new result.`,
+    );
   }
   private async restoreSource() {
     if (!this.source) return;
@@ -431,7 +450,9 @@ export class RigPanel {
     const revision = this.revision;
     await this.restoreSource();
     if (revision === this.revision)
-      this.message("Edit mode. Generate weights again after edits.");
+      this.message(
+        "Edit joints, then update the preview. Previous output is unavailable while editing.",
+      );
   }
   private generate() {
     if (
@@ -490,6 +511,7 @@ export class RigPanel {
           return;
         }
         this.preview = true;
+        this.hasPreviewed = true;
         this.busy(false);
         this.get("rig-preview").hidden = false;
         this.get<HTMLInputElement>("rig-angle").value = "0";

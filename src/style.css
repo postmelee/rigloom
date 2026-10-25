@@ -450,3 +450,22 @@ code {
 .view-help-content button {
   width: 100%;
 }
+
+#next-action,
+#rig-generate,
+#mapping-start-rig,
+#rig-route {
+  width: 100%;
+}
+#next-action {
+  margin-bottom: 6px;
+}
+#mapping-help {
+  margin-bottom: 10px;
+}
+#mapping-fields > p {
+  margin-top: 10px;
+}
+#diagnostics details {
+  margin-top: 4px;
+}

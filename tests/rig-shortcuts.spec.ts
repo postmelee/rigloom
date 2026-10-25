@@ -118,7 +118,10 @@ test("worker work and generated preview block placement shortcuts", async ({
   });
   const pending = page.waitForRequest(/rig\.worker/);
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await pending;
   await page.locator("canvas").focus();

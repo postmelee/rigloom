@@ -70,7 +70,7 @@ for (const variant of variants)
       buffer: fixture.bytes,
     });
     await expect(page.locator("#mapping-status")).toContainText(
-      "Mapping valid",
+      "Body-part assignments checked",
     );
     await expect(page.locator("#bind-status")).toContainText(
       "Bind/weight checks passed",

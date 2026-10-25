@@ -62,7 +62,10 @@ test("keyboard-only example entry loads the original fixture and camera commands
     page.getByRole("button", { name: "Undo", exact: true }),
   ).toBeDisabled();
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await expect(page.locator("#rig-status")).toContainText("Preview ·");
   await page.locator("canvas").focus();

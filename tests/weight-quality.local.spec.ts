@@ -38,7 +38,10 @@ for (const sample of ["seed", "twist"])
     );
     const start = Date.now();
     await page
-      .getByRole("button", { name: "Generate weights", exact: true })
+      .getByRole("button", {
+        name: /^(Preview deformation|Update preview)$/,
+        exact: true,
+      })
       .click();
     await expect(page.locator("#rig-status")).toContainText("Preview ·", {
       timeout: 60000,
@@ -71,7 +74,10 @@ for (const sample of ["seed", "twist"])
       .click();
     await expect(page.locator("#rig-preview")).toBeHidden();
     await page
-      .getByRole("button", { name: "Generate weights", exact: true })
+      .getByRole("button", {
+        name: /^(Preview deformation|Update preview)$/,
+        exact: true,
+      })
       .click();
     await expect(page.locator("#rig-status")).toContainText("Preview ·", {
       timeout: 60000,

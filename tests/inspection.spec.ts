@@ -22,7 +22,7 @@ test("Rust WASM previews multi-mesh geometry and downloads the report without up
   page.on("pageerror", (e) => errors.push(String(e)));
   await page.goto("/");
   await upload(page, { multi: true });
-  await expect(page.getByRole("status")).toHaveText(
+  await expect(page.locator("#status")).toHaveText(
     "Inspection complete. Preview ready.",
   );
   await expect(page.locator("#stats")).toContainText("Vertices6");
@@ -31,6 +31,7 @@ test("Rust WASM previews multi-mesh geometry and downloads the report without up
     await page.getByRole("button", { name, exact: true }).click();
   await page.getByRole("button", { name: "Switch to dark mode" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByText("File details", { exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Save report" }).click();
   const download = await downloadPromise;
@@ -46,7 +47,7 @@ test("Rust WASM previews multi-mesh geometry and downloads the report without up
 test("existing skin is inventoried and rendered", async ({ page }) => {
   await page.goto("/");
   await upload(page, { rigged: true });
-  await expect(page.getByRole("status")).toHaveText(
+  await expect(page.locator("#status")).toHaveText(
     "Inspection complete. Preview ready.",
   );
   await expect(page.locator("#stats")).toContainText("Skins1");
@@ -60,7 +61,7 @@ test("external resources are blocked before loader network access", async ({
   });
   await page.goto("/");
   await upload(page, { external: true });
-  await expect(page.getByRole("status")).toContainText("Preview blocked");
+  await expect(page.locator("#status")).toContainText("Preview blocked");
   await expect(page.locator("#diagnostics")).toContainText("resource_uri");
   expect(requests).toEqual([]);
 });
@@ -69,7 +70,7 @@ test("unsupported extensions and malformed files return actionable diagnostics",
 }) => {
   await page.goto("/");
   await upload(page, { extension: true });
-  await expect(page.getByRole("status")).toContainText("Preview blocked");
+  await expect(page.locator("#status")).toContainText("Preview blocked");
   await expect(page.locator("#diagnostics")).toContainText(
     "unsupported_extension",
   );
@@ -91,11 +92,11 @@ test("cancel and replacement ignore stale results", async ({ page }) => {
   );
   await upload(page);
   await page.getByRole("button", { name: "Cancel" }).click();
-  await expect(page.getByRole("status")).toContainText("Cancelled");
+  await expect(page.locator("#status")).toContainText("Cancelled");
   await page.waitForTimeout(600);
-  await expect(page.getByRole("status")).toContainText("Cancelled");
+  await expect(page.locator("#status")).toContainText("Cancelled");
   await upload(page, { rigged: true });
-  await expect(page.getByRole("status")).toHaveText(
+  await expect(page.locator("#status")).toHaveText(
     "Inspection complete. Preview ready.",
   );
   await expect(page.locator("#stats")).toContainText("Skins1");
@@ -112,14 +113,12 @@ test("invalid accessor layouts return diagnostics and a subsequent valid file st
     ["position_reference", "invalid_gltf"],
   ]) {
     await upload(page, { invalidAccessor });
-    await expect(page.getByRole("status")).toContainText("Preview blocked");
+    await expect(page.locator("#status")).toContainText("Preview blocked");
     await expect(page.locator("#diagnostics")).toContainText(code);
-    await expect(
-      page.getByRole("button", { name: "Save report" }),
-    ).toBeEnabled();
+    await expect(page.locator("#report")).toBeEnabled();
   }
   await upload(page, { rigged: true });
-  await expect(page.getByRole("status")).toHaveText(
+  await expect(page.locator("#status")).toHaveText(
     "Inspection complete. Preview ready.",
   );
 });

@@ -16,19 +16,23 @@ const uploadRig = async (page: Page, options = {}) => {
   await page.getByRole("button", { name: "Mapping", exact: true }).click();
 };
 const loadMapping = (page: Page, artifact: unknown) =>
-  page.getByLabel("Load mapping", { exact: true }).setInputFiles({
+  page.getByLabel("Load assignments", { exact: true }).setInputFiles({
     name: "mapping.json",
     mimeType: "application/json",
     buffer: Buffer.from(JSON.stringify(artifact)),
   });
 async function saveMapping(page: Page) {
   const pending = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Save mapping", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Save assignments", exact: true })
+    .click();
   const download = await pending;
   return JSON.parse(await readFile((await download.path())!, "utf8"));
 }
 const expectValid = async (page: Page) => {
-  await expect(page.locator("#mapping-status")).toContainText("Mapping valid");
+  await expect(page.locator("#mapping-status")).toContainText(
+    "Body-part assignments checked",
+  );
   await expect(page.locator("#bind-status")).toContainText(
     "Bind/weight checks passed",
   );
@@ -66,23 +70,21 @@ test("reviews transformed multi-mesh rigs and round-trips source-bound mapping d
     .getByLabel("Bone leftUpperArm", { exact: true })
     .selectOption(String(boneNodes.rightUpperArm));
   await expect(page.locator("#mapping-status")).toHaveText(
-    "Mapping changed. Validate to apply.",
+    "Assignments changed. Check them to apply.",
   );
-  await expect(
-    page.getByRole("button", { name: "Save mapping", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-mapping")).toBeDisabled();
   await expect(page.locator("#report")).toBeDisabled();
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await expect(page.locator("#diagnostics")).toContainText("mapping_duplicate");
   await expect(page.locator("#mapping-status")).not.toContainText(
-    "Mapping valid",
+    "Body-part assignments checked",
   );
 
   await loadMapping(page, saved);
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await expectValid(page);
   expect((await saveMapping(page)).mapping).toEqual(saved.mapping);
@@ -158,7 +160,7 @@ test("hierarchy errors, unassigned overrides and replacement cannot keep stale m
   await expectValid(page);
   await page.getByLabel("Bone hips", { exact: true }).selectOption("");
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await expect(page.locator("#diagnostics")).toContainText("mapping_required");
   const saved = await saveMapping(page);
@@ -182,15 +184,13 @@ test("cancelling mapping validation discards the pending worker result", async (
   });
   await page.getByLabel("Bone hips", { exact: true }).selectOption("");
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(page.locator("#status")).toContainText("Cancelled");
   await page.waitForTimeout(600);
   await expect(page.locator("#status")).toContainText("Cancelled");
-  await expect(
-    page.getByRole("button", { name: "Save mapping", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator("#save-mapping")).toBeDisabled();
   await expect(page.locator("#report")).toBeDisabled();
   await uploadRig(page);
   await expectValid(page);
@@ -216,7 +216,7 @@ test("rest-transform errors and renderer limits are diagnosed without silently c
         "Bind/weight checks passed",
       );
       await expect(page.locator("#mapping-status")).toContainText(
-        "Mapping valid",
+        "Body-part assignments checked",
       );
     }
   }
