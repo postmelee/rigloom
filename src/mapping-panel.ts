@@ -17,7 +17,7 @@ export class MappingPanel {
     private onChange: () => void,
     private onValidate: (mapping: Mapping) => void,
   ) {
-    this.root.innerHTML = `<p id="mapping-status" aria-live="polite">Open a GLB to map bones.</p><p id="bind-status"></p><p id="mapping-message" role="alert"></p><fieldset id="mapping-fields" disabled><legend class="sr-only">Humanoid bone assignments</legend><div id="required-bones"></div><details><summary>Optional bones</summary><div id="optional-bones"></div></details><button id="validate-mapping" type="button">Validate mapping</button><div class="button-row"><button id="save-mapping" type="button">Save mapping</button><label class="upload mapping-upload">Load mapping<input id="load-mapping" type="file" accept=".json,application/json" aria-label="Load mapping"></label></div></fieldset>`;
+    this.root.innerHTML = `<p id="mapping-status" aria-live="polite">Open a GLB to map bones.</p><p id="bind-status"></p><p id="mapping-help" hidden>Match each body part to an existing bone. * Required; optional bones may stay unassigned. Left/right refer to the character.</p><button id="mapping-start-rig" hidden>Place joints in Rig</button><p id="mapping-message" role="alert"></p><fieldset id="mapping-fields" hidden disabled><legend class="sr-only">Humanoid bone assignments</legend><div id="required-bones"></div><details><summary>Optional bones</summary><div id="optional-bones"></div></details><button id="validate-mapping" type="button">Check assignments</button><div class="button-row"><button id="save-mapping" type="button">Save assignments</button><label class="upload mapping-upload">Load assignments<input id="load-mapping" type="file" accept=".json,application/json" aria-label="Load assignments"></label></div><p>Assignment files save these choices only. Save the model from Export.</p></fieldset>`;
     const get = <T extends HTMLElement>(id: string) =>
       this.root.querySelector<T>(`#${id}`)!;
     this.fields = get<HTMLFieldSetElement>("mapping-fields");
@@ -55,7 +55,7 @@ export class MappingPanel {
         this.drawChoices();
         this.changed();
         this.message.textContent =
-          "Mapping loaded. Validate to apply these choices.";
+          "Assignments loaded. Check them to apply these choices.";
       } catch (error) {
         if (epoch === this.epoch)
           this.message.textContent = `Could not load mapping: ${error instanceof Error ? error.message : String(error)}`;
@@ -68,6 +68,9 @@ export class MappingPanel {
     this.sha = undefined;
     this.draft = {};
     this.fields.disabled = true;
+    this.fields.hidden = true;
+    this.root.querySelector<HTMLElement>("#mapping-help")!.hidden = true;
+    this.root.querySelector<HTMLElement>("#mapping-start-rig")!.hidden = true;
     this.root.querySelector("#required-bones")!.replaceChildren();
     this.root.querySelector("#optional-bones")!.replaceChildren();
     this.status.textContent = "Open a GLB to map bones.";
@@ -77,6 +80,7 @@ export class MappingPanel {
   busy(message = "Validating mapping and existing skin…") {
     this.epoch++;
     this.fields.disabled = true;
+    this.root.querySelector<HTMLElement>("#mapping-start-rig")!.hidden = true;
     this.save.disabled = true;
     this.status.textContent = message;
   }
@@ -84,6 +88,12 @@ export class MappingPanel {
     this.epoch++;
     this.report = report;
     this.sha = sha;
+    const unskinned = report.inventory.skins === 0;
+    this.fields.hidden = !report.rig || unskinned;
+    this.root.querySelector<HTMLElement>("#mapping-help")!.hidden =
+      !report.rig || unskinned;
+    this.root.querySelector<HTMLElement>("#mapping-start-rig")!.hidden =
+      !report.preview_allowed || !report.rig || !unskinned;
     this.fields.disabled = !report.rig;
     this.save.disabled = !report.rig;
     this.message.textContent = "";
@@ -95,13 +105,21 @@ export class MappingPanel {
         "Bind/weight checks not run.";
       return;
     }
+    if (unskinned) {
+      this.status.textContent =
+        "No skin found. Create a rig before assigning body parts.";
+      this.root.querySelector("#bind-status")!.textContent =
+        "Rigloom assigns the bones it generates automatically.";
+      this.save.disabled = true;
+      return;
+    }
     this.draft = Object.fromEntries(
       rig.mapping.bones.map((b) => [b.bone, b.node]),
     );
     this.drawChoices();
     this.status.textContent = rig.mapping.valid
-      ? "Mapping valid."
-      : "Mapping needs attention. See diagnostics.";
+      ? "Body-part assignments checked."
+      : "Check the missing or incorrect body-part assignments below.";
     this.root.querySelector("#bind-status")!.textContent =
       report.inventory.skins === 0
         ? "No existing skin to validate."
@@ -112,7 +130,7 @@ export class MappingPanel {
   private changed() {
     this.epoch++;
     this.save.disabled = true;
-    this.status.textContent = "Mapping changed. Validate to apply.";
+    this.status.textContent = "Assignments changed. Check them to apply.";
     this.message.textContent = "";
     this.onChange();
   }

@@ -40,9 +40,13 @@ test("narrow screens keep the preview and selected controls in the document with
   await expect(page.getByLabel("Bone hips", { exact: true })).toBeVisible();
   await page.getByLabel("Bone hips", { exact: true }).selectOption("");
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await expect(page.locator("#diagnostics")).toContainText("mapping_required");
+  await page.screenshot({
+    path: "test-results/workflow-narrow.png",
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Export", exact: true }).click();
   await expect(page.locator("#panel-mapping")).toBeHidden();
   await expect(page.locator("#export-vrm")).toBeDisabled();

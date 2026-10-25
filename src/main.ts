@@ -1,3 +1,4 @@
+import { nextStep, diagnosticTitle } from "./workflow";
 import { RigPanel } from "./rig-panel";
 import { Viewer } from "./viewer";
 import type {
@@ -17,7 +18,7 @@ app.innerHTML = `<header class="toolbar">
 <main class="workspace"><section class="studio" aria-label="3D model preview"><div class="stage-bar"><p id="status" role="status" aria-live="polite">Ready.</p><button id="cancel" disabled>Cancel</button><div class="view-tools" aria-label="Camera view"><button data-view="front" aria-pressed="false">Front</button><button data-view="side" aria-pressed="false">Side</button><button data-view="free" aria-pressed="true">Free</button></div><details class="view-help"><summary>View keys</summary><div class="view-help-content"><p>Model focus: + / − zoom · I/J/K/L orbit · Shift+I/J/K/L pan · F fit · 1/2/3 Front/Side/Free.</p><button id="focus-view">Focus model view</button></div></details></div>
 <div class="viewport"><canvas aria-label="Orbitable model canvas" tabindex="0"></canvas><p class="empty" id="empty">Open a GLB or choose Open example.</p></div></section>
 <aside id="inspector" class="inspector" hidden><div class="inspector-heading"><h2 id="panel-title">Model</h2><button id="close-panel" aria-label="Close panel" title="Close (Esc)">×</button></div>
-<section id="panel-model" class="panel" hidden><dl id="stats"></dl><button id="report" disabled>Save report</button><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details><p><a href="https://github.com/postmelee/rigloom/blob/main/docs/guide/en.md" target="_blank" rel="noreferrer">Help</a></p></section>
+<section id="panel-model" class="panel" hidden><p id="next-step" role="status"></p><button id="next-action" hidden></button><details><summary>File details</summary><dl id="stats"></dl><button id="report" disabled>Save report</button></details><details><summary>Node hierarchy</summary><ul id="nodes"></ul></details><p><a href="https://github.com/postmelee/rigloom/blob/main/docs/guide/en.md" target="_blank" rel="noreferrer">Help</a></p></section>
 <details id="diagnostic-details" class="diagnostics" hidden><summary id="diagnostic-summary">Diagnostics</summary><ul id="diagnostics"></ul></details></aside></main>`;
 const el = <T extends HTMLElement>(id: string) =>
   document.getElementById(id) as T;
@@ -92,6 +93,9 @@ const mappingPanel = new MappingPanel(
     latest = undefined;
     save.disabled = true;
     exportPanel.waitForMapping();
+    el("next-step").textContent =
+      "Bone assignments changed. Check them in Mapping before exporting.";
+    el("next-action").hidden = true;
   },
   (mapping) => {
     if (!sourceBytes) return;
@@ -134,6 +138,13 @@ for (const panel of [mappingPanel.root, exportPanel.root, rigPanel.root]) {
   panel.hidden = true;
   el("diagnostic-details").before(panel);
 }
+const rigRoute = document.createElement("button");
+rigRoute.id = "rig-route";
+rigRoute.textContent = "Review bone mapping";
+rigRoute.hidden = true;
+rigRoute.onclick = () => setPanel("mapping");
+rigPanel.root.append(rigRoute);
+el("mapping-start-rig").onclick = () => setPanel("rig");
 const stop = () => {
   exampleAbort?.abort();
   exampleAbort = undefined;
@@ -153,9 +164,19 @@ const stop = () => {
   viewer?.clear();
   el("empty").hidden = false;
   el("diagnostic-details").hidden = true;
+  el("next-step").textContent = "Open a GLB to see the next step.";
+  el("next-action").hidden = true;
+  el("rig-route").hidden = true;
 };
 const showReport = (report: Inspection) => {
   latest = report;
+  const step = nextStep(report);
+  el("next-step").textContent = step.message;
+  el("next-action").hidden = !step.panel;
+  el("next-action").textContent = step.action ?? "";
+  el("next-action").onclick = () => {
+    if (step.panel) setPanel(step.panel);
+  };
   save.disabled = false;
   el("stats").replaceChildren();
   for (const [label, key] of [
@@ -191,10 +212,14 @@ const showReport = (report: Inspection) => {
     const title = document.createElement("strong"),
       body = document.createElement("p"),
       path = document.createElement("code");
-    title.textContent = diagnostic.code;
+    title.textContent = diagnosticTitle(diagnostic);
     body.textContent = `${diagnostic.message} ${diagnostic.remedy}`;
-    path.textContent = diagnostic.path;
-    item.append(title, body, path);
+    const details = document.createElement("details"),
+      summary = document.createElement("summary");
+    summary.textContent = "Technical details";
+    path.textContent = `${diagnostic.code} · ${diagnostic.path}`;
+    details.append(summary, path);
+    item.append(title, body, details);
     el("diagnostics").append(item);
   }
   el("nodes").replaceChildren();
@@ -223,6 +248,8 @@ const runInspection = (
   cancel.disabled = false;
   mappingPanel.busy();
   exportPanel.inspecting();
+  el("next-step").textContent = "Checking the model…";
+  el("next-action").hidden = true;
   status.textContent = "Inspecting…";
   try {
     worker = new Worker(new URL("./inspect.worker.ts", import.meta.url), {
@@ -266,6 +293,15 @@ const runInspection = (
       showReport(data.report);
       mappingPanel.show(data.report, data.source_sha256);
       exportPanel.setSource(data.report);
+      if (!unriggedSource) {
+        const existing = data.report.inventory.skins > 0;
+        rigPanel.unavailable(
+          existing
+            ? "This model already has a rig. Use Mapping to identify its body parts; existing weights are preserved."
+            : "Resolve the file issues in Model before placing joints.",
+        );
+        el("rig-route").hidden = !existing;
+      } else el("rig-route").hidden = true;
       if (!data.report.preview_allowed) {
         viewer?.clear();
         el("empty").hidden = false;

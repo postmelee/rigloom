@@ -58,8 +58,9 @@ test("placement mirrors depth edits, undoes, restores source-bound files and val
   await page.locator("#rig-joint").selectOption("2");
   await page.getByLabel("Joint Y", { exact: true }).fill("0");
   await page.getByLabel("Joint Y", { exact: true }).press("Tab");
+  await page.getByText("Additional checks", { exact: true }).click();
   await page
-    .getByRole("button", { name: "Validate joints", exact: true })
+    .getByRole("button", { name: "Check joint placement", exact: true })
     .click();
   await expect(page.locator("#rig-status")).toContainText("Head must be above");
 });
@@ -80,7 +81,9 @@ test("frame preparation is undoable and existing skins stay on preservation path
     mimeType: "model/gltf-binary",
     buffer: exportFixture(),
   });
-  await expect(page.locator("#mapping-status")).toContainText("Mapping valid");
+  await expect(page.locator("#mapping-status")).toContainText(
+    "Body-part assignments checked",
+  );
   await page.getByRole("button", { name: "Rig", exact: true }).click();
   await expect(page.locator("#rig-validate")).toBeDisabled();
 });

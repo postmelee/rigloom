@@ -1,4 +1,12 @@
-# Handoff — 2026-10-25
+# Handoff — 2026-10-26
+
+## Current owner-testing checkpoint (#33)
+
+The owner authorized a small usability issue/PR before continuing #8. Branch `codex/workflow-clarity` stacks on unmerged PR #32 (`codex/weight-quality`, base head `6e09bd99676e39ae3f72e344e25216e472d5e59a`). #33 owns acceptance and its PR owns final validation/CI. This follow-up changes presentation only: next actions in Model, context-specific Rig/Mapping guidance, Preview deformation / Update preview, optional placement checks and expandable diagnostic codes. Existing validation and stale-output gates remain in force.
+
+Run `npm run dev -- --port 5173 --strictPort` for http://127.0.0.1:5173/. Owner test: Open example → move joints → Preview deformation → Bend/Angle → Edit joints → Update preview. Personal files start in Model with the suggested next action. A generated preview is still discarded on entering edit mode, even before an actual change. No caching or quality algorithm change is included. See the bilingual guide.
+
+**Next: wait for owner local-test feedback before further #8 quality work or later features.** No merge, release or deployment is authorized. The historical #8 checkpoint below describes PR #32, not authorization to continue it now. Keep drum-vrm unchanged.
 
 ## Current #8 quality follow-up
 
@@ -6,7 +14,7 @@ The owner authorized actual-model deformation validation and improvement through
 
 [Measured evidence](verification/weight-quality-2026-10-25.md) records two official samples, all 32 poses, native/WASM byte parity, 88 Rust tests and 39 browser tests per dev/static mode. Remote influence is reduced; mechanical attachments and other natural-deformation gates remain unresolved. #8 stays open. The PR owns final head/CI/review status. Next: owner review of the PR and actual-model results; do not merge, release or deploy without a new instruction. Full #9/#10 and #2 remain separate. The user-provided quadruped is outside the humanoid generator's scope and remains unchanged.
 
-Local test copies/placements live in `.local/weight-quality/`; comparison is at `http://127.0.0.1:5173/scripts/quality/viewer.html` while the local dev server runs. Open `twist/source.glb` → Rig → Load placement (`twist/placement.json`) → Generate weights. These geometry-only derivatives intentionally omit textures/morphs/constraints and are not general-purpose conversions. No external models enter Git/public assets.
+Local test copies/placements live in `.local/weight-quality/`; comparison is at `http://127.0.0.1:5173/scripts/quality/viewer.html` while the local dev server runs. Open `twist/source.glb` → Rig → Load placement (`twist/placement.json`) → Preview deformation. These geometry-only derivatives intentionally omit textures/morphs/constraints and are not general-purpose conversions. No external models enter Git/public assets.
 
 ## Completed ordered-merge checkpoint
 
@@ -53,7 +61,7 @@ The drum-vrm integration snapshot is commit `d8dfab38cefc3bffd6edc0b88643d02ff82
 
 ## Owner testing checkpoint
 
-Local URL: http://127.0.0.1:5173/ (verify process availability on resume). Choose **Open example** to enter Rig with the original standard model and keyboard focus; no local file selection is needed. For a personal model, Open GLB → choose file → Rig. `node scripts/unrigged-fixture.mjs` creates `.local/initial-skin/unrigged-{standard,short-wide,asymmetric}.glb`. Open a source under Rig, place joints using Front/Side, Generate weights, inspect Bend/Angle, then Edit joints or save rigged GLB/report. Explicit Export permissions are still required for VRM. Original private models stay uncommitted. T/A-pose static core GLB is accepted for initial skinning; animation/morph inputs are blocked in that path, existing rigs remain preserved. Generated weights are experimental and may attach nearby body parts incorrectly. See the bilingual guide and research/initial-skin.md. No mandatory additional user operation is needed for automated fixtures; real-character review is now possible locally.
+Local URL: http://127.0.0.1:5173/ (verify process availability on resume). Choose **Open example** to enter Rig with the original standard model and keyboard focus; no local file selection is needed. For a personal model, Open GLB → choose file → Rig. `node scripts/unrigged-fixture.mjs` creates `.local/initial-skin/unrigged-{standard,short-wide,asymmetric}.glb`. Open a source under Rig, place joints using Front/Side, Preview deformation, inspect Bend/Angle, then Edit joints or save rigged GLB/report. Explicit Export permissions are still required for VRM. Original private models stay uncommitted. T/A-pose static core GLB is accepted for initial skinning; animation/morph inputs are blocked in that path, existing rigs remain preserved. Generated weights are experimental and may attach nearby body parts incorrectly. See the bilingual guide and research/initial-skin.md. No mandatory additional user operation is needed for automated fixtures; real-character review is now possible locally.
 
 ## Keyboard follow-up (#28)
 

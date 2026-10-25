@@ -30,7 +30,9 @@ async function upload(page: Page, bytes = exportFixture()) {
     mimeType: "model/gltf-binary",
     buffer: bytes,
   });
-  await expect(page.locator("#mapping-status")).toContainText("Mapping valid");
+  await expect(page.locator("#mapping-status")).toContainText(
+    "Body-part assignments checked",
+  );
   await expect(page.locator("#bind-status")).toContainText(
     "Bind/weight checks passed",
   );
@@ -259,7 +261,7 @@ test("metadata edits, invalid mapping and source replacement invalidate complete
   await expectNoOutput(page);
   await expect(page.locator("#export-vrm")).toBeDisabled();
   await page
-    .getByRole("button", { name: "Validate mapping", exact: true })
+    .getByRole("button", { name: "Check assignments", exact: true })
     .click();
   await expect(page.locator("#diagnostics")).toContainText("mapping_required");
   await expect(page.locator("#export-vrm")).toBeDisabled();

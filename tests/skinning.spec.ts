@@ -18,7 +18,10 @@ async function upload(page: Page, variant = "standard") {
 }
 async function generate(page: Page) {
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await expect(page.locator("#rig-status")).toContainText(
     "Preview · 120 vertices",
@@ -151,7 +154,10 @@ test("rigid attachment survives saved placement and changed joints require regen
   await page.getByLabel("Joint Y", { exact: true }).fill("0");
   await page.getByLabel("Joint Y", { exact: true }).press("Tab");
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await expect(page.locator("#rig-status")).toContainText("Head must be above");
   await expect(page.locator("#rig-preview")).toBeHidden();
@@ -166,7 +172,10 @@ test("cancelled generation and source replacement cannot resurrect output", asyn
   });
   let pending = page.waitForRequest(/rig\.worker/);
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await pending;
   await page.locator("#rig-cancel").click();
@@ -176,7 +185,10 @@ test("cancelled generation and source replacement cannot resurrect output", asyn
   await expect(page.getByLabel("Joint X", { exact: true })).toBeEnabled();
   pending = page.waitForRequest(/rig\.worker/);
   await page
-    .getByRole("button", { name: "Generate weights", exact: true })
+    .getByRole("button", {
+      name: /^(Preview deformation|Update preview)$/,
+      exact: true,
+    })
     .click();
   await pending;
   await page.getByLabel("Open GLB", { exact: true }).setInputFiles({
